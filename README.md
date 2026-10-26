@@ -25,7 +25,7 @@ These steps can be combined. Obfuscation and date masking are **not encryption**
 
 ### From source
 
-Use Node.js 26.10.0 or newer and Corepack:
+Use Node.js 26.12.1 or newer and Corepack:
 
 ```bash
 corepack pnpm install --frozen-lockfile

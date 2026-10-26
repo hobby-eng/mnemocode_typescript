@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Toolchain and dependencies
+
+- Node.js 26.12.1 and pnpm 12.15.0; Vitest 5.0.5, Prettier 3.9.10, oxlint 1.89.0, oxlint-tsgolint 7.0.2005 and `@types/node` 26.6.5.
+- The SSKR engine builds with Rust 1.99.1 and rustup 1.29.2, in a container on the current `buildpack-deps:noble`, and with the newest compatible crates: it links among them `crc32fast` 1.5.3, `unicode-normalization` 0.1.26, which brings the Unicode license with it, and `zerocopy` 0.8.63, and builds with `cc` 1.10.0 and `syn` 3.0.9.
+- The Windows terminal check installs pywinpty 3.1.0, as mhfe does.
+- Node.js 26.12.1 normalizes text by Unicode 17.0 (ICU 78.3), as before: Unicode 18 follows when Node.js brings it.
+
 ## 0.1.0 (2026-10-22)
 
 First release of MnemoCode. The last two sections, "Toolchain and dependencies" and "Development", are for those who build or change the program.

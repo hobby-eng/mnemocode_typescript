@@ -36,7 +36,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends poppler-utils
       # Clippy and rustfmt for the SSKR engine's crate in pnpm check (RUST-02), at the version of its
       # rust-toolchain.toml and its container (scripts/verify-toolchain.mjs).
-      - run: rustup toolchain install 1.99.0 --profile minimal --component clippy,rustfmt
+      - run: rustup toolchain install 1.99.1 --profile minimal --component clippy,rustfmt
       # The fast gates of CORE-43 on a push; a release's checks (package.json verify) otherwise.
       - if: env.FULL != 'true'
         run: pnpm format:check && pnpm check && pnpm build

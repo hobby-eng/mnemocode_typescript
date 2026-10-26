@@ -40,7 +40,7 @@ The bridge's copyright and its licenses, MIT or Apache-2.0 at your option, are i
 | `blake2` | 0.10.6 | MIT OR Apache-2.0 |
 | `block-buffer` | 0.10.4 | MIT OR Apache-2.0 |
 | `bumpalo` | 3.20.3 | MIT OR Apache-2.0 |
-| `cc` | 1.6.0 | MIT OR Apache-2.0 |
+| `cc` | 1.10.0 | MIT OR Apache-2.0 |
 | `cfg-if` | 1.0.5 | MIT OR Apache-2.0 |
 | `chacha20` | 0.9.1 | MIT OR Apache-2.0 |
 | `chacha20poly1305` | 0.10.1 | MIT OR Apache-2.0 |
@@ -51,7 +51,7 @@ The bridge's copyright and its licenses, MIT or Apache-2.0 at your option, are i
 | `cpufeatures` | 0.2.17 | MIT OR Apache-2.0 |
 | `crc` | 3.4.0 | MIT OR Apache-2.0 |
 | `crc-catalog` | 2.5.0 | MIT OR Apache-2.0 |
-| `crc32fast` | 1.5.2 | MIT OR Apache-2.0 |
+| `crc32fast` | 1.5.3 | MIT OR Apache-2.0 |
 | `crunchy` | 0.2.4 | MIT |
 | `crypto-common` | 0.1.7 | MIT OR Apache-2.0 |
 | `curve25519-dalek` | 4.1.3 | BSD-3-Clause |
@@ -62,7 +62,7 @@ The bridge's copyright and its licenses, MIT or Apache-2.0 at your option, are i
 | `ed25519` | 2.2.3 | Apache-2.0 OR MIT |
 | `ed25519-dalek` | 2.2.0 | BSD-3-Clause |
 | `fiat-crypto` | 0.2.9 | MIT OR Apache-2.0 OR BSD-1-Clause |
-| `find-msvc-tools` | 0.1.14 | MIT OR Apache-2.0 |
+| `find-msvc-tools` | 0.1.15 | MIT OR Apache-2.0 |
 | `futures-core` | 0.3.34 | MIT OR Apache-2.0 |
 | `futures-task` | 0.3.34 | MIT OR Apache-2.0 |
 | `futures-util` | 0.3.34 | MIT OR Apache-2.0 |
@@ -80,7 +80,7 @@ The bridge's copyright and its licenses, MIT or Apache-2.0 at your option, are i
 | `inout` | 0.1.4 | MIT OR Apache-2.0 |
 | `js-sys` | 0.3.106 | MIT OR Apache-2.0 |
 | `lazy_static` | 1.5.1 | MIT OR Apache-2.0 |
-| `libc` | 0.2.190 | MIT OR Apache-2.0 |
+| `libc` | 0.2.191 | MIT OR Apache-2.0 |
 | `log` | 0.4.34 | MIT OR Apache-2.0 |
 | `minicbor` | 0.19.1 | BlueOak-1.0.0 |
 | `minicbor-derive` | 0.13.0 | BlueOak-1.0.0 |
@@ -129,13 +129,13 @@ The bridge's copyright and its licenses, MIT or Apache-2.0 at your option, are i
 | `subtle` | 2.6.1 | BSD-3-Clause |
 | `syn` | 1.0.109 | MIT OR Apache-2.0 |
 | `syn` | 2.0.119 | MIT OR Apache-2.0 |
-| `syn` | 3.0.6 | MIT OR Apache-2.0 |
+| `syn` | 3.0.9 | MIT OR Apache-2.0 |
 | `thiserror` | 2.0.21 | MIT OR Apache-2.0 |
 | `thiserror-impl` | 2.0.21 | MIT OR Apache-2.0 |
 | `tinyvec` | 1.13.3 | Zlib OR Apache-2.0 OR MIT |
 | `typenum` | 1.20.1 | MIT OR Apache-2.0 |
-| `unicode-ident` | 1.0.26 | (MIT OR Apache-2.0) AND Unicode-3.0 |
-| `unicode-normalization` | 0.1.25 | MIT OR Apache-2.0 |
+| `unicode-ident` | 1.0.27 | (MIT OR Apache-2.0) AND Unicode-3.0 |
+| `unicode-normalization` | 0.1.26 | (MIT OR Apache-2.0) AND Unicode-3.0 |
 | `universal-hash` | 0.5.1 | MIT OR Apache-2.0 |
 | `ur` | 0.4.1 | MIT |
 | `version_check` | 0.9.5 | MIT OR Apache-2.0 |
@@ -153,8 +153,8 @@ The bridge's copyright and its licenses, MIT or Apache-2.0 at your option, are i
 | `windows-strings` | 0.5.1 | MIT OR Apache-2.0 |
 | `wit-bindgen` | 0.57.1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT |
 | `x25519-dalek` | 2.0.1 | BSD-3-Clause |
-| `zerocopy` | 0.8.62 | BSD-2-Clause OR Apache-2.0 OR MIT |
-| `zerocopy-derive` | 0.8.62 | BSD-2-Clause OR Apache-2.0 OR MIT |
+| `zerocopy` | 0.8.63 | BSD-2-Clause OR Apache-2.0 OR MIT |
+| `zerocopy-derive` | 0.8.63 | BSD-2-Clause OR Apache-2.0 OR MIT |
 | `zeroize` | 1.9.1 | Apache-2.0 OR MIT |
 | `zeroize_derive` | 1.5.0 | MIT OR Apache-2.0 |
 

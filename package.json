@@ -1,7 +1,7 @@
 {
   "name": "mnemocode",
   "version": "0.1.0",
-  "packageManager": "pnpm@12.8.1",
+  "packageManager": "pnpm@12.15.0",
   "private": true,
   "description": "Offline tool that writes a BIP39 mnemonic as numbers, Unicode codes or colors, masks it with dates you remember, splits it into Shamir shares, and prints QR codes and recovery cards",
   "type": "module",
@@ -406,20 +406,20 @@
     "qrcode": "1.5.4"
   },
   "devDependencies": {
-    "@types/node": "26.6.4",
+    "@types/node": "26.6.5",
     "@types/pngjs": "6.0.5",
     "@types/qrcode": "1.5.6",
-    "@vitest/coverage-v8": "5.0.3",
+    "@vitest/coverage-v8": "5.0.5",
     "esbuild": "0.28.2",
-    "oxlint": "1.88.0",
-    "oxlint-tsgolint": "7.0.2004",
-    "prettier": "3.9.9",
+    "oxlint": "1.89.0",
+    "oxlint-tsgolint": "7.0.2005",
+    "prettier": "3.9.10",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vitest": "5.0.3"
+    "vitest": "5.0.5"
   },
   "engines": {
-    "node": ">=26.10.0"
+    "node": ">=26.12.1"
   },
   "license": "MIT OR Apache-2.0"
 }

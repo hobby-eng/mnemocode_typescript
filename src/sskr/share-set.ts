@@ -201,7 +201,8 @@ export class ShareSet extends Redacted implements Disposable {
 
   /**
    * Whether `error`, thrown by restore or combine, refuses the shares given: a coded refusal of
-   * the share modules, or the engine's refusal of a combination (ShareCombineRefusalError). A
+   * the share modules, the Unicode reader's refusal of a share in Unicode codes
+   * (SHARE_READ_REFUSALS), or the engine's refusal of a combination (ShareCombineRefusalError). A
    * failure of the host, of its engine or of MnemoCode is no refusal: a caller lets it pass
    * through rather than ask for other shares (AUD-037-API002).
    */
