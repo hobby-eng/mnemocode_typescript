@@ -369,6 +369,7 @@
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "pnpm clean && tsc -p tsconfig.json",
+    "record:rust-parity": "pnpm build && node scripts/rust-parity.mjs",
     "check:toolchain": "node scripts/verify-toolchain.mjs",
     "check:markdown": "node scripts/verify-markdown.mjs",
     "check:audit-privacy": "node scripts/verify-audit-privacy.mjs",
