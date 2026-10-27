@@ -8,8 +8,8 @@ import {
 import {
   compactCode,
   completeHexUnits,
-  UNICODE_CODE_DIGITS,
   hexCodePoint,
+  UNICODE_CODE_DIGITS,
   unspacedCode,
 } from "./code-text.js";
 import { inWholeRange } from "./typed-number.js";
@@ -335,9 +335,7 @@ function colorUnicodePoints(value: string): number[] {
   const compact = compactCode(value);
   return /^[0-9A-F]+$/iu.test(compact) && compact.length % COLOR_UNICODE_CODE_POINT_DIGITS === 0
     ? textPieces(compact, COLOR_UNICODE_CODE_POINT_DIGITS, (code) => Number.parseInt(code, 16))
-    : Array.from(value)
-        .filter((point) => !/\s/u.test(point))
-        .map((point) => defined(point.codePointAt(0)));
+    : Array.from(compact, (point) => defined(point.codePointAt(0)));
 }
 
 /** Two code points per color back to #RRGGBB codes, for any number of colors. */
@@ -380,11 +378,12 @@ export function unicodeToColorCodes(value: string): string[] {
 
 /**
  * Color Unicode written as the Private Use symbols themselves, with a ? where one cannot be read:
- * the symbols and the ? marks, white space left out; undefined when the text is empty or holds
- * anything else, such as the codes written in digits.
+ * the symbols and the ? marks, the separators of codes left out (white space, commas, semicolons
+ * and #); undefined when the text is empty or holds anything else, such as the codes in digits.
  */
 export function colorSymbolsOf(text: string): string[] | undefined {
-  const symbols = Array.from(text.replace(/\s+/gu, ""));
+  // The symbols take the separators of codes written in digits, and have no case.
+  const symbols = Array.from(compactCode(text));
   if (
     symbols.length === 0 ||
     !symbols.every((symbol) => symbol === "?" || isColorUnicodeSymbol(symbol))

@@ -12,6 +12,7 @@
 ### Typed values
 
 - One rule removes what a person typed or pasted around a value read whole: Unicode's White_Space at either end, as Rust's `str::trim` takes it. Dates and date patterns, records, words of the numbered dictionaries, a re-encode's original final word, shares, the list passphrase, the Discovery Scanner's recipient, card details, `--bitcoin-profile` values and paths were trimmed with JavaScript's `String.prototype.trim`, which keeps NEL (U+0085), white space, and removes a byte order mark (U+FEFF), which is none. A record, a share, the Scanner's recipient and the list passphrase read from a file still lose the byte order mark an editor may put at their start. Words, codes and dates read as a list are still split at JavaScript's white space.
+- Color Unicode written as its Private Use symbols takes the separators of every other code: JavaScript's white space, commas, semicolons and the # before a color. Symbols separated by commas were refused, while the same codes written in digits were read. Text that holds such a symbol is taken for Color Unicode before colors, also with a # before it.
 
 ### Toolchain and dependencies
 

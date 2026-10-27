@@ -221,11 +221,12 @@ const VARIANTS = Object.freeze({
 
 /**
  * The order in which the forms are guessed from typed text: the most telling characters first,
- * English words last, which every other text is taken for.
+ * English words last, which every other text is taken for. A Private Use symbol says more than a
+ * #, which separates Color Unicode symbols too, and colors never read text that holds one.
  */
 const LIKELY_ORDER = Object.freeze([
-  "colors",
   "colors-unicode",
+  "colors",
   "indexes",
   "unicode",
   "english",
