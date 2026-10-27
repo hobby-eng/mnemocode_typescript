@@ -23,6 +23,7 @@ import {
 } from "./self-test-check.js";
 import {
   BITCOIN_PROFILES,
+  FIRST_RECEIVING_LOCATION,
   isPlacedKind,
   parseBitcoinAddress,
   WalletEvidenceCheck,
@@ -78,13 +79,18 @@ const TESTNET_ADDRESS = "tb1q6rz28mcfaxtmd6v789l9rrlrusdprr9pqcpvkl";
 const FIRST = { account: 0, branch: 0, index: 0 } as const;
 const checks = new WalletEvidenceCheck(PUBLIC_PHRASE_SEEDS, [BITCOIN]);
 
-/** Evidence of one key at the first receiving place, in `profiles`. */
+/**
+ * Evidence of one key at the first receiving place, in `profiles`; an account key, which has no
+ * branch or index, at the first account.
+ */
 function located(
   kind: "address" | "compressed-public-key" | "wif" | "account-xpub",
   value: string,
   profiles: readonly BitcoinProfile[],
   network: BitcoinNetworkName = "mainnet",
 ): WalletEvidence {
+  if (kind === "account-xpub")
+    return { kind, value, profiles, location: { network, account: FIRST.account } };
   return { kind, value, profiles, location: { network, ...FIRST } };
 }
 
@@ -238,7 +244,10 @@ const MATCHES: readonly (readonly [string, WalletEvidence, string, string?])[] =
   ["Second address, scanned from the third", scanned(KEYS.second84, 20, 2), "not matched"],
 ];
 
-/** Evidence that no wallet can match, refused before any key is derived, and why. */
+/**
+ * Evidence that no wallet can match, or with a place that would be ignored, refused before any key
+ * is derived, and why.
+ */
 const REFUSED: readonly (readonly [string, WalletEvidence, RegExp])[] = [
   [
     "A public key that is not compressed",
@@ -264,6 +273,17 @@ const REFUSED: readonly (readonly [string, WalletEvidence, RegExp])[] = [
     "A testnet address on mainnet",
     located("address", TESTNET_ADDRESS, ["native-segwit"]),
     /it is a testnet address/u,
+  ],
+  [
+    "An account key with a branch and an index",
+    {
+      kind: "account-xpub",
+      value: KEYS.account84Zpub,
+      profiles: ["native-segwit"],
+      // A branch and an index, which no account key has, fed on purpose as a JavaScript host could.
+      location: FIRST_RECEIVING_LOCATION,
+    } as unknown as WalletEvidence,
+    /has no branch or index/u,
   ],
   [
     "A testnet key on mainnet",

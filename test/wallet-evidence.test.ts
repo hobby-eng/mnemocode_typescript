@@ -36,6 +36,7 @@ import {
   TESTNET_NESTED_ADDRESS,
 } from "./helpers/coin-addresses.js";
 import {
+  TEST_ACCOUNT_ZPUB,
   TEST_ADDRESS,
   TEST_FINGERPRINT,
   TEST_PHRASE,
@@ -52,8 +53,7 @@ const browserCheck = new WalletEvidenceCheck(noblePbkdf2, [BITCOIN]);
 const BIP84 = {
   rootZpub:
     "zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF",
-  accountZpub:
-    "zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs",
+  accountZpub: TEST_ACCOUNT_ZPUB,
   firstReceiving: TEST_ADDRESS,
   firstReceivingPublicKey: TEST_PUBLIC_KEY,
   firstReceivingWif: TEST_WIF,
@@ -109,12 +109,20 @@ const MAINNET_LOCATION: DerivationLocation = {
 };
 const TESTNET_LOCATION: DerivationLocation = { ...MAINNET_LOCATION, network: "testnet" };
 
+/**
+ * Evidence of one key at `location`, in `profiles`; an account key, which has no branch or index,
+ * at its account.
+ */
 function located(
   kind: "address" | "compressed-public-key" | "wif" | "account-xpub",
   value: string,
   profiles: readonly BitcoinProfile[],
   location: DerivationLocation = MAINNET_LOCATION,
 ): BitcoinEvidence {
+  if (kind === "account-xpub") {
+    const { network, account } = location;
+    return { kind, value, profiles, location: { network, account } };
+  }
   return { kind, value, profiles, location };
 }
 
@@ -580,7 +588,7 @@ describe("evidence of a key at a place of an account", () => {
       "compressed-public-key",
       "wif",
     ]);
-    for (const evidence of placed) expect(evidence.location).toHaveProperty("index");
+    for (const evidence of placed) expect(evidence.location).toHaveProperty("account");
     expect(kindsOf(every.filter((evidence) => !isPlacedEvidence(evidence)))).toEqual([
       "master-fingerprint",
       "master-xpub",

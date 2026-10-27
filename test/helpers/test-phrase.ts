@@ -65,6 +65,10 @@ export const TEST_WIF = "KyZpNDKnfs94vbrwhJneDi77V6jF64PWPF8x5cdJb8ifgg2DUc9d";
 /** The compressed public key of TEST_ADDRESS, m/84'/0'/0'/0/0, in hex (BIP84's test vectors). */
 export const TEST_PUBLIC_KEY = "0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c";
 
+/** The extended public key of TEST_PHRASE's account m/84'/0'/0', a zpub (BIP84's test vectors). */
+export const TEST_ACCOUNT_ZPUB =
+  "zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs";
+
 /** The record of TEST_PHRASE without masking, as word numbers (format indexes). */
 export const TEST_RECORD = `MNC1:direct:indexes:${TEST_NUMBERS}`;
 

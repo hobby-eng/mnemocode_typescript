@@ -70,7 +70,12 @@ it("keeps the labels of supported wallet evidence and redacts unknown keys", () 
   const evidences: readonly WalletEvidence[] = [
     { kind: "address", value: "public fixture", profiles: ["native-segwit"], location },
     { kind: "master-xpub", value: "public fixture", network: "mainnet" },
-    { kind: "account-xpub", value: "public fixture", profiles: ["native-segwit"], location },
+    {
+      kind: "account-xpub",
+      value: "public fixture",
+      profiles: ["native-segwit"],
+      location: { network: "mainnet", account: 0 },
+    },
   ];
   for (const evidence of evidences) expect(evidenceLabel(evidence)).not.toBe("unknown option");
   for (const key of ["account", "branch", "index"])

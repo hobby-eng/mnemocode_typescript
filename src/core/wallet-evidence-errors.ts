@@ -10,6 +10,8 @@ export const ERRORS = new ErrorCatalog("core.wallet-evidence", {
     `The address is a ${value0} address, which none of the selected Bitcoin address profiles writes.`,
   "only-address-address-another-coin-compressed-public-key": () =>
     "Only an address, an address of another coin, a compressed public key or a WIF is compared with several addresses.",
+  "account-key-no-branch-or-index": () =>
+    "An account extended public key has no branch or index: its location is the network and the account.",
   "unsupported-bitcoin-evidence-kind": () => "Unsupported Bitcoin evidence kind.",
   "bitcoin-network": (value0: string) => `Bitcoin network must be ${value0}.`,
   "at-least-one-bitcoin-address-profile-selected": () =>

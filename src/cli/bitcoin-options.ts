@@ -47,6 +47,8 @@ const ERRORS = new ErrorCatalog("cli.bitcoin-options", {
     `--${value0} is for Bitcoin evidence; the coin's address tells its own.`,
   "places-address-key-wif-master-key-no-place": (value0: string) =>
     `--${value0} places an address, a key or a WIF; a master key has no place.`,
+  "account-key-no-branch-or-index": (value0: string) =>
+    `--${value0} places an address, a key or a WIF in its account; an account key has no branch or index.`,
   "scan-gap-applies-address-given-option-asked-on": () =>
     "--scan-gap applies to an address given with an option, or asked on the screen with --ask-secrets.",
   "applies-wallet-given-as-option-such-as-bitcoin": (value0: string, value1: string) =>
@@ -70,9 +72,15 @@ function isEvidenceKind(key: string): key is keyof typeof EVIDENCE_OPTIONS {
 }
 
 /**
+ * The options that place an address, a key or a WIF in its account: what an account key, which
+ * its account places, refuses.
+ */
+const ADDRESS_PLACE_OPTIONS = ["branch", "index"] as const;
+
+/**
  * The options that place a wallet in its account: what a master key, which has no place, refuses.
  */
-const ACCOUNT_PLACE_OPTIONS = ["account", "branch", "index", "bitcoin-profile"] as const;
+const ACCOUNT_PLACE_OPTIONS = ["account", ...ADDRESS_PLACE_OPTIONS, "bitcoin-profile"] as const;
 
 /** The options that say where a wallet given with an option is looked for. */
 const WALLET_PLACE_OPTIONS = ["network", ...ACCOUNT_PLACE_OPTIONS] as const;
@@ -150,8 +158,9 @@ export function walletEvidenceArguments(evidence: WalletEvidence): string[] {
   if ("network" in evidence && evidence.network !== FIRST_RECEIVING_LOCATION.network)
     options.push("--network", evidence.network);
   if ("location" in evidence) {
-    const { location } = evidence;
-    if ("network" in location && location.network !== FIRST_RECEIVING_LOCATION.network)
+    // A coin's address has no network and an account key no branch or index: each is the default.
+    const location = { ...FIRST_RECEIVING_LOCATION, ...evidence.location };
+    if (location.network !== FIRST_RECEIVING_LOCATION.network)
       options.push("--network", location.network);
     for (const name of ["account", "branch", "index"] as const)
       if (location[name] !== FIRST_RECEIVING_LOCATION[name])
@@ -168,7 +177,9 @@ export function walletEvidenceArguments(evidence: WalletEvidence): string[] {
  * The wallet evidence that the options give: one of the Bitcoin kinds, or an address of another
  * coin (--coin-address with --coin); none without one. The coin's own address tells its network
  * and type, so --network and --bitcoin-profile are refused beside it. An address, a public key or
- * a WIF is compared with the first 20 addresses from --index on, or as many as --scan-gap says.
+ * a WIF is compared with the first 20 addresses from --index on, or as many as --scan-gap says. An
+ * account key's place is its account: --branch and --index are refused beside it, and beside a
+ * master key, which has no place, so are --account and --bitcoin-profile.
  */
 export function walletEvidence(arguments_: ParsedArguments): WalletEvidence | undefined {
   // Every key passes the guard, which gives each its kind's type without an assertion (TS-04).
@@ -215,10 +226,13 @@ export function walletEvidence(arguments_: ParsedArguments): WalletEvidence | un
       throw ERRORS.create("places-address-key-wif-master-key-no-place", [`${placing}`]);
     return { kind, value: value_, network };
   }
-  const location: DerivationLocation = { network, ...place };
   const profiles = bitcoinProfilesFrom(arguments_);
-  if (isScannedKind(kind)) return { kind, value: value_, profiles, location, addresses };
-  return { kind, value: value_, profiles, location };
+  if (isScannedKind(kind))
+    return { kind, value: value_, profiles, location: { network, ...place }, addresses };
+  // An account key's place is its account: --branch and --index would be ignored, so are refused.
+  const placing = ADDRESS_PLACE_OPTIONS.find((key) => value(arguments_, key) !== undefined);
+  if (placing !== undefined) throw ERRORS.create("account-key-no-branch-or-index", [`${placing}`]);
+  return { kind, value: value_, profiles, location: { network, account: place.account } };
 }
 
 /**
@@ -284,7 +298,11 @@ export function walletPlaceOf(
       },
       given.addresses,
     );
-  const place = { location: given.location, profiles: given.profiles };
+  // An account key has no branch or index: from its account's first receiving address on.
+  const place = {
+    location: { ...FIRST_RECEIVING_LOCATION, ...given.location },
+    profiles: given.profiles,
+  };
   return isScannedEvidence(given) ? counted(place, given.addresses) : place;
 }
 

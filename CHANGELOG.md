@@ -10,6 +10,7 @@
 - A Unicode code that is no BIP39 word is refused with "The Unicode code at place N is not a BIP39 word.", which names the place as a place; it read as if N were the code.
 - A Bitcoin address whose type none of the selected `--bitcoin-profile` values writes, such as a `bc1q…` address with `--bitcoin-profile legacy`, is refused before any secret with `core.wallet-evidence.address-outside-profiles`, and asked again when typed on the private screen; the search ran over every path and found nothing.
 - A command that needs the seed phrase or the encoded input, given by no option, asks for it in a file, for the encoded input also in a QR image, or through `--ask-secrets`; its refusal, and the one of two encoded input sources, no longer offer direct text, which the command line refuses for secrets.
+- `--branch` and `--index` beside `--account-xpub` are refused before any secret with `cli.bitcoin-options.account-key-no-branch-or-index`, as the place options are beside a master key: the account alone places an account key, and both were checked and then ignored. The library's `account-xpub` evidence has a location of its network and account only: a TypeScript host that gives it a branch or an index no longer compiles, and evidence that still gives one is refused with `core.wallet-evidence.account-key-no-branch-or-index`.
 
 ### Typed values
 

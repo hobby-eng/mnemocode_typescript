@@ -134,8 +134,17 @@ export interface DerivationLocation extends AddressLocation {
 // The scan's limits, under the names every caller of this module has used.
 export { DEFAULT_ADDRESS_COUNT, defaultAddressCount, MAX_ADDRESS_COUNT } from "./address-scan.js";
 
-/** A key or an address of kind `K` at a place of a wallet, in its profiles. */
-interface KeyAtPlace<K extends string> {
+/**
+ * Where an account key sits: the network and the account. A branch and an index place an address
+ * in its account, so an account key has none, and a location that gives one does not compile.
+ */
+type AccountLocation = Pick<DerivationLocation, "network" | "account"> & {
+  readonly branch?: never;
+  readonly index?: never;
+};
+
+/** A key or an address of kind `K` at a place `L` of a wallet, in its profiles. */
+interface KeyAtPlace<K extends string, L = DerivationLocation> {
   /** What the value is, which tells the form it is written in. */
   readonly kind: K;
   /** The key or address as the wallet shows it, as typed. */
@@ -145,8 +154,11 @@ interface KeyAtPlace<K extends string> {
    * (checkedBitcoinProfiles).
    */
   readonly profiles: readonly BitcoinProfile[];
-  /** Where it sits: the network, and the account, branch and index of its path. */
-  readonly location: DerivationLocation;
+  /**
+   * Where it sits: the network, and the account, branch and index of its path; an account key's,
+   * the network and the account (AccountLocation).
+   */
+  readonly location: L;
 }
 
 /** A key or an address of kind `K` looked for among addresses from its place on. */
@@ -171,7 +183,7 @@ export type BitcoinEvidence =
   | ScannedKey<"compressed-public-key">
   | ScannedKey<"wif">
   | NetworkKey<"master-xpub">
-  | KeyAtPlace<"account-xpub">
+  | KeyAtPlace<"account-xpub", AccountLocation>
   | NetworkKey<"master-fingerprint">;
 
 /**
@@ -433,6 +445,8 @@ function bitcoinAddressOn(value: string, network: BitcoinNetworkName): CoinAddre
  *   (core.wallet-evidence.unsupported-extended-key-prefix-supported-public-forms-include), one of
  *   the other network (extended-key-prefix-does-not-match-selected-bitcoin), and a key that is not
  *   valid (extended-public-key-not-valid);
+ * - "account-xpub": a location with a branch or an index, which an account key does not have
+ *   (core.wallet-evidence.account-key-no-branch-or-index);
  * - the Bitcoin kinds at a place, all but the master's: a location that names no BIP32 path
  *   (core.coins.coin.assert-address-location-refused); no profile
  *   (core.wallet-evidence.at-least-one-bitcoin-address-profile-selected), one that is none of
@@ -559,6 +573,12 @@ function evidenceOf(evidence: WalletEvidence, coins: CoinList): Evidence {
     throw ERRORS.create("unsupported-bitcoin-evidence-kind", []);
   if (!isScannedKind(evidence.kind) && "addresses" in evidence && evidence.addresses !== undefined)
     throw ERRORS.create("only-address-address-another-coin-compressed-public-key", []);
+  if (evidence.kind === "account-xpub") {
+    // A branch or an index from a JavaScript host would be ignored: the account places the key.
+    const { branch, index }: Partial<AddressLocation> = evidence.location;
+    if (branch !== undefined || index !== undefined)
+      throw ERRORS.create("account-key-no-branch-or-index", []);
+  }
   switch (evidence.kind) {
     case "master-fingerprint":
       return new MasterFingerprintEvidence(evidence.value, evidence.network);
@@ -638,10 +658,15 @@ abstract class LocatedEvidence implements Evidence {
 
   /** Checks the place and the profiles, before the kind checks its value. */
   constructor(evidence: LocatedBitcoinEvidence, level: KeyLevel) {
-    const source = evidence.location;
-    const network = source.network;
+    const network = evidence.location.network;
     assertNetwork(network);
-    const { account, branch, index } = checkedAddressLocation(source);
+    // An account key has only its account (AccountLocation): the branch and index of the account's
+    // first receiving address stand beside it, and its comparison uses neither.
+    const { account, branch, index } = checkedAddressLocation(
+      evidence.kind === "account-xpub"
+        ? { ...FIRST_RECEIVING_LOCATION, account: evidence.location.account }
+        : evidence.location,
+    );
     this.#profiles = checkedBitcoinProfiles(evidence.profiles);
     this.#location = { network, account, branch, index };
     this.#addresses = isScannedEvidence(evidence) ? addressCount(evidence.addresses, index) : 1;
