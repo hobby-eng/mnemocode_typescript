@@ -2,6 +2,7 @@
 fixtures only.
 """
 import errno
+import json
 import os
 import re
 from pathlib import Path
@@ -35,6 +36,11 @@ NARROW_SCREEN = (12, 32)
 # A taller terminal, 80 by 30, where the eight candidates of
 # recover-word fit as one row each but not as parts of their own.
 CANDIDATE_SCREEN = (30, 80)
+# The public test keys of the candidate lists, which the Scanner's key
+# of a list saved here is taken from.
+CANDIDATE_VECTORS = terminal.ROOT / "vectors" / "candidates-v1.json"
+# How an encrypted list begins (age's header).
+AGE_HEADER = b"age-encryption.org/v1"
 
 
 def size_text(*sizes):
@@ -289,6 +295,50 @@ def check_word_result_under_question():
     print(
         "recover-word: What now? under the result and every warning, "
         "at " + size_text(FULL_SCREEN)
+    )
+
+
+def check_word_list_after_search():
+    """recover-word with the words in a file, on a terminal: the 1,497
+    candidates of a missing word do not fit at 80x24, What now? offers
+    to save them for the Discovery Scanner, the file and the Scanner's
+    key are asked as the menu asks them, and the list is written, which
+    the command can only because it kept the right to write files.
+    """
+    vectors = json.loads(CANDIDATE_VECTORS.read_text(encoding="utf-8"))
+    prefix = "mnemocode-public-word-list-"
+    with tempfile.TemporaryDirectory(prefix=prefix) as folder:
+        words = Path(folder) / "public-words.txt"
+        words.write_text(" ".join(TEST_WORDS[1:]), encoding="utf-8")
+        path = Path(folder) / "candidates.age"
+        with terminal.terminal_size(*FULL_SCREEN):
+            session = terminal.Session((
+                "recover-word", "--missing-word",
+                "--mnemonic-file", str(words),
+            ))
+        try:
+            session.wait_for("Save them for the Discovery Scanner")
+            session.type("2")
+            session.wait_for("File name")
+            session.type(str(path) + terminal.ENTER)
+            session.wait_for("How should the list be encrypted?")
+            session.type("1")
+            session.wait_for("Scanner key")
+            session.type(vectors["age"]["recipient"] + terminal.ENTER)
+            session.wait_for(CLEAR_PROMPT)
+            terminal.assert_private_result_visible(
+                session, ("Saved 1,497 candidate phrases",)
+            )
+            session.type(terminal.ENTER)
+            assert session.wait_for_exit() == 0
+        finally:
+            session.close()
+        assert path.read_bytes().startswith(AGE_HEADER), (
+            "the candidate list was not saved encrypted"
+        )
+    print(
+        "recover-word: a list for the Scanner saved after a search of "
+        "words from a file, at " + size_text(FULL_SCREEN)
     )
 
 

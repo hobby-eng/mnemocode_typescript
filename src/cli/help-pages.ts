@@ -462,7 +462,7 @@ export const COMMAND_HELP: Readonly<Record<CommandName, CommandHelp>> = {
   "recover-word": {
     summary: "Find forgotten words of a phrase",
     about: [
-      `Put ? in place of each forgotten word, ab* for a word that starts with ab, or rich|rice for one of a few words. MnemoCode tries every combination, up to ${counting(MAX_SEARCH_COMBINATIONS)}, and lists those that pass the checksum test: for one forgotten word about ${lastWordEntropyValues(BIP39_WORD_COUNTS[0])} in a ${BIP39_WORD_COUNTS[0]}-word phrase, about ${lastWordEntropyValues(LONGEST_WORD_COUNT)} in ${LONGEST_WORD_COUNT} words. With one forgotten word each candidate shows the word, its number in the BIP39 list, the checksum bits and the whole phrase. A file or a pipe gets one row for each candidate, and a recovery check marks the matching rows. On a terminal each candidate is a part of its own: every candidate is shown when the list, one row for each, fits on the screen; a longer list shows only the candidates that match the wallet, and without a wallet or a candidate list says how to narrow it. More than ${counting(MAX_SHOWN_CANDIDATES)} candidates are not shown: save them with --candidates-file, or check them against the wallet.`,
+      `Put ? in place of each forgotten word, ab* for a word that starts with ab, or rich|rice for one of a few words. MnemoCode tries every combination, up to ${counting(MAX_SEARCH_COMBINATIONS)}, and lists those that pass the checksum test: for one forgotten word about ${lastWordEntropyValues(BIP39_WORD_COUNTS[0])} in a ${BIP39_WORD_COUNTS[0]}-word phrase, about ${lastWordEntropyValues(LONGEST_WORD_COUNT)} in ${LONGEST_WORD_COUNT} words. With one forgotten word each candidate shows the word, its number in the BIP39 list, the checksum bits and the whole phrase. A file or a pipe gets one row for each candidate, and a recovery check marks the matching rows. On a terminal each candidate is a part of its own: every candidate is shown when the list, one row for each, fits on the screen; a longer list shows only the candidates that match the wallet, and without a wallet or a candidate list says how to narrow it and offers to check them against the wallet or to save them as an encrypted list for the Discovery Scanner, also for words read with --mnemonic-file. More than ${counting(MAX_SHOWN_CANDIDATES)} candidates are not shown: save them with --candidates-file, or check them against the wallet.`,
     ],
     usage: "[OPTIONS] (--ask-secrets | --mnemonic-file <PATH>)",
     groups: [
@@ -496,6 +496,10 @@ export const COMMAND_HELP: Readonly<Record<CommandName, CommandHelp>> = {
       [
         "Wallet",
         "to check the candidates, after the search, unless an option gives it; then how many addresses, unless --scan-gap",
+      ],
+      [
+        "Candidate list",
+        "where it goes and how it is encrypted, after a search whose candidates do not fit, unless --candidates-file gives one",
       ],
       LIST_PASSPHRASE_ASK,
     ],

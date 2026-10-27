@@ -139,9 +139,18 @@ describe("cloud folders", () => {
 
 describe("process protection", () => {
   it("lets a command write and run programs only when it saves files or draws images", () => {
-    const needs = (command: CommandName, items: string[]) =>
-      neededPermissions(COMMAND_FACTS[command].alwaysWrites, parseArguments(items));
+    // As the command line works them out (command-line.ts).
+    const needs = (command: CommandName, items: string[]) => {
+      const facts = COMMAND_FACTS[command];
+      const args = parseArguments(items);
+      return neededPermissions(facts.alwaysWrites || facts.offersList?.(args) === true, args);
+    };
     expect(needs("decode", ["--ask-secrets"])).toEqual({ writes: false, runsPrograms: false });
+    // A list is offered only on a terminal, which the test workers do not have.
+    expect(needs("recover-word", ["--mnemonic-file", "words.txt"])).toEqual({
+      writes: false,
+      runsPrograms: false,
+    });
     expect(needs("encode", ["--ask-secrets", "--pdf", "cards.pdf"])).toEqual({
       writes: true,
       runsPrograms: false,

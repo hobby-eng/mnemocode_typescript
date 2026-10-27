@@ -18,7 +18,6 @@
 
 import { Masking, type SplitMode } from "../core/masking.js";
 import { UNICODE_CODE_HINT, WordTable, type WordTableLookup } from "../core/word-table.js";
-import { parseRecipient } from "../core/candidate-encryption.js";
 import { askWalletEvidence, type WalletValueAsker } from "./wallet-question.js";
 import { MAX_TEXT_INPUT_BYTES } from "./bounded-read.js";
 import { MAX_PNG_BYTES } from "../core/png-admission.js";
@@ -88,7 +87,7 @@ import {
 } from "./encode-questions.js";
 import { askDesign } from "./card-questions.js";
 import { ClaimedOutputs, FILE_NAME_QUESTIONS, inputFile } from "./output-questions.js";
-import { optionLabel } from "./option-copy.js";
+import { askCandidateList } from "./candidates-file.js";
 import { defined } from "../core/defined.js";
 
 /** The menu reads keys from a terminal and draws on one; anything else gets the help instead. */
@@ -411,32 +410,9 @@ async function wordRecoveryAction(): Promise<Action> {
   );
   if (save === undefined || save === CANCELLED) return save;
   if (save === "no") return { run: search };
-  const path = await ClaimedOutputs.askOutputFile("File name", "candidates.age");
-  if (path === undefined || path === CANCELLED) return path;
-  const protection = await choose(
-    "How should the list be encrypted?",
-    [
-      { label: "The Scanner's key", note: "paste the age1 key the Scanner shows", value: "key" },
-      {
-        label: "A passphrase",
-        note: "asked next; for a list made in advance",
-        value: "passphrase",
-      },
-    ] as const,
-    { label: "Protect" },
-  );
-  if (protection === undefined || protection === CANCELLED) return protection;
-  const key =
-    protection === "key"
-      ? await askLine(optionLabel("candidates-key"), "Key", {
-          what: "the age1 key that the Scanner shows",
-          check: parseRecipient,
-        })
-      : "";
-  if (key === undefined || key === CANCELLED) return key;
-  return {
-    run: [...search, "--candidates-file", path, ...(key === "" ? [] : ["--candidates-key", key])],
-  };
+  const list = await askCandidateList();
+  if (list === undefined || list === CANCELLED) return list;
+  return { run: [...search, ...list] };
 }
 
 /** Why candidates are saved, shown with the question. */

@@ -118,7 +118,7 @@ export async function runCommandLine(argv: readonly string[]): Promise<CommandEn
   const facts = COMMAND_FACTS[command];
   // Before anything is read: what this command does not need is given up for good.
   ProcessProtection.dropUnneeded(
-    facts.alwaysWrites,
+    facts.alwaysWrites || facts.offersList?.(arguments_) === true,
     arguments_,
     facts.asksOutputs?.(arguments_) === true,
   );

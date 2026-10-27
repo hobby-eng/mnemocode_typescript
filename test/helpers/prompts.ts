@@ -27,6 +27,8 @@ export const SEEDSHIFT_QUESTION = "Was Seedshift used when it was encoded?";
 export const SEED_PHRASE_PROMPT = "Seed phrase (English BIP39 words):";
 /** The answer that compares candidates with the wallet. */
 export const CHECK_WALLET_ANSWER = "Check them against the wallet";
+/** The answer that saves candidates as a list for the Discovery Scanner. */
+export const SAVE_LIST_ANSWER = "Save them for the Discovery Scanner";
 /** The answer that starts a new word entry. */
 export const WORDS_AGAIN_ANSWER = "Type the words again";
 /** The answer that starts a new encoded-phrase entry. */

@@ -4,7 +4,8 @@
 // the wallet's own, so it is encrypted: to the Scanner's one-time key, or under a passphrase.
 // Without either only on explicit request. The list, its limit, its protection and the passphrase
 // rule are the core's (core/candidate-list.ts, core/candidate-encryption.ts); this module reads the
-// options and files, asks on the private screen, writes the file and says what happened.
+// options and files, asks on the private screen, writes the file and says what happened. It also
+// asks where a list goes and how it is encrypted, as the menu and recover-word ask it.
 
 import {
   MIN_LIST_PASSPHRASE_LENGTH,
@@ -12,6 +13,7 @@ import {
   NoProtection,
   parseListPassphrase,
   PassphraseProtection,
+  parseRecipient,
   ScannerKeyProtection,
   type OwnedListProtection,
 } from "../core/candidate-encryption.js";
@@ -36,7 +38,9 @@ import {
   terminalSaved,
 } from "./terminal.js";
 import { saveOutput } from "./output-saving.js";
-import type { Choice } from "./terminal-choice.js";
+import { askLine, choose, type Choice } from "./terminal-choice.js";
+import { ClaimedOutputs } from "./output-questions.js";
+import { optionLabel } from "./option-copy.js";
 import { counted } from "../core/search-plan.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
 
@@ -97,6 +101,41 @@ export const CANDIDATE_LIST_OPTIONS = ["candidates-file", ...CANDIDATE_PROTECTIO
  */
 export function stopWithoutListAnswer<T>(value: T): Choice<T> {
   return { label: "Stop", note: "no list is saved", value };
+}
+
+/**
+ * Asks where a candidate list goes, a file checked at once (ClaimedOutputs), and how it is
+ * encrypted: to the Scanner's key, checked at once, or with a passphrase, which the command asks
+ * on its private screen. The answers as the options of the command; undefined when the person goes
+ * back with Escape, CANCELLED at Ctrl+C. The menu and recover-word, after a search, ask it so; the
+ * list is the only file that its answers name.
+ */
+export async function askCandidateList(): Promise<string[] | undefined | Cancelled> {
+  ClaimedOutputs.forget();
+  const path = await ClaimedOutputs.askOutputFile("File name", "candidates.age");
+  if (path === undefined || path === CANCELLED) return path;
+  const protection = await choose(
+    "How should the list be encrypted?",
+    [
+      { label: "The Scanner's key", note: "paste the age1 key the Scanner shows", value: "key" },
+      {
+        label: "A passphrase",
+        note: "asked next; for a list made in advance",
+        value: "passphrase",
+      },
+    ] as const,
+    { label: "Protect" },
+  );
+  if (protection === undefined || protection === CANCELLED) return protection;
+  const key =
+    protection === "key"
+      ? await askLine(optionLabel("candidates-key"), "Key", {
+          what: "the age1 key that the Scanner shows",
+          check: parseRecipient,
+        })
+      : "";
+  if (key === undefined || key === CANCELLED) return key;
+  return ["--candidates-file", path, ...(key === "" ? [] : ["--candidates-key", key])];
 }
 
 /**

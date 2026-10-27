@@ -6,7 +6,9 @@
 // as soon as it is typed, before the list's passphrase is asked, and asked again; a search without
 // a usable result, or with more candidates than the window holds as one row each, offers what to
 // change, keeping the list, its protection and its passphrase. A shorter list is shown whole, by
-// pages where its candidates are taller than the window (PrivatePage).
+// pages where its candidates are taller than the window (PrivatePage). Candidates that the window
+// does not hold are offered a wallet check on the private screen also when a file gave the words,
+// and, where no list was given, a list for the Discovery Scanner, asked as the menu asks it.
 
 import { wipeAll } from "../core/bits.js";
 import { recoverLegacyValidLastWords, type MissingWordCandidate } from "../core.js";
@@ -20,6 +22,7 @@ import {
   unshownCandidatesNotice,
 } from "../core/candidates.js";
 import {
+  assertListPassphrase,
   candidateListHolds,
   MAX_CANDIDATE_RECORDS,
   TooManyForListError,
@@ -29,10 +32,15 @@ import { BackupReading } from "../core/backup-reading.js";
 import { MENU_ENTRY_NAMES } from "./menu-entries.js";
 import { WordList } from "../core/word-hints.js";
 import { walletCheckOf, type WalletEvidence, type EvidenceMatch } from "../bitcoin-evidence.js";
-import { type ParsedArguments, assertAskedNotGiven } from "./arguments.js";
+import { type ParsedArguments, assertAskedNotGiven, parseArguments } from "./arguments.js";
 import { askAfterFailure, askSecretUntil, WHAT_NOW } from "./ask.js";
 import { askWalletEvidence, changeWalletAnswer, checkWalletAnswer } from "./wallet-question.js";
-import { type GivenWallet, type WalletPlace, givenWallet } from "./bitcoin-options.js";
+import {
+  type GivenWallet,
+  type WalletPlace,
+  givenWallet,
+  walletOptionGiven,
+} from "./bitcoin-options.js";
 import { textInput, PHRASE_SECRET_OPTIONS } from "./input.js";
 import { candidateLabel, candidateLines, matchedAt } from "./candidate-view.js";
 import { linesFitPrivateScreen } from "./screen-fit.js";
@@ -49,12 +57,14 @@ import {
 } from "./terminal.js";
 import type { Choice } from "./terminal-choice.js";
 import { evidenceLabel } from "./option-copy.js";
-import { CandidatesFile, stopWithoutListAnswer } from "./candidates-file.js";
+import { askCandidateList, CandidatesFile, stopWithoutListAnswer } from "./candidates-file.js";
 import { CtrlCWatch, nodeTurn } from "./terminal-input.js";
 import { wordNumberOf } from "../core/bip39-sizes.js";
 import { counting } from "../core/search-plan.js";
 import { rowsOf, listQuestionRows } from "./terminal-choice.js";
-import { closingRows } from "./private-screen.js";
+import { closingRows, onPrivateScreen, privateScreenAvailable } from "./private-screen.js";
+import { RenamedOutputs } from "./output-paths.js";
+import { warnOfCloudCopies } from "./cloud-folders.js";
 import { PrivateSteps } from "./private-steps.js";
 import { defined } from "../core/defined.js";
 import { CANCELLED, type Cancelled } from "./terminal-keys.js";
@@ -413,6 +423,8 @@ class Row implements Disposable {
 /** Where the candidates go, what they are compared with, and the wallet's passphrase. */
 interface SearchContext {
   readonly target: CandidatesFile | undefined;
+  /** Whether a list may be offered after the search where none is saved (offersCandidateList). */
+  readonly offersList: boolean;
   /** The wallet: the one given with the options, or one asked after a search; none lists all. */
   readonly evidence: WalletEvidence | undefined;
   /**
@@ -443,7 +455,9 @@ type Next =
       readonly kind: "wallet";
       readonly evidence: WalletEvidence | undefined;
       readonly listed: boolean;
-    };
+    }
+  /** The same phrase is searched again for the list that `options` name (askCandidateList). */
+  | { readonly kind: "list"; readonly options: readonly string[] };
 
 const DONE: Next = { kind: "done" };
 const PHRASE: Next = { kind: "phrase" };
@@ -451,6 +465,37 @@ const PHRASE: Next = { kind: "phrase" };
 const WORDS_AGAIN: Choice<Next> = { label: "Type the words again", value: PHRASE };
 /** WORDS_AGAIN where more letters of the words would narrow the search. */
 const MORE_LETTERS: Choice<Next> = { ...WORDS_AGAIN, note: "with more letters" };
+/** The answer that saves the candidates as a list, whose file and encryption are asked next. */
+const SAVE_LIST: Choice<Next> = {
+  label: "Save them for the Discovery Scanner",
+  note: "an encrypted list",
+  value: { kind: "list", options: [] },
+};
+
+/**
+ * Whether recover-word may offer a candidate list after a search, on its private screen: where no
+ * --candidates-file names one, not for a legacy last word, whose replacements are no wallets, and
+ * not where a wallet given with an option stays, as it does without --ask-secrets. The command
+ * then keeps the right to write files (command-line.ts).
+ */
+export function offersCandidateList(args: ParsedArguments): boolean {
+  return (
+    privateScreenAvailable() &&
+    args["legacy-valid-last-word"] !== true &&
+    args["candidates-file"] === undefined &&
+    (args["ask-secrets"] === true || !walletOptionGiven(args))
+  );
+}
+
+/** Whether a list can hold `bip39Passphrase`, that of its every candidate (assertListPassphrase). */
+function listHolds(bip39Passphrase: string): boolean {
+  try {
+    assertListPassphrase(bip39Passphrase);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /** Searches the forgotten words; CANCELLED when the person cancelled. */
 export async function runRecoverWord(arguments_: ParsedArguments): Promise<Cancelled | undefined> {
@@ -466,6 +511,10 @@ export async function runRecoverWord(arguments_: ParsedArguments): Promise<Cance
   using wallet = givenWallet(arguments_);
   // A wallet asked later replaces the one given.
   let evidence = wallet.evidence;
+  // A list chosen after a search holds the BIP39 passphrase too; it is offered only where it can.
+  const offersList = offersCandidateList(arguments_) && listHolds(wallet.passphrase);
+  // A list chosen after a search (askCandidateList), owned until the command ends.
+  let chosenList: CandidatesFile | undefined;
   const asked = arguments_["ask-secrets"] === true;
   target?.assertListable(wallet.passphrase);
   if (asked) assertAskedNotGiven(arguments_, PHRASE_SECRET_OPTIONS);
@@ -489,7 +538,7 @@ export async function runRecoverWord(arguments_: ParsedArguments): Promise<Cance
     // Only once the phrase can be searched: a list passphrase typed for nothing is lost work.
     if ((await target?.prepare(wallet.passphrase)) === CANCELLED) return CANCELLED;
     for (;;) {
-      const next = await searchAndShow(phrase, { target, evidence, wallet }, asked);
+      const next = await searchAndShow(phrase, { target, offersList, evidence, wallet }, asked);
       if (next === CANCELLED) return CANCELLED;
       if (next.kind === "done") return undefined;
       // The result was read: what comes next has a page of its own (CORE-39).
@@ -499,6 +548,9 @@ export async function runRecoverWord(arguments_: ParsedArguments): Promise<Cance
         if (typed === CANCELLED) return CANCELLED;
         phrase.wipe();
         phrase = typed;
+      } else if (next.kind === "list") {
+        target = chosenList = await listOf(next.options);
+        if ((await target.prepare(wallet.passphrase)) === CANCELLED) return CANCELLED;
       } else {
         evidence = next.evidence;
         if (!next.listed) target = undefined;
@@ -506,7 +558,21 @@ export async function runRecoverWord(arguments_: ParsedArguments): Promise<Cance
     }
   } finally {
     phrase.wipe();
+    chosenList?.wipe();
   }
+}
+
+/**
+ * The candidate list that the answers `options` name (askCandidateList), its name numbered where
+ * it is taken, as the command line numbers it before it runs, with a warning where a cloud service
+ * would keep a copy of it.
+ */
+async function listOf(options: readonly string[]): Promise<CandidatesFile> {
+  // A passphrase chosen for the list is asked on this private screen (--ask-secrets).
+  const args = parseArguments([...options, "--ask-secrets"]);
+  await RenamedOutputs.settle(args);
+  warnOfCloudCopies(args);
+  return defined(await CandidatesFile.of(args));
 }
 
 /**
@@ -553,8 +619,9 @@ async function searchAndShow(
 
 /**
  * Asks what comes next after a search; a choice of the wallet asks for it at once
- * (askWalletEvidence: at `place`, with "It cannot" only when `optional`), and Escape there asks
- * the first question again. CANCELLED when the person cancelled.
+ * (askWalletEvidence: at `place`, with "It cannot" only when `optional`), and a choice of a list
+ * its file and encryption (askCandidateList); Escape there asks the first question again.
+ * CANCELLED when the person cancelled.
  */
 async function askNext(
   choices: readonly Choice<Next>[],
@@ -562,7 +629,13 @@ async function askNext(
 ): Promise<Next | Cancelled> {
   for (;;) {
     const next = await askAfterFailure(WHAT_NOW, choices);
-    if (next === CANCELLED || next.kind !== "wallet") return next;
+    if (next === CANCELLED) return CANCELLED;
+    if (next.kind === "list") {
+      const options = await askCandidateList();
+      if (options === undefined) continue;
+      return options === CANCELLED ? CANCELLED : { kind: "list", options };
+    }
+    if (next.kind !== "wallet") return next;
     const answer = await askWalletEvidence(wallet);
     if (answer === CANCELLED) return CANCELLED;
     if (answer.kind === "back") continue;
@@ -701,21 +774,21 @@ async function show(
       return CANCELLED;
   } else if (tooManyToShow) terminalNotice(tooManyNotice(count), "warning");
   for (const note of notes) terminalResultNote(note);
-  if (!asked) return DONE;
-  // A list cannot be saved now: the right to write files was given up at the start
-  // (protection.ts), so the menu asks for the list before the search.
-  if (tooManyToShow)
+  // On the private screen also for words read from a file, which are not typed again.
+  if (tooManyToShow && onPrivateScreen())
     return askNext(
       [
         checkWalletAnswer(
           { kind: "wallet", evidence: undefined, listed: true } as const,
           "only those that match are shown",
         ),
-        MORE_LETTERS,
+        ...(context.offersList && candidateListHolds(count) ? [SAVE_LIST] : []),
+        ...(asked ? [MORE_LETTERS] : []),
         { label: "Done", value: DONE },
       ],
       { optional: false, place: wallet.place },
     );
+  if (!asked) return DONE;
   if (savedLater) {
     const next = await askNext(laterChoices, { optional: true, place: wallet.place });
     if (next === CANCELLED || next.kind !== "done" || target === undefined) return next;

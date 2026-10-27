@@ -249,7 +249,7 @@ If the wallet uses a BIP39 passphrase, give it with `--bip39-passphrase-file`, a
 
 ## Candidate lists for discovery
 
-With no known reference, save candidates using `--candidates-file candidates.age` for the Discovery Scanner of the [multi-chain wallet tools](https://github.com/hobby-eng/multi-chain-wallet-tools). Candidate N on screen is record N in the file.
+With no known reference, save candidates using `--candidates-file candidates.age` for the Discovery Scanner of the [multi-chain wallet tools](https://github.com/hobby-eng/multi-chain-wallet-tools). Candidate N on screen is record N in the file. On a terminal, `recover-word` also offers this after its search, when its candidates do not fit on the screen.
 
 **The file contains seed phrases.** It is encrypted to the Scanner's one-time key (`--candidates-key age1…`) or with a passphrase. MnemoCode stays offline; the Scanner checks for funds online. [Candidate lists](docs/CANDIDATES.md) describes the format, privacy and limits.
 

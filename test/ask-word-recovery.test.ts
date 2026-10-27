@@ -1,22 +1,29 @@
-// recover-word --ask-secrets and its candidate list on the private screen, with the terminal
-// replaced (test/helpers/question-terminal.ts). `terminal.saveFailures` makes that many saves of
-// the list fail as a full disk would. Standard output is a terminal only with
-// `terminal.stdoutTerminal`; the private screen then shows what fits in the window, which windowOf
-// sets.
+// recover-word --ask-secrets, or with the words in a file, and its candidate list on the private
+// screen, with the terminal replaced (test/helpers/question-terminal.ts). `terminal.saveFailures`
+// makes that many saves of the list fail as a full disk would. Standard output is a terminal only
+// with `terminal.stdoutTerminal`; the private screen then shows what fits in the window, which
+// windowOf sets.
 
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { decryptCandidates } from "../src/core/candidate-encryption.js";
 import { decodeCandidateList } from "../src/core/candidate-list.js";
-import { runRecoverWord } from "../src/cli/recover-word-command.js";
+import { offersCandidateList, runRecoverWord } from "../src/cli/recover-word-command.js";
+import { parseArguments } from "../src/cli/arguments.js";
+import { RenamedOutputs } from "../src/cli/output-paths.js";
 import { PrivateSteps } from "../src/cli/private-steps.js";
 import { CANCELLED, type Cancelled } from "../src/cli/terminal-keys.js";
-import { CTRL_C } from "./helpers/keys.js";
+import { CTRL_C, ESCAPE } from "./helpers/keys.js";
 import { matching } from "./helpers/matchers.js";
 import { promptsShown } from "./helpers/phrase-questions.js";
-import { WALLET_QUESTION, WORDS_AGAIN_ANSWER, CHECK_WALLET_ANSWER } from "./helpers/prompts.js";
+import {
+  WALLET_QUESTION,
+  WORDS_AGAIN_ANSWER,
+  CHECK_WALLET_ANSWER,
+  SAVE_LIST_ANSWER,
+} from "./helpers/prompts.js";
 import { questionsOnPrivateScreen, seen, terminal, windowOf } from "./helpers/question-terminal.js";
 import {
   LAST_WORD_FORGOTTEN,
@@ -307,6 +314,128 @@ describe("recover-word on the private screen", () => {
     ]);
     expect(decodeCandidateList(await readFile(other)).records).toHaveLength(1);
     expect(terminal.questions).toEqual(["What now?", "What now?"]);
+  });
+});
+
+describe("recover-word on the private screen", () => {
+  it("offers a list for the Discovery Scanner too, also for words read from a file", async () => {
+    // The 1,497 candidates of a missing word do not fit in a window of 40 rows. The list's file and
+    // its encryption are asked as the menu asks them, its passphrase on the private screen, and
+    // the list holds every candidate.
+    terminal.stdoutTerminal = true;
+    windowOf(40, 80);
+    const words = join(directory, "words.txt");
+    await writeFile(words, `${ONE_WORD_MISSING}\n`);
+    const path = join(directory, "candidates.age");
+    terminal.choices = [SAVE_LIST_ANSWER, "A passphrase"];
+    terminal.answers = [`${path}\r`, `${LIST_PASSPHRASE}\r`, `${LIST_PASSPHRASE}\r`];
+    await runRecoverWord({ "mnemonic-file": words, "missing-word": true });
+    expect(terminal.questions).toEqual(["What now?", "How should the list be encrypted?"]);
+    expect(terminal.labels[0]).toEqual([CHECK_WALLET_ANSWER, SAVE_LIST_ANSWER, "Done"]);
+    expect(seen.notices).toContain(
+      `Saved 1,497 candidate phrases, encrypted with the passphrase: ${path} (record N is candidate N).`,
+    );
+    const list = decodeCandidateList(
+      await decryptCandidates(await readFile(path), { passphrase: LIST_PASSPHRASE }),
+    );
+    expect(list.records).toHaveLength(1_497);
+
+    // Typed words may be typed again with more letters; Escape at the file goes back, and so does
+    // Escape at the encryption, after which the same name may be given again.
+    Object.assign(terminal, { questions: [], labels: [] });
+    const again = join(directory, "again.age");
+    terminal.answers = [
+      `${ONE_WORD_MISSING}\r`,
+      ESCAPE,
+      `${again}\r`,
+      `${again}\r`,
+      `${LIST_PASSPHRASE}\r`,
+      `${LIST_PASSPHRASE}\r`,
+    ];
+    terminal.choices = [
+      SAVE_LIST_ANSWER,
+      SAVE_LIST_ANSWER,
+      undefined,
+      SAVE_LIST_ANSWER,
+      "A passphrase",
+    ];
+    await recover({ "missing-word": true });
+    expect(terminal.questions).toEqual([
+      "What now?",
+      "What now?",
+      "How should the list be encrypted?",
+      "What now?",
+      "How should the list be encrypted?",
+    ]);
+    expect(seen.notices).toContain(
+      `Saved 1,497 candidate phrases, encrypted with the passphrase: ${again} (record N is candidate N).`,
+    );
+    expect(terminal.labels[0]).toEqual([
+      CHECK_WALLET_ANSWER,
+      SAVE_LIST_ANSWER,
+      WORDS_AGAIN_ANSWER,
+      "Done",
+    ]);
+  });
+
+  it("offers no list for a legacy last word, nor where a list cannot hold the BIP39 passphrase", async () => {
+    terminal.stdoutTerminal = true;
+    windowOf(40, 80);
+    const words = join(directory, "words.txt");
+    const passphrase = join(directory, "passphrase.txt");
+    await writeFile(words, `${ONE_WORD_MISSING}\n`);
+    // One byte more than a record of a list holds (MAX_PASSPHRASE_BYTES).
+    await writeFile(passphrase, "x".repeat(257));
+    terminal.choices = ["Done", "Done"];
+    await runRecoverWord({
+      "mnemonic-file": words,
+      "missing-word": true,
+      "bip39-passphrase-file": passphrase,
+    });
+    // The 128 replacements of a legacy last word do not fit either.
+    await writeFile(words, `${LEGACY_EXAMPLE_MASKED}\n`);
+    await runRecoverWord({ "mnemonic-file": words, "legacy-valid-last-word": true });
+    expect(terminal.labels).toEqual([
+      [CHECK_WALLET_ANSWER, "Done"],
+      [CHECK_WALLET_ANSWER, "Done"],
+    ]);
+  });
+
+  it("saves the list under a numbered name where its name is taken, and warns of a cloud copy", async () => {
+    terminal.stdoutTerminal = true;
+    windowOf(40, 80);
+    const words = join(directory, "words.txt");
+    await writeFile(words, `${ONE_WORD_MISSING}\n`);
+    // A folder that Dropbox synchronises, by its usual name.
+    await mkdir(join(directory, "Dropbox"));
+    const taken = join(directory, "Dropbox", "candidates.age");
+    const numbered = join(directory, "Dropbox", "candidates-1.age");
+    await writeFile(taken, "an earlier file");
+    terminal.choices = [SAVE_LIST_ANSWER, "A passphrase"];
+    terminal.answers = [`${taken}\r`, `${LIST_PASSPHRASE}\r`, `${LIST_PASSPHRASE}\r`];
+    await runRecoverWord({ "mnemonic-file": words, "missing-word": true });
+    // The command line reports a numbered name once the command has ended (command-line.ts).
+    RenamedOutputs.report();
+    const notices = seen.notices.join("\n");
+    expect(notices).toContain(`Dropbox keeps a copy of ${numbered}`);
+    expect(notices).toContain(`${taken} already exists: saved as ${numbered} instead.`);
+    expect(await readFile(taken, "utf8")).toBe("an earlier file");
+    const list = decodeCandidateList(
+      await decryptCandidates(await readFile(numbered), { passphrase: LIST_PASSPHRASE }),
+    );
+    expect(list.records).toHaveLength(1_497);
+  });
+
+  it("keeps the right to write files only where a list may be offered", () => {
+    const offers = (...items: string[]) => offersCandidateList(parseArguments(items));
+    expect(offers("--mnemonic-file", "words.txt")).toBe(true);
+    // With --ask-secrets a wallet given with an option may be given up after a search.
+    expect(offers("--ask-secrets", "--master-fingerprint", TEST_FINGERPRINT)).toBe(true);
+    expect(offers("--mnemonic-file", "words.txt", "--master-fingerprint", TEST_FINGERPRINT)).toBe(
+      false,
+    );
+    expect(offers("--ask-secrets", "--candidates-file", "candidates.age")).toBe(false);
+    expect(offers("--ask-secrets", "--legacy-valid-last-word")).toBe(false);
   });
 });
 

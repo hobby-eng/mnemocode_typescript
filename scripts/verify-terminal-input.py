@@ -50,7 +50,9 @@ It checks that
 - recover-word asks what comes next under its result, which stays on
   the screen with every warning it gave, when no candidate matched the
   wallet and when the candidates are too many to show; a short list of
-  candidates taller than the screen is read whole by pages;
+  candidates taller than the screen is read whole by pages; with the
+  words in a file, candidates that do not fit are saved as a list for
+  the Discovery Scanner, its file and key asked after the search;
 - an answer under a result that leads to another step starts a screen
   of its own, without the old result: the dates typed again in Decode,
   recover-date and Re-encode, and recover-date's search with another
@@ -102,6 +104,7 @@ from terminal_result_checks import (
     check_private_result_pages,
     check_share_pages,
     check_word_candidate_pages,
+    check_word_list_after_search,
     check_word_result_under_question,
 )
 from terminal_menu_checks import (
@@ -181,6 +184,7 @@ def main():
     check_private_result_pages()
     check_share_pages()
     check_word_result_under_question()
+    check_word_list_after_search()
     check_word_candidate_pages()
     check_steps_after_result()
     check_candidate_passphrase_roles()

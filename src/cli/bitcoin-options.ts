@@ -71,6 +71,11 @@ function isEvidenceKind(key: string): key is keyof typeof EVIDENCE_OPTIONS {
   return Object.hasOwn(EVIDENCE_OPTIONS, key);
 }
 
+/** Whether an option gives the wallet's evidence, before walletEvidence reads and checks it. */
+export function walletOptionGiven(arguments_: ParsedArguments): boolean {
+  return Object.values(EVIDENCE_OPTIONS).some((option) => value(arguments_, option) !== undefined);
+}
+
 /**
  * The options that place an address, a key or a WIF in its account: what an account key, which
  * its account places, refuses.

@@ -6,6 +6,7 @@ import { DRAWING_OPTIONS } from "./output-options.js";
 import { SSKR_EXPORT_OPTIONS } from "./sskr-output.js";
 import { SSKR_INPUT_OPTIONS } from "./sskr-restore-command.js";
 import { asksNewBackup, RE_ENCODE_OPTIONS } from "./re-encode-options.js";
+import { offersCandidateList } from "./recover-word-command.js";
 import type { ParsedArguments } from "./arguments.js";
 
 // Recognized parser keys, including legacy material keys that the argv policy refuses first.
@@ -166,6 +167,11 @@ export interface CommandFacts {
    * re-encode does without options of its new backup.
    */
   readonly asksOutputs?: (args: ParsedArguments) => boolean;
+  /**
+   * Whether it may offer on its private screen, after a search, a candidate list that no option
+   * names, as recover-word does: it then keeps the right to write files.
+   */
+  readonly offersList?: (args: ParsedArguments) => boolean;
 }
 
 /** A command that takes or shows a secret, as most do. */
@@ -184,7 +190,7 @@ export const COMMAND_FACTS: Readonly<Record<CommandName, CommandFacts>> = Object
   decode: SECRET,
   "re-encode": Object.freeze({ ...SECRET, asksOutputs: asksNewBackup }),
   "recover-date": SECRET,
-  "recover-word": SECRET,
+  "recover-word": Object.freeze({ ...SECRET, offersList: offersCandidateList }),
   "sskr-combine": SECRET,
   "sskr-export": SECRET,
   "sskr-split": Object.freeze({ ...SECRET, listed: false }),
