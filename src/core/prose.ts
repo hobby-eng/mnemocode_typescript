@@ -32,13 +32,13 @@ export function capitalized(text: string): string {
 
 /**
  * A first word that keeps its case: an abbreviation such as SSKR or PDF (two capitals at the
- * start), or a name with a capital inside it, such as MnemoCode.
+ * start), a name with a capital inside it, such as MnemoCode, or the name Unicode.
  */
-const KEEPS_CASE_START = /^(?:[A-Z]{2}|[A-Z][a-z]+[A-Z])/u;
+const KEEPS_CASE_START = /^(?:[A-Z]{2}|[A-Z][a-z]+[A-Z]|Unicode\b)/u;
 
 /**
  * `text` with its first letter made small, to follow other words, unless its first word keeps
- * its case, an abbreviation such as SSKR or a name such as MnemoCode.
+ * its case, an abbreviation such as SSKR or a name such as MnemoCode or Unicode.
  */
 export function lowerFirst(text: string): string {
   return KEEPS_CASE_START.test(text) ? text : `${text.charAt(0).toLowerCase()}${text.slice(1)}`;

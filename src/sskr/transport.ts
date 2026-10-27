@@ -15,7 +15,13 @@
 // Does not: split, restore or repair shares (split.ts, share-set.ts, repair.ts, joint-repair.ts).
 // Its messages never repeat a share.
 
-import { codeTokens, completeHexUnits, elementsFit } from "../core/code-text.js";
+import {
+  codeTokens,
+  compactCode,
+  completeHexUnits,
+  elementsFit,
+  UNICODE_CODE_DIGITS,
+} from "../core/code-text.js";
 import {
   byteStringHeads,
   CBOR_BYTE_STRING,
@@ -448,6 +454,21 @@ function mixedWriter(format: ShareFormat): (ur: string) => string {
 const HEX_ELEMENT = /^[0-9A-F]+$/u;
 /** Elements of a share in Color Unicode, its codes in digits or the Private Use symbols. */
 const COLOR_UNICODE_ELEMENT = new RegExp(`^[0-9A-F${COLOR_UNICODE_SYMBOL_CLASS}]+$`, "u");
+/**
+ * Whether `text` is written as a share in Unicode codes: its digits, separators left out, hold
+ * more than one word's Unicode code at more than half as many places as it has codes. Every place
+ * is looked at, not only every fourth, so that codes run together that lost or gained a digit
+ * still count as the codes they were, one place along. Colors and Color Unicode, however their
+ * digits are spaced, have a word's code at about one place in 32.
+ */
+function writtenInWordCodes(text: string): boolean {
+  const digits = compactCode(text);
+  let wordCodes = 0;
+  for (let at = 0; at + UNICODE_CODE_DIGITS <= digits.length; at += 1)
+    if (SHARE_UNITS.unicode.valueOf(digits.slice(at, at + UNICODE_CODE_DIGITS)) !== undefined)
+      wordCodes += 1;
+  return wordCodes > 1 && wordCodes * UNICODE_CODE_DIGITS * 2 > digits.length;
+}
 
 /**
  * What one share form is, past the units it writes (SHARE_UNITS): its name, the form of a seed
@@ -472,7 +493,8 @@ interface ShareFormVariant {
    * Its place among the readers, the lowest first (readShare). Text may look like more than one
    * form, such as hexadecimal digits; each form carries a version byte, a length and a checksum,
    * so only the right reader accepts it, and a text that none reads is refused with the refusal of
-   * the first it looks like. Bytewords, which take any text, come last.
+   * the form it is written in (writtenIn), or else of the first it looks like. Bytewords, which
+   * take any text, come last.
    */
   readonly readOrder: number;
   /**
@@ -483,6 +505,12 @@ interface ShareFormVariant {
   readonly looks: (text: string) => boolean;
   /** The share of `text`, trimmed, as its UR; refuses a text that is no share in this form. */
   readonly read: (text: string) => string;
+  /**
+   * Whether `text`, trimmed, that looks like this form and that no form reads is written in this
+   * form, so that this form's reader gives the refusal rather than the first it looks like
+   * (readShare). Only a form whose text can be told from that of a form read before it has one.
+   */
+  readonly writtenIn?: (text: string) => boolean;
   /** The share `ur` written in this form. */
   readonly write: (ur: string) => string;
   /** The list that the form's words are typed from, for the hints below a share being typed. */
@@ -537,6 +565,9 @@ const SHARE_FORMS: Readonly<Record<ShareFormat, ShareFormVariant>> = Object.free
     readOrder: 3,
     looks: (text) => elementsFit(text, HEX_ELEMENT),
     read: unicodeToShare,
+    // Refused as Unicode codes although colors, tried first, read the same digits (owner,
+    // 2026-10-27).
+    writtenIn: writtenInWordCodes,
     write: mixedWriter("unicode"),
   },
   colors: {
@@ -670,30 +701,48 @@ export interface ReadShare {
 
 /**
  * A share in any form MnemoCode writes, as its UR, and the form it was written in. Refuses text
- * that is no share with the refusal of the first form it looks like (readOrder): a UR as
- * urToTransport refuses it; numbers, decimal digits only, as word numbers: that run together
- * (sskr.transport.word-numbers-run-together), that are no word numbers or too many
- * (word-numbers-share-whole-numbers-from), or that hold no share (mixed-share-refused, or as
- * shareInfo refuses their bytes); other hexadecimal codes, as colors, Unicode codes and Color
- * Unicode in digits are written, as colorsToShare refuses them, since colors come first of the
- * forms that they look like; Color Unicode in its symbols as unicodeToColorCodes and
- * colorsToShare refuse it; and any other text as bytewordsToUr refuses it. Blank text, which
- * looks like no form, is refused with not-sskr-share.
+ * that is no share with the refusal of the form it is written in (ShareFormVariant writtenIn),
+ * also where a character mistyped in it makes it look like none: codes, apart or run together,
+ * most of them the Unicode code of a word, as Unicode codes: too
+ * long a text (sskr.transport.unicode-codes-share-too-long), codes that hold no share
+ * (mixed-share-refused, or as shareInfo refuses their bytes), codes that are not whole
+ * (core.words.unicode-codes-four-hexadecimal-digits-each-separated-by) or no word's
+ * (core.words.unicode-code-not-bip39-word). Other text is refused with the refusal of the first
+ * form it looks like (readOrder): a UR as urToTransport refuses it; numbers, decimal digits only,
+ * as word numbers: that run together (word-numbers-run-together), that are no word numbers or too
+ * many (word-numbers-share-whole-numbers-from), or that hold no share (mixed-share-refused, or as
+ * shareInfo refuses their bytes); other hexadecimal codes, such as colors and Color Unicode in
+ * digits, as colorsToShare refuses them, since colors come first of the forms that they look
+ * like; Color Unicode in its symbols as unicodeToColorCodes and colorsToShare refuse it; and any
+ * other text as bytewordsToUr refuses it. Blank text, which looks like no form, is refused with
+ * not-sskr-share.
  */
 export function readShare(value: string): ReadShare {
   // A share read from a file may start with the byte order mark an editor wrote.
   const text = trimWhiteSpace(withoutByteOrderMark(value));
-  let firstError: unknown;
+  let refusal: unknown;
   for (const format of READ_ORDER) {
     const form = SHARE_FORMS[format];
     if (!form.looks(text)) continue;
     try {
       return { ur: form.read(text), format };
     } catch (error) {
-      firstError ??= error;
+      if (refusal === undefined || form.writtenIn?.(text) === true) refusal = error;
     }
   }
-  throw firstError instanceof Error ? firstError : ERRORS.create("not-sskr-share", []);
+  // A form that the text does not look like, such as Unicode codes with a letter typed for a
+  // digit, still gives the refusal where the text is written in it.
+  for (const format of READ_ORDER) {
+    const form = SHARE_FORMS[format];
+    if (form.looks(text) || form.writtenIn?.(text) !== true) continue;
+    try {
+      return { ur: form.read(text), format };
+    } catch (error) {
+      refusal = error;
+      break;
+    }
+  }
+  throw refusal instanceof Error ? refusal : ERRORS.create("not-sskr-share", []);
 }
 
 /** The share of `value`, in any form, as a UR; refuses what readShare refuses. */

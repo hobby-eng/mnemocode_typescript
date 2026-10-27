@@ -109,6 +109,14 @@ const SHARE_REFUSAL_PARTS = [
   "sskr.repair.",
   "sskr.share-values.",
 ];
+/**
+ * Refusals of other modules that readShare passes on for a share written in Unicode codes: codes
+ * that are not whole, and a code of no word (sskr/transport.ts, readShare).
+ */
+const SHARE_READ_REFUSALS: ReadonlySet<string> = new Set([
+  "core.words.unicode-codes-four-hexadecimal-digits-each-separated-by",
+  "core.words.unicode-code-not-bip39-word",
+]);
 /** Coded errors of those parts that end an owner's lifetime rather than refuse the shares. */
 const SHARE_FAULTS = new Set(["sskr.joint-repair.plan-wiped"]);
 
@@ -210,7 +218,9 @@ export class ShareSet extends Redacted implements Disposable {
     if (ShareCombineRefusalError.is(error)) return true;
     const code = errorCode(error);
     if (code === undefined || error instanceof TypeError || SHARE_FAULTS.has(code)) return false;
-    return SHARE_REFUSAL_PARTS.some((part) => code.startsWith(part));
+    return (
+      SHARE_REFUSAL_PARTS.some((part) => code.startsWith(part)) || SHARE_READ_REFUSALS.has(code)
+    );
   }
 
   /**
