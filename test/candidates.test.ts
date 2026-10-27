@@ -167,6 +167,9 @@ describe("Candidate searches", () => {
       replacedAt(TEST_PHRASE, { 1: "ABANDON", 2: "ab*", 12: "zoo|zone" }),
     );
     expect(search.kind === "unknown-words" && search.places[1]!.length).toBe(10);
+    // A place whose words reduce to one is a known word (docs/CANDIDATES.md): zoo|zoo is zoo.
+    const twice = parseUnknownWords(replacedAt(TEST_PHRASE, { 1: "zoo|zoo", 12: "?" }));
+    expect(twice.kind === "unknown-words" && twice.places[0]).toEqual([wordlist.indexOf("zoo")]);
     expect(() => parseUnknownWords("abandon ".repeat(12))).toThrow(/Mark each/u);
     expect(() => parseUnknownWords(ONE_WORD_MISSING)).toThrow(/12, 15/u);
     expect(() => parseUnknownWords(replacedAt(TEST_PHRASE, { 1: "xyz*", 12: "?" }))).toThrow(

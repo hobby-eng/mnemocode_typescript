@@ -26,9 +26,9 @@ The phrase is written as 12, 15, 18, 21 or 24 places separated by spaces. Each p
 | `zoo`        | that English BIP39 word                                           |
 | `?`          | any of the 2,048 words                                            |
 | `ab*`        | any word that starts with the letters given; at least one matches |
-| `rich\|rice` | one of the words given, at least two                              |
+| `rich\|rice` | one of the words given                                            |
 
-Letters are compared after Unicode NFKD and lower-casing. A place whose words reduce to one, such as `zoo*`, is a known word.
+Letters are compared after Unicode NFKD and lower-casing. A place whose words reduce to one, such as `zoo*` or `zoo|zoo`, is a known word.
 
 The unknown places are taken in ascending order, u₁ < u₂ < … < uₖ, and the words of each place in the order of the BIP39 English list. The candidates are the combinations in lexicographic order of (word at u₁, word at u₂, …, word at uₖ), the word at uₖ changing fastest, of which only those with a valid checksum are kept. The number of combinations, the product of the numbers of words at the unknown places, may be at most 2^24 = 16,777,216.
 
