@@ -118,7 +118,7 @@ describe("CC-01: a saved candidate list leaves no copy of the entropies", () => 
 describe("Encoded command result lifetimes", () => {
   it("releases the encoded backup after the command has shown its result", async () => {
     const encode = vi.spyOn(EncodedBackup, "encode");
-    await runEncode({ mnemonic: TEST_PHRASE, mode: "direct", format: "english" });
+    await runEncode({ mnemonic: TEST_PHRASE, mode: "direct", format: "unicode" });
     const outcome = encode.mock.results[0]!;
     expect(outcome.type).toBe("return");
     if (outcome.type !== "return") return;

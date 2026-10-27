@@ -7,7 +7,7 @@ import { decodeQrPngFile } from "../src/cli/qr-input.js";
 import { containing, matching } from "./helpers/matchers.js";
 import { runBuiltCli as run } from "./helpers/built-cli.js";
 import { MANY_STARTS_TEST_TIME_LIMIT_MS } from "./helpers/limits.js";
-import { DATE, TEST_PHRASE } from "./helpers/test-phrase.js";
+import { DATE, TEST_NUMBERS, TEST_PHRASE, TEST_UNICODE } from "./helpers/test-phrase.js";
 
 describe("CLI records", () => {
   it("reports the package version through both CLI forms", async () => {
@@ -79,15 +79,14 @@ describe("CLI records", () => {
         "--mnemonic",
         TEST_PHRASE,
         "--format",
-        "1",
+        "3",
         "--output",
         path,
       ]);
-      expect(encoded.stdout).toContain("English BIP39 words of");
-      expect(encoded.stdout).toContain(TEST_PHRASE);
-      expect(await readFile(path, "utf8")).toMatch(/^MNC1:direct:english:/u);
+      expect(encoded.stdout).toContain(TEST_UNICODE);
+      expect(await readFile(path, "utf8")).toMatch(/^MNC1:direct:unicode:/u);
       await expect(
-        run(["encode", "--mnemonic", TEST_PHRASE, "--format", "1", "--output"]),
+        run(["encode", "--mnemonic", TEST_PHRASE, "--format", "3", "--output"]),
       ).rejects.toMatchObject({
         stderr: containing("output record file setting requires a value"),
       });
@@ -251,9 +250,14 @@ describe("CLI records", () => {
   it(
     "auto-detects every representation that encode can produce",
     async () => {
+      // English words (1) and word numbers (2) are always masked: no copy without a Seedshift.
+      for (const number of ["1", "2"])
+        await expect(
+          run(["encode", "--mode", "direct", "--mnemonic", TEST_PHRASE, "--format", number]),
+        ).rejects.toMatchObject({
+          stderr: containing("English words and word numbers are always masked"),
+        });
       const formats = [
-        ["english", "1"],
-        ["indexes", "2"],
         ["unicode", "3"],
         ["colors-unicode", "4"],
         ["colors", "5"],
@@ -293,22 +297,13 @@ describe("CLI records", () => {
   );
 
   it("keeps an explicit raw format authoritative", async () => {
-    const encoded = await run([
-      "encode",
-      "--mode",
-      "direct",
-      "--mnemonic",
-      TEST_PHRASE,
-      "--format",
-      "2",
-    ]);
-    const raw = encoded.stdout.trim().split("\n").at(-1)!;
+    // The phrase's own word numbers, as a record without a Seedshift would hold them.
     const decoded = await run([
       "decode",
       "--mode",
       "direct",
       "--input",
-      raw,
+      TEST_NUMBERS,
       "--format",
       "indexes",
     ]);

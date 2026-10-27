@@ -367,7 +367,7 @@ describe.runIf(PAGE_IMAGES)(
       await runEncode({
         mnemonic: TEST_PHRASE,
         mode: "direct",
-        format: "indexes",
+        format: "unicode",
         output: record,
         qr,
       });

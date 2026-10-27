@@ -14,7 +14,14 @@ import { CLEAR_SCREEN, terminalResultHeader, terminalWork } from "../src/cli/ter
 import { checkedExportFileName } from "../src/export/file-name.js";
 import { keyedQuestions, watchScreen } from "./helpers/terminal-screen.js";
 import { terminal } from "./helpers/keyed-terminal.js";
-import { DATE, MASKED, MASKED_WORDS, TEST_NUMBERS, TEST_PHRASE } from "./helpers/test-phrase.js";
+import {
+  DATE,
+  MASKED,
+  MASKED_WORDS,
+  TEST_NUMBERS,
+  TEST_PHRASE,
+  TEST_UNICODE,
+} from "./helpers/test-phrase.js";
 import { BACKUP_CHECK_QUESTION, SEED_PHRASE_PROMPT } from "./helpers/prompts.js";
 
 const harness = await vi.hoisted(async () => import("./helpers/keyed-terminal.js"));
@@ -203,12 +210,13 @@ describe("Encode result stays on the private screen through follow-up questions"
         await runEncode({
           "ask-secrets": true,
           mode,
-          format: shares && mode === "direct" ? "1" : "2",
+          // Word numbers (2) are always masked; one copy without a Seedshift takes Unicode codes (3).
+          format: mode === "direct" ? (shares ? "1" : "3") : "2",
           ...(shares ? { sskr: true, threshold: "2", shares: "3" } : {}),
         }),
       ).toBeUndefined();
       expect(atCheck).toContain(BACKUP_CHECK_QUESTION);
-      const expected = mode === "direct" ? (shares ? TEST_PHRASE : TEST_NUMBERS) : MASKED;
+      const expected = mode === "direct" ? (shares ? TEST_PHRASE : TEST_UNICODE) : MASKED;
       expect(atCheck).toContain(expected);
       // The result is a step of its own (CORE-39): the secret prompts, and the dates typed at one,
       // were cleared away before it.

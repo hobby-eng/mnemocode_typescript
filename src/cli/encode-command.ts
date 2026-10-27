@@ -43,7 +43,11 @@ async function validateEncodeOptions(args: ParsedArguments): Promise<{
   const originalCopy = originalCopyRequested(args);
   maskedWordsRequested(args, mode);
   const format = encodeFormat(value(args, "format"));
-  EncodedBackup.assertEncodable(mode, { validLastWord: args["legacy-valid-last-word"] === true });
+  EncodedBackup.assertEncodable(
+    mode,
+    { validLastWord: args["legacy-valid-last-word"] === true },
+    format,
+  );
   assertDateInputMode(args, mode);
   // The sheet leads through the menu, whose Decode does not offer a replaced last word.
   const replacement = Masking.of(mode).withValidLastWord;

@@ -43,7 +43,7 @@ The examples below use `mnemocode`. In a checkout, use `node dist/mnemocode.js` 
 
 Run `mnemocode` without arguments in a terminal. The menu offers encoding, re-encoding, decoding, sharing, recovery, sample cards and word lookup. The lookup entry also exports numbered dictionaries and a [printable guide to recovery without MnemoCode](docs/MANUAL_RECOVERY.md).
 
-The menu always masks word numbers and English words with Seedshift, because the BIP39 list makes them easy to read. Unicode codes and colors can remain unmasked. The command line also allows direct word numbers and English words.
+Word numbers and English words are always masked with Seedshift, because the BIP39 list makes them easy to read: the menu, the command line and the library refuse them without it. Unicode codes and colors can remain unmasked.
 
 After Encode, the optional backup check asks for the written copy and dates again and checks that they restore the same seed phrase. The menu shows the equivalent command, with secrets omitted.
 

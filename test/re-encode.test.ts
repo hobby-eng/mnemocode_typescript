@@ -347,7 +347,7 @@ describe("re-encode CLI", () => {
       stderr: containing("its checksum confirms nothing"),
     });
     await expect(
-      run([...OLD, "--recognised", "--master-fingerprint", TEST_FINGERPRINT]),
+      run([...OLD, "--format", "3", "--recognised", "--master-fingerprint", TEST_FINGERPRINT]),
     ).rejects.toMatchObject({ stderr: containing("give one") });
     await expect(run(["--ask-secrets", "--old-dates", DATE])).rejects.toMatchObject({
       stderr: containing(
@@ -376,7 +376,7 @@ describe("re-encode CLI", () => {
   it("refuses a new backup's option before the old backup is read", async () => {
     // A form without cards: refused before the codes are read, which here are no backup at all.
     await expect(
-      run(["--input", "not a backup", "--format", "1", "--cards", "--recognised"]),
+      run(["--input", "not a backup", "--format", "3", "--cards", "--recognised"]),
     ).rejects.toMatchObject({
       stderr: containing("Terminal color cards are available only"),
     });

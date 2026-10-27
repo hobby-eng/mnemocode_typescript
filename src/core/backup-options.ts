@@ -47,7 +47,8 @@ export function writtenInColors(form: EncodedFormat): boolean {
 
 /**
  * Whether a seed phrase in `form` is always masked with Seedshift: the menu always masks it, and
- * a page that offers it unmasked warns (UNMASKED_NOTE). The reason is the form's (EncodedForm).
+ * the library refuses it without a Seedshift (EncodedBackup.assertEncodable:
+ * core.encoded-backup.form-always-masked). The reason is the form's (EncodedForm).
  */
 export function alwaysMasked(form: EncodedFormat): boolean {
   return EncodedForm.of(form).alwaysMasked;

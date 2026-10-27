@@ -643,7 +643,7 @@ export const ENCODE_FORMAT: HelpOption = {
   value: "FORMAT",
   summary: `The form of the result, ${FORMAT_NUMBER_RANGE} or its name; default ${formatNumber("english")} (english)`,
   details: [
-    `${formatLegend(FORMAT_LEGEND_NAMES)}. Cards need ${CARD_FORMAT_NUMBERS}. See mnemocode help formats. With --sskr and Seedshift, --format alone shows the complete masked backup beside the shares. The original phrase is shown only as English words, with --show-original words.`,
+    `${formatLegend(FORMAT_LEGEND_NAMES)}. Formats ${formatNumber("english")} and ${formatNumber("indexes")} need a Seedshift (--mode seedshift with its dates): unmasked, they are the seed phrase itself. Cards need ${CARD_FORMAT_NUMBERS}. See mnemocode help formats. With --sskr and Seedshift, --format alone shows the complete masked backup beside the shares. The original phrase is shown only as English words, with --show-original words.`,
   ],
 };
 

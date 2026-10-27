@@ -414,7 +414,10 @@ export class EncodedForm {
     return this.#variant.phraseWords;
   }
 
-  /** Whether front ends should require masking for directly readable words or indexes. */
+  /**
+   * Whether a seed phrase in this form is always masked: Encode refuses it without a Seedshift
+   * (EncodedBackup.assertEncodable).
+   */
   get alwaysMasked(): boolean {
     return this.#variant.alwaysMasked;
   }

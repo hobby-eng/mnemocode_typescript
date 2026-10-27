@@ -94,7 +94,7 @@ describe("the cards of Encode", () => {
     expect(content.labels).toEqual(EncodedForm.of("unicode").cardCodes(unicode.indexes));
     expect(content.colors).toEqual(codeColors(content.labels!));
     expect(content.payload).toBe(unicode.text());
-    const words = EncodedBackup.encode(TEST_PHRASE, [], "english", "direct").backup;
+    const words = EncodedBackup.encode(TEST_PHRASE, dates, "english", "seedshift").backup;
     expect(() => backupCardContent(words)).toThrow("No card prints codes written as english.");
     const numbers = EncodedBackup.encode(TEST_PHRASE, dates, "indexes", "seedshift").backup;
     expect(() => backupCardContent(numbers)).toThrow("No card prints codes written as indexes.");

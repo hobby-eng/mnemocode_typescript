@@ -158,13 +158,13 @@ describe("encode, decode and the backup check on the private screen", () => {
         await runEncode({
           "ask-secrets": true,
           mode: "direct",
-          format: "indexes",
+          format: "unicode",
           output: join(directory, "record.txt"),
           qr: join(directory, "qr.png"),
         });
         expect(seen.notices).toContain("The record was not saved.");
         expect(seen.notices.filter((line) => line.startsWith("Saved"))).toEqual([
-          `Saved QR code (indexes): ${join(directory, "qr.png")}`,
+          `Saved QR code (unicode): ${join(directory, "qr.png")}`,
         ]);
         expect(terminal.questions).toEqual(["What now?", BACKUP_CHECK_QUESTION]);
       } finally {

@@ -669,7 +669,10 @@ export const TOPIC_HELP: Readonly<Record<string, TopicHelp>> = {
       {
         heading: "Modes:",
         rows: [
-          ["direct", "Writes the phrase in another form without changing it. No dates."],
+          [
+            "direct",
+            "Writes the phrase in another form without changing it. No dates. Not in formats 1 and 2, which would be the phrase itself.",
+          ],
           [
             "seedshift",
             "Masks the phrase with dates. The result is always a valid BIP39 phrase, and the same dates give the original back without a search. The default when --dates-file is given.",

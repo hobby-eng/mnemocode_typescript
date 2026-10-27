@@ -16,7 +16,7 @@ const DIRECT = serializeRecord("direct", "indexes", TEST_NUMBERS);
 const LEGACY = serializeRecord("seedshift-legacy-valid", "indexes", LEGACY_VALID_MASKED);
 
 it.each([
-  ["encoding", ["encode", "--mnemonic", TEST_PHRASE, "--mode", "direct", "--format", "1"]],
+  ["encoding", ["encode", "--mnemonic", TEST_PHRASE, "--mode", "direct", "--format", "3"]],
   ["decoding", ["decode", "--input", DIRECT]],
   [
     "a shorter-prefix warning",

@@ -55,7 +55,9 @@ describe("leaving a refused backup check", () => {
         ESCAPE,
       ];
       terminal.choices = ["Yes"];
-      expect(await runEncode({ "ask-secrets": true, mode, format: "indexes" })).toBe(CANCELLED);
+      // Word numbers are always masked: without a Seedshift, the copy is in Unicode codes.
+      const format = mode === "direct" ? "unicode" : "indexes";
+      expect(await runEncode({ "ask-secrets": true, mode, format })).toBe(CANCELLED);
       const made = encoding.mock.results[0]!;
       expect(made.type).toBe("return");
       if (made.type === "return") expect(() => made.value.backup.text()).toThrow("has been wiped");
@@ -66,13 +68,14 @@ describe("leaving a refused backup check", () => {
 describe("encode, decode and the backup check on the private screen", () => {
   describe("the backup check", () => {
     it("keeps its backup live while an asynchronous check asks to show it again, then disposes it", async () => {
-      const direct = formatEncoded(representMnemonic(TEST_PHRASE), "indexes");
-      const wrong = direct.replace(/^\d+/u, "2");
+      const direct = formatEncoded(representMnemonic(TEST_PHRASE), "unicode");
+      // The code of "about" in place of "abandon": another phrase, which the check refuses.
+      const wrong = direct.replace(/^7684/u, "5728");
       const encode = vi.spyOn(EncodedBackup, "encode");
       terminal.answers = [`${TEST_PHRASE}\r`, `${wrong}\r`];
       terminal.choices = ["Yes", "Show the result again", "No"];
       await expect(
-        runEncode({ "ask-secrets": true, mode: "direct", format: "indexes" }),
+        runEncode({ "ask-secrets": true, mode: "direct", format: "unicode" }),
       ).resolves.toBeUndefined();
       expect(terminal.questions).toContain("What now?");
       const result = encode.mock.results[0]!;

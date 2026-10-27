@@ -50,7 +50,7 @@ import { plannedCardJob } from "../src/export/render.js";
 import { nodeCardRenderer } from "../src/export/platform-node.js";
 import { selectTemplate } from "../src/export/templates.js";
 import { NewFolder, publishNewPrivateFile } from "../src/export/private-file.js";
-import { TEST_PHRASE } from "./helpers/test-phrase.js";
+import { TEST_PHRASE, TEST_UNICODE } from "./helpers/test-phrase.js";
 import { TEST_TIME_LIMIT_MS } from "./helpers/limits.js";
 import { testFolder } from "./helpers/test-folders.js";
 
@@ -147,7 +147,7 @@ describe("AUD-014-SEC002: a swap table that cannot be read is not taken for no s
       const publicFile = join(await scratch(), "public-mnemonic.txt");
       await writeFile(publicFile, TEST_PHRASE, "utf8");
       const run = protectedRun(
-        ["encode", "--mode", "direct", "--format", "indexes", "--mnemonic-file", publicFile],
+        ["encode", "--mode", "direct", "--format", "unicode", "--mnemonic-file", publicFile],
         [cwd, swappedCase(cwd), publicFile],
       );
       expect(run.status, run.stderr).toBe(0);
@@ -156,7 +156,7 @@ describe("AUD-014-SEC002: a swap table that cannot be read is not taken for no s
       );
       expect(run.stderr).toContain("#unencrypted-swap");
       // The command itself still works: the warning only comes first.
-      expect(run.stdout).toContain("1 1 1 1 1 1 1 1 1 1 1 4");
+      expect(run.stdout).toContain(TEST_UNICODE);
     },
   );
 });

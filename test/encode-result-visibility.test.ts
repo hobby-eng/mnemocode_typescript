@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runEncode } from "../src/cli/encode-command.js";
+import { alwaysMasked } from "../src/core/backup-options.js";
 import { ENCODED_FORMATS } from "../src/core/types.js";
 import { terminal } from "./helpers/keyed-terminal.js";
 import { PrivateTerminal } from "./helpers/private-terminal.js";
@@ -37,7 +38,8 @@ afterEach(async () => {
 
 const cases = ENCODED_FORMATS.flatMap((format) =>
   (["direct", "seedshift", "seedshift-legacy"] as const).flatMap((mode) =>
-    format === "english" && mode === "direct"
+    // English words and word numbers are always masked: the library refuses them without one.
+    alwaysMasked(format) && mode === "direct"
       ? []
       : (["screen", "record", "qr", "all"] as const).map((destination) => ({
           format,

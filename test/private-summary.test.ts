@@ -39,7 +39,7 @@ import {
   LAST_WORD_FORGOTTEN,
   MASKED,
   TEST_FINGERPRINT,
-  TEST_NUMBERS,
+  TEST_UNICODE,
   TEST_PHRASE,
 } from "./helpers/test-phrase.js";
 
@@ -74,7 +74,7 @@ function mainScreen(): string[] {
 
 /** Encode's options with --ask-secrets, as the command line gives them, and more of them. */
 function encodeArguments(more: ParsedArguments): ParsedArguments {
-  return { "ask-secrets": true, mode: "direct", format: "indexes", ...more };
+  return { "ask-secrets": true, mode: "direct", format: "unicode", ...more };
 }
 
 /** Runs Encode with `args` on the private screen, as the command line runs it (command-line.ts). */
@@ -117,12 +117,12 @@ describe("the summary left on the main screen after the private screen", () => {
     // No answer to "Check the backup now?": Escape skips it.
     expect(await encodeOnPrivateScreen(encodeArguments({ output: record }))).toBeUndefined();
     // The result was shown on the private screen, its fingerprint on standard error.
-    expect(seen.out).toContain(TEST_NUMBERS);
+    expect(seen.out).toContain(TEST_UNICODE);
     const privateScreen = seen.screen.slice(0, seen.screen.indexOf(LEAVE_ALTERNATE_SCREEN));
     expect(privateScreen).toContain(TEST_FINGERPRINT);
     const shown = mainScreen();
     expect(shown).toEqual(["", HEADING, `Saved MnemoCode record: ${record}`, CLEARED, ""]);
-    for (const secret of [TEST_PHRASE, TEST_NUMBERS, TEST_FINGERPRINT])
+    for (const secret of [TEST_PHRASE, TEST_UNICODE, TEST_FINGERPRINT])
       expect(shown.join("\n")).not.toContain(secret);
   });
 

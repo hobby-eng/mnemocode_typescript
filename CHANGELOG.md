@@ -4,6 +4,7 @@
 
 ### Refusals
 
+- English words and word numbers, which unmasked are the seed phrase itself, are refused without a Seedshift by the library for every front end, before any secret, with `core.encoded-backup.form-always-masked`, whose message names the forms to choose instead; only the menu kept them from it, and `encode --mode direct --format 1` or `2` was accepted. `encode` and `re-encode` with their default format, English words, now need a Seedshift or another `--format`.
 - Codes without the BIP39 checksum that their mode keeps are refused with the code `core.masking.missing-checksum`; it had no namespace (`missing-checksum`), unlike the other codes of its module.
 - A date's year or month out of range is refused with `core.dates.year-out-of-range` or `core.dates.month-out-of-range`, so a host can tell the two apart by the code; they were `core.dates.assert-calendar-date-refused` and `assert-calendar-date-refused-2`.
 - A Unicode code that is no BIP39 word is refused with "The Unicode code at place N is not a BIP39 word.", which names the place as a place; it read as if N were the code.

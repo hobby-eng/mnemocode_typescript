@@ -43,6 +43,8 @@ import { ErrorCatalog } from "./error-catalog.js";
 const ERRORS = new ErrorCatalog("core.encoded-backup", {
   "encoded-seed-phrase": (value0: string, value1: string, value2: string) =>
     `These are ${value0} ${value1}; an encoded seed phrase has ${value2}.`,
+  "form-always-masked": () =>
+    "English words and word numbers are always masked: unmasked, they are the seed phrase itself. Choose a Seedshift, or Unicode codes or colors.",
   "create-legacy-checksum-valid-record-select-legacy-seedshift": () =>
     "To create a legacy checksum-valid record, select legacy Seedshift and enable the checksum-word replacement.",
   "legacy-checksum-word-replacement-available-only-legacy-seedshift": () =>
@@ -163,11 +165,20 @@ export class EncodedBackup extends Redacted {
    * valid last word comes only from the Original Seedshift with its replacement
    * (core.encoded-backup.create-legacy-checksum-valid-record-select-legacy-seedshift), and
    * `validLastWord` only from a mode that has the replacement
-   * (legacy-checksum-word-replacement-available-only-legacy-seedshift). A value that names no mode
-   * is refused (core.masking.unsupported-mode).
+   * (legacy-checksum-word-replacement-available-only-legacy-seedshift), and with `format`, a form
+   * that is always masked (EncodedForm.alwaysMasked: English words and word numbers) without a
+   * Seedshift (form-always-masked). A value that names no mode is refused
+   * (core.masking.unsupported-mode), and one that names no form
+   * (core.encoded-form.unsupported-encoded-format).
    */
-  static assertEncodable(mode: MaskingMode, options: EncodeOptions = {}): void {
+  static assertEncodable(
+    mode: MaskingMode,
+    options: EncodeOptions = {},
+    format?: EncodedFormat,
+  ): void {
     const masking = Masking.of(mode);
+    if (format !== undefined && EncodedForm.of(format).alwaysMasked && !masking.masked)
+      throw ERRORS.create("form-always-masked", []);
     if (!masking.encodable)
       throw ERRORS.create("create-legacy-checksum-valid-record-select-legacy-seedshift", []);
     if (options.validLastWord === true && masking.withValidLastWord === undefined)
@@ -192,7 +203,7 @@ export class EncodedBackup extends Redacted {
     mode: MaskingMode,
     options: EncodeOptions = {},
   ): Encoding {
-    EncodedBackup.assertEncodable(mode, options);
+    EncodedBackup.assertEncodable(mode, options, format);
     const masking = Masking.of(mode);
     masking.assertDateCount(dates.length);
     const base = masking.encode(mnemonic, dates);
