@@ -16,6 +16,7 @@
 
 import {
   type AddressLocation,
+  assertWalletEvidence,
   type Coin,
   COINS,
   type DerivationLocation,
@@ -314,9 +315,9 @@ const COINS_NOTE = `${COINS.slice(0, NAMED_COINS)
 
 /**
  * Asks which coin the address is for, every coin in one list, then its address at the place:
- * Bitcoin's in the profiles of the place, another coin's at its account, branch and index; each
- * asked until it is one of that coin. Undefined when the person goes back (Escape), to the wallet
- * question; CANCELLED at Ctrl+C.
+ * Bitcoin's in the profiles of the place, of a type one of them writes, another coin's at its
+ * account, branch and index; each asked until it is one of that coin. Undefined when the person
+ * goes back (Escape), to the wallet question; CANCELLED at Ctrl+C.
  */
 async function askAddress(
   place: WalletPlace,
@@ -330,12 +331,18 @@ async function askAddress(
   if (coin === undefined || coin === CANCELLED) return coin;
   const { location, profiles } = place;
   if (coin.id === "bitcoin")
-    return asker.ask({ ...words.bitcoinAddress, label: "Address" }, (answer): WalletEvidence => ({
-      kind: "address",
-      value: parseBitcoinAddress(answer, location.network),
-      profiles,
-      location,
-    }));
+    return asker.ask({ ...words.bitcoinAddress, label: "Address" }, (answer): WalletEvidence => {
+      const evidence: WalletEvidence = {
+        kind: "address",
+        value: parseBitcoinAddress(answer, location.network),
+        profiles,
+        location,
+      };
+      // An address of a type that none of the place's profiles writes is asked again, as
+      // --bitcoin-address refuses it (core.wallet-evidence.address-outside-profiles).
+      assertWalletEvidence(evidence);
+      return evidence;
+    });
   const { account, branch, index } = location;
   return asker.ask({ ...words.coinAddress(coin), label: "Address" }, (answer): WalletEvidence => ({
     kind: "coin-address",

@@ -27,6 +27,8 @@ import { DATE, TEST_ADDRESS, TEST_FINGERPRINT, TEST_PHRASE } from "./helpers/tes
 import { Keyboard, keyboardAsStandardInput } from "./helpers/terminal-streams.js";
 import { BITCOIN_ADDRESS_QUESTION, COIN_QUESTION } from "./helpers/menu-paths.js";
 
+/** The test phrase's first legacy (BIP44) address. */
+const LEGACY_ADDRESS = "1LqBGSKuX5yYUonjxT5qGfpUsXKYYWeabA";
 /** A valid testnet address (BIP173's example), which mainnet refuses by name. */
 const TESTNET_ADDRESS = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
 
@@ -329,6 +331,21 @@ describe("questions asked again until the answer can be used", () => {
       await askWalletEvidence({ optional: false, place: { location, profiles: BITCOIN_PROFILES } }),
     ).toMatchObject({ evidence: { kind: "address", location, addresses: 1 } });
     expect(notices).toEqual([]);
+  });
+
+  it("asks again for an address of a type that none of the place's profiles writes", async () => {
+    const location = { network: "mainnet", account: 0, branch: 0, index: 0 } as const;
+    pick(WALLET_QUESTION, "Address");
+    pick(COIN_QUESTION, "Bitcoin");
+    at(`${BITCOIN_ADDRESS_QUESTION}:`, `${TEST_ADDRESS}\r`);
+    at(`${BITCOIN_ADDRESS_QUESTION}:`, `${LEGACY_ADDRESS}\r`);
+    at("Compare with how many addresses from the first (Enter: 20):", "\r");
+    expect(
+      await askWalletEvidence({ optional: false, place: { location, profiles: ["legacy"] } }),
+    ).toMatchObject({ evidence: { kind: "address", value: LEGACY_ADDRESS, profiles: ["legacy"] } });
+    expect(notices).toEqual([
+      "The address is a native-segwit address, which none of the selected Bitcoin address profiles writes.",
+    ]);
   });
 });
 

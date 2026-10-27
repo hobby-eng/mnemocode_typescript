@@ -212,11 +212,6 @@ const MATCHES: readonly (readonly [string, WalletEvidence, string, string?])[] =
     "matched at m/86'/0'/0'/0/0",
   ],
   [
-    "Address in another profile",
-    located("address", KEYS.address86, ["legacy", "nested-segwit", "native-segwit"]),
-    "not matched",
-  ],
-  [
     "Compressed public key",
     located("compressed-public-key", KEYS.publicKey84, ["native-segwit"]),
     "matched at m/84'/0'/0'/0/0",
@@ -259,6 +254,11 @@ const REFUSED: readonly (readonly [string, WalletEvidence, RegExp])[] = [
     "A script address",
     located("address", SCRIPT_ADDRESS, ["native-segwit"]),
     /not the address of a single key/u,
+  ],
+  [
+    "An address that none of the profiles writes",
+    located("address", KEYS.address86, ["legacy", "nested-segwit", "native-segwit"]),
+    /none of the selected Bitcoin address profiles writes/u,
   ],
   [
     "A testnet address on mainnet",

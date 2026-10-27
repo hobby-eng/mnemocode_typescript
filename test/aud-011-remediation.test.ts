@@ -233,16 +233,18 @@ describe("AUD-011-ARC014, ARC015, ARC016, ARC022: Bitcoin evidence reads through
           derived: address,
           path,
         });
-        // In a profile of another kind the same address is never found.
+        // Profiles of other kinds never write it: the address is refused, not searched for.
         const others = PROFILES.filter((other) => other !== profile);
-        expect(
+        expect(() =>
           matchWalletEvidence(TEST_PHRASE, {
             kind: "address",
             value: address,
             profiles: others,
             location: { network, ...LOCATION_0 },
-          }).matched,
-        ).toBe(false);
+          }),
+        ).toThrow(
+          expect.objectContaining({ code: "core.wallet-evidence.address-outside-profiles" }),
+        );
       }
   });
 

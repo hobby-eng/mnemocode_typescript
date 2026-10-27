@@ -441,7 +441,8 @@ function bitcoinAddressOn(value: string, network: BitcoinNetworkName): CoinAddre
  *   number of addresses out of range (core.address-scan.address-count-refused, or
  *   addresses-compared-would-pass-index past the last index);
  * - "address": what parseBitcoinAddress refuses (core.wallet-evidence.address-not-valid-bitcoin,
- *   address-not-valid-bitcoin-address, core.coins.coin.address-not-single-key);
+ *   address-not-valid-bitcoin-address, core.coins.coin.address-not-single-key), and an address of
+ *   a type that none of its profiles writes (core.wallet-evidence.address-outside-profiles);
  * - "compressed-public-key": a value that is not 33 bytes in hexadecimal
  *   (core.wallet-evidence.compressed-public-key-exactly-bytes-encoded-as-hexadecimal), whose first
  *   byte is not 02 or 03 (compressed-public-key-start-02-03), or that is no point of the curve
@@ -649,6 +650,11 @@ abstract class LocatedEvidence implements Evidence {
     this.network = network;
   }
 
+  /** The profiles the key is looked for in, in their order. */
+  protected get profiles(): readonly BitcoinProfile[] {
+    return this.#profiles;
+  }
+
   compare(root: HDKey): EvidenceMatch {
     for (const profile of this.#profiles) {
       const matchOf: KeyMatch = (node, publicKey) => this.derivedFrom(node, publicKey, profile);
@@ -697,9 +703,20 @@ abstract class LocatedEvidence implements Evidence {
 class AddressEvidence extends LocatedEvidence {
   readonly #expected: CoinAddress;
 
+  /**
+   * Checks the place and the profiles, then reads the address; refuses one of a kind that none of
+   * the profiles writes, which no search could match (address-outside-profiles).
+   */
   constructor(evidence: Extract<BitcoinEvidence, { kind: "address" }>) {
     super(evidence, "address");
-    this.#expected = bitcoinAddressOn(evidence.value, evidence.location.network);
+    const address = bitcoinAddressOn(evidence.value, evidence.location.network);
+    // Every type that Bitcoin's addresses read as is one profile's.
+    const writer = defined(
+      BITCOIN_PROFILES.find((profile) => PROFILE_TYPES[profile] === address.type),
+    );
+    if (!this.profiles.includes(writer))
+      throw ERRORS.create("address-outside-profiles", [`${writer}`]);
+    this.#expected = address;
   }
 
   protected derivedFrom(_node: HDKey, publicKey: Uint8Array, profile: BitcoinProfile) {

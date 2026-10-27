@@ -6,6 +6,8 @@ export const ERRORS = new ErrorCatalog("core.wallet-evidence", {
     `The address is not valid for Bitcoin ${value0}.`,
   "address-not-valid-bitcoin-address": (value0: string, value1: string) =>
     `The address is not valid for Bitcoin ${value0}; it is a ${value1} address.`,
+  "address-outside-profiles": (value0: string) =>
+    `The address is a ${value0} address, which none of the selected Bitcoin address profiles writes.`,
   "only-address-address-another-coin-compressed-public-key": () =>
     "Only an address, an address of another coin, a compressed public key or a WIF is compared with several addresses.",
   "unsupported-bitcoin-evidence-kind": () => "Unsupported Bitcoin evidence kind.",
