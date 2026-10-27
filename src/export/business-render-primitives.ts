@@ -33,6 +33,14 @@ const QUARTER_CIRCLE_CONTROL = 0.55228475;
 const MIN_MEASURED_WIDTH = 0.001;
 
 /**
+ * Whether `font` has every character of `text`. pdf-lib draws a character that an embedded font
+ * lacks as the font's .notdef glyph, which the bundled font leaves blank, without an error.
+ */
+export function hasEveryCharacter(font: PDFFont, text: string): boolean {
+  return Array.from(text).every((c) => font.getCharacterSet().includes(defined(c.codePointAt(0))));
+}
+
+/**
  * The size, at most `preferred`, at which `text` fits `width` points; refused, naming `label`, when
  * the font lacks one of its characters
  * (export.business-render-primitives.contains-character-not-supported-by-card-font) or it would be
@@ -47,10 +55,7 @@ export function fit(
   width: number,
   label: string,
 ): number {
-  const unsupported = Array.from(text).find(
-    (c) => !font.getCharacterSet().includes(defined(c.codePointAt(0))),
-  );
-  if (unsupported !== undefined)
+  if (!hasEveryCharacter(font, text))
     throw ERRORS.create("contains-character-not-supported-by-card-font", [label]);
   const size = Math.min(
     preferred,

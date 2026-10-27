@@ -10,6 +10,7 @@
 
 import { rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import { MM } from "./business-layout.js";
+import { hasEveryCharacter } from "./business-render-primitives.js";
 import { clearDocumentMetadata } from "./document-metadata.js";
 import { documentWithFont } from "./pdf-documents.js";
 import type { AssetSource } from "./platform.js";
@@ -24,6 +25,8 @@ const ERRORS = new ErrorCatalog("export.heir-sheet", {
     "The steps and the basics for heirs do not fit on the back.",
   "size-instructions-heirs": (value0: string) =>
     `The size of the instructions for heirs must be ${value0}.`,
+  "instructions-heirs-contain-character-not-supported-by-font": () =>
+    "The instructions for heirs contain a character not supported by the font.",
 });
 
 /** A part of the back: a heading and its paragraphs. */
@@ -193,7 +196,13 @@ class Writer {
     return this.#y - this.#format.margin;
   }
 
+  /**
+   * Writes `text`, wrapped, after `marker` if given; refuses a character that the font does not
+   * have before it draws it, as a host's route may write one.
+   */
   paragraph(text: string, size: number, color = INK, indent = 0, marker?: string): void {
+    if (!hasEveryCharacter(this.#font, text))
+      throw ERRORS.create("instructions-heirs-contain-character-not-supported-by-font", []);
     const width = this.#format.width - 2 * this.#format.margin - indent;
     const x = this.#format.margin;
     wrap(text, this.#font, size, width).forEach((line, index) => {
@@ -317,9 +326,11 @@ export function parseHeirSheetSize(value: string | undefined): HeirSheetFormat {
 /**
  * Draws the sheet for heirs of `text` in `format`, A5 unless another is given, as a PDF of two
  * pages, its front and its back, without metadata. Refuses words that leave the front no room for
- * a hint (export.heir-sheet.instructions-heirs-leave-no-room-hint-on-front) or do not fit on the
- * back (export.heir-sheet.steps-basics-heirs-do-not-fit-on-back); a failure of `assets` to read
- * the font passes on.
+ * a hint (export.heir-sheet.instructions-heirs-leave-no-room-hint-on-front), do not fit on the
+ * back (export.heir-sheet.steps-basics-heirs-do-not-fit-on-back) or have a character that the font
+ * does not have, such as one of a host's route
+ * (export.heir-sheet.instructions-heirs-contain-character-not-supported-by-font); a failure of
+ * `assets` to read the font passes on.
  */
 export async function renderHeirSheet(
   assets: AssetSource,

@@ -244,6 +244,34 @@ describe("instructions for heirs", () => {
       }
   });
 
+  it("refuses a host's words with a character that its font does not have", async () => {
+    // The arrow (U+2192) is outside the font, which pdf-lib drew as a blank without an error.
+    const route: HeirRoute = {
+      subtitle: "Made with the Wallet Tool, free and offline.",
+      address: "example.com/wallet-tool",
+      start: ["Open example.com/wallet-tool on a computer you trust, then go offline."],
+      decode: () => ["Choose Decode and type the backup."],
+      restore: () => ["Choose Shares and type the shares."],
+      dateDigitHelp: undefined,
+    };
+    const facts: HeirSheetFacts = {
+      backup: { kind: "shares", format: "words", threshold: 2, count: 3 },
+      mode: "direct",
+      dates: 0,
+    };
+    // On the front, which is measured before it is drawn, and on the back.
+    for (const arrowed of [
+      { ...route, subtitle: "Made with the Wallet Tool \u2192 free and offline." },
+      { ...route, restore: () => ["Choose Tools \u2192 Shares and type the shares."] },
+    ])
+      await expect(
+        renderHeirSheet(nodeCardRenderer, new HeirInstructions(arrowed).text(facts)),
+      ).rejects.toMatchObject({
+        code: "export.heir-sheet.instructions-heirs-contain-character-not-supported-by-font",
+        message: "The instructions for heirs contain a character not supported by the font.",
+      });
+  });
+
   it("is saved by encode next to the shares, in A5 or A6, never over an existing file", async () => {
     const directory = mkdtempSync(join(tmpdir(), "mnc-heirs-"));
     try {
