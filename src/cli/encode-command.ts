@@ -173,9 +173,9 @@ export async function prepareEncode(args: ParsedArguments): Promise<PreparedEnco
   const { mode, format, originalCopy } = await validateEncodeOptions(args);
   const checkAnswer = backupCheckAnswer(args);
   const saving: ParsedArguments = { ...args };
-  // A detail too long for its card is refused before a secret is asked, not after the result is
-  // shown.
-  const fit = args["ask-secrets"] === true ? colorCardsFit(saving, format) : undefined;
+  // A detail too long for its card is refused before a secret is asked or read, not after the
+  // result is shown.
+  const fit = colorCardsFit(saving, format);
   if (fit !== undefined) {
     terminalWork("Checking that the cards can be printed…");
     await fit();

@@ -129,7 +129,7 @@ export const SHARE_COMMAND_HELP: Readonly<
             value: "FORMAT",
             summary: "How the shares are shown (see encode --share-format)",
             details: [
-              "Without it, in the form they are written in: a share repaired from elements marked with ? comes back whole, in its own form.",
+              "Without it, in the form they are written in: a share repaired from elements marked with ? comes back whole, in its own form. Cards are then checked in every form that has them, before the shares are asked.",
             ],
           },
           {

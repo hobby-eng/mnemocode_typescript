@@ -44,9 +44,12 @@ import type { RepairedSet, RepairedShares } from "../sskr/joint-results.js";
 import { defined } from "../core/defined.js";
 import { CANCELLED, type Cancelled } from "./terminal-keys.js";
 import { ErrorCatalog, suppliedMessage } from "../core/error-catalog.js";
+import { refusalMessage } from "../core/refusal.js";
 
 const ERRORS = new ErrorCatalog("cli.sskr-export-command", {
   "card-form-refused": suppliedMessage,
+  "cards-own-form-refused": (refusal: string) =>
+    `Without --format each share is printed in the form it is written in, which may be ${SHARE_FORMAT_NAMES.unicode}; --format colors prints every share in colors. ${refusal}`,
   "no-share-settled": () => NO_SHARE_SETTLED,
   "repair-each-refused": suppliedMessage,
   "few-export-refused": suppliedMessage,
@@ -240,6 +243,19 @@ async function fewForExport(r: Recovery): Promise<"again" | "few" | Cancelled> {
 }
 
 /**
+ * Refuses, without --format, the cards of `checked` where they cannot print a share written in
+ * Unicode codes, before the shares are asked: each share is then printed in the form it is
+ * written in, which only the shares tell (cli.sskr-export-command.cards-own-form-refused).
+ */
+async function assertCodeCardsPrintable(checked: ShareCardOptions): Promise<void> {
+  try {
+    await assertShareCardsPrintable({ ...checked, shareFormat: "unicode" });
+  } catch (error) {
+    throw ERRORS.create("cards-own-form-refused", [refusalMessage(error)], { cause: error });
+  }
+}
+
+/**
  * Exports the shares given, or typed on the private screen, after repairing them where marked;
  * CANCELLED when the person cancelled.
  */
@@ -251,8 +267,10 @@ export async function runSskrExport(args: ParsedArguments): Promise<Cancelled | 
   const given = value(args, "format") === undefined ? undefined : shareFormat(args);
   const checked = exportOptions(args, given ?? "colors");
   await preflightOutputs(args);
-  // In colors where the shares keep their own form, which is known only once they are typed.
+  // Where the shares keep their own form, which is known only once they are typed: in colors,
+  // which the cards of every color form print (shareCardFace), and in Unicode codes.
   await assertShareCardsPrintable(checked);
+  if (given === undefined && checked !== undefined) await assertCodeCardsPrintable(checked);
   const settings = await recoverySettings(args);
   using initialDates = settings.dates;
   using ownedWallet = settings.wallet;

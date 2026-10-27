@@ -82,7 +82,7 @@ Word numbers and Unicode codes are made the same way with the version byte `A2`,
 
 ## Share cards
 
-Shares written in colors (`colors`, `colors-unicode`) can be printed as cards with every template, and shares in Unicode codes (`unicode`) with every template but the enclosure and tile materials, which have too few samples for the longest share; one code to a card. Shares in word numbers, Bytewords or as a `ur:sskr` code have no cards: write them on paper, keep the text file or save standalone QR images with `--qr-dir NEW_FOLDER`. `sskr-export` prints existing shares and never makes new ones; `--format` writes them in a form that has cards; here the `ur` shares saved above are printed in colors:
+Shares written in colors (`colors`, `colors-unicode`) can be printed as cards with every template, and shares in Unicode codes (`unicode`) with every template but the enclosure and tile materials, which have too few samples for the longest share; one code to a card. Shares in word numbers, Bytewords or as a `ur:sskr` code have no cards: write them on paper, keep the text file or save standalone QR images with `--qr-dir NEW_FOLDER`. `sskr-export` prints existing shares and never makes new ones; `--format` writes them in a form that has cards. Without `--format` each share is printed in the form it is written in, so the cards are checked in every form that has them before the shares are asked: the enclosure and tile materials then need `--format colors` or `colors-unicode`. Here the `ur` shares saved above are printed in colors:
 
 ```bash
 mnemocode sskr-export --share-file ./shares.txt --format colors \

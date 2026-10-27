@@ -1,7 +1,7 @@
 // Whether the cards that the options ask for can be printed with the details typed for them: the
-// check that Encode and the commands of shares run before a secret is asked, and that the menu
-// runs as soon as the details are typed (CORE-42), so that a detail too long for its card is typed
-// again at once, with every other answer kept. Each check draws the cards in memory, writes
+// check that Encode and the commands of shares run before a secret is asked or read, and that the
+// menu runs as soon as the details are typed (CORE-42), so that a detail too long for its card is
+// typed again at once, with every other answer kept. Each check draws the cards in memory, writes
 // nothing and shows nothing: a command says that it is checking, while the menu, whose record of
 // answers counts every line it writes, says nothing.
 
@@ -9,7 +9,6 @@ import { parseArguments, type ParsedArguments, value } from "./arguments.js";
 import { businessOptions, TYPED_CARD_TEXT_OPTIONS } from "./business-options.js";
 import { cardOutputs } from "./card-options.js";
 import { exportOptions } from "./sskr-output.js";
-import { EncodedForm } from "../core/encoded-form.js";
 import type { EncodedFormat } from "../core/types.js";
 import { CardPreview, LONGEST_SAMPLE_WORDS } from "../export/card-preview.js";
 import type { CardSettings } from "../export/card-settings.js";
@@ -33,19 +32,21 @@ function cardsMayFail(saving: ParsedArguments, settings: CardSettings): boolean 
 
 /**
  * The check that the colour cards that the options `saving` ask for can be printed in `format`,
- * with their card details: it draws them with a sample phrase of the longest length, drawn at
- * random as for every preview (CardPreview), and refuses a detail too long for its card
- * (CardPreview.assertColorsPrint). Undefined where nothing can fail (cardsMayFail): a render
- * takes seconds, so it is not made then.
+ * their colours or their Unicode codes, with their card details: it draws them with a sample
+ * phrase of the longest length, drawn at random as for every preview (CardPreview), and refuses a
+ * detail too long for its card (CardPreview.assertColorsPrint). Undefined where nothing can fail
+ * (cardsMayFail): a render takes seconds, so it is not made then. A form without cards never
+ * comes here: Encode refuses its cards first (validateCardOptions), and the menu offers it none.
  */
 export function colorCardsFit(
   saving: ParsedArguments,
   format: EncodedFormat,
 ): (() => Promise<void>) | undefined {
-  if (!EncodedForm.of(format).writtenInColors) return undefined;
   const { sheets, cards } = cardOutputs(saving);
+  // Before any detail is drawn: a run that prints no cards draws none.
+  if (!sheets && !cards) return undefined;
   const settings = businessOptions(saving);
-  if ((!sheets && !cards) || !cardsMayFail(saving, settings)) return undefined;
+  if (!cardsMayFail(saving, settings)) return undefined;
   const preview = new CardPreview(nodeCardRenderer, {
     words: LONGEST_SAMPLE_WORDS,
     settings,
