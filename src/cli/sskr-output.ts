@@ -3,7 +3,12 @@
 
 import { imageFormat, cardFileFormat, savedPagesNotice } from "./image-options.js";
 import { DEFAULT_SHARE_TEMPLATE_ID, resolveTemplateId } from "../export/template-catalog.js";
-import { resolveSskrLayout, parseSskrLayout, SSKR_LAYOUT_RULES } from "../export/sskr-content.js";
+import {
+  assertSskrLayoutQr,
+  resolveSskrLayout,
+  parseSskrLayout,
+  SSKR_LAYOUT_RULES,
+} from "../export/sskr-content.js";
 import {
   printableText,
   codeLines,
@@ -82,6 +87,7 @@ export function exportOptions(
   const settings = businessOptions(args, template);
   // Resolved here so that the messages below describe what is actually written.
   const layout = resolveSskrLayout(requested, settings.pageSize);
+  assertSskrLayoutQr(layout, settings);
   SSKR_LAYOUT_RULES[layout].assertDesign(design);
   return {
     ...settings,

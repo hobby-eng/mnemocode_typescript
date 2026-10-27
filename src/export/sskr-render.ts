@@ -33,6 +33,7 @@ import { printedCode, separateCardName } from "./card-codes.js";
 import type { UniformChoice } from "./platform.js";
 import { catalogSheetShape, renderCatalogDesign, type CardDrawing } from "./templates.js";
 import {
+  assertSskrLayoutQr,
   resolveSskrLayout,
   type SskrCardContent,
   type SskrCardLayout,
@@ -162,7 +163,8 @@ export class ShareCardSet extends Redacted implements Disposable {
    * choice is made, a layout of none (export.sskr-content.card-layout-one), a title that cardTitle
    * refuses, a form of no shares (sskr.transport.share-format-one) or of shares without cards
    * (sskr.transport.shares-written-as-no-cards-cards-print-shares), a layout that the page size
-   * does not give (resolveSskrLayout), a style of no design
+   * does not give (resolveSskrLayout), a QR code on separate cards
+   * (export.sskr-content.qr-code-printed-on-sheet-only-choose-layout), a style of no design
    * (export.sskr-render.unsupported-sskr-card-style) and separate cards of a design printed on
    * sheets only (export.template-catalog.sheets-only); then details that ExportDetails refuses,
    * shares that Share.readSet refuses, which asks here for no quorum, and a plan that
@@ -184,6 +186,7 @@ export class ShareCardSet extends Redacted implements Disposable {
     parseShareFormat(format);
     assertShareFormatHasCards(format);
     const layout = resolveSskrLayout(requested.layout, requested.pageSize);
+    assertSskrLayoutQr(layout, requested);
     const rules = SSKR_LAYOUT_RULES[layout];
     const options: ResolvedOptions = {
       ...requested,
@@ -312,7 +315,6 @@ export class ShareCardSet extends Redacted implements Disposable {
    */
   get qrCodes(): readonly ShareQrCode[] {
     this.#assertLive();
-    if (SSKR_LAYOUT_RULES[this.#options.layout].separateCards) return [];
     return this.#members
       .filter((member) => member.owned.settings.cardQr === true)
       .map((member) =>

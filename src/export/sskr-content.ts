@@ -13,6 +13,8 @@ const ERRORS = new ErrorCatalog("export.sskr-content", {
   "card-layout-one": (value0: string) => `The card layout must be one of: ${value0}.`,
   "business-page-size-gives-separate-cards-choose-size": (value0: string) =>
     `The business page size gives separate cards. Choose the ${value0} size for a collection sheet.`,
+  "qr-code-printed-on-sheet-only-choose-layout": (value0: string) =>
+    `A QR code is printed on a sheet only. Choose the qr layout, or a collection sheet of the ${value0} size, for a QR code; separate cards never carry one.`,
 });
 
 /** The layouts of share cards that a caller may ask for. */
@@ -115,6 +117,17 @@ export function resolveSskrLayout(
     parseSskrLayout(requested) ?? (isCardPageSize(pageSize) ? "individual" : "collection");
   SSKR_LAYOUT_RULES[layout].assertPageSize(pageSize);
   return layout;
+}
+
+/**
+ * Refuses a QR code (`cardQr`) on the separate cards of `layout`, which never carry one, as a seed
+ * phrase's separate cards refuse it
+ * (export.sskr-content.qr-code-printed-on-sheet-only-choose-layout). Fast, it draws nothing: the
+ * share cards check it, and a host before it asks for a secret.
+ */
+export function assertSskrLayoutQr(layout: SskrCardLayout, settings: CardSettings): void {
+  if (SSKR_LAYOUT_RULES[layout].separateCards && settings.cardQr === true)
+    throw ERRORS.create("qr-code-printed-on-sheet-only-choose-layout", [`${SHEET_SIZES_TEXT}`]);
 }
 
 /**

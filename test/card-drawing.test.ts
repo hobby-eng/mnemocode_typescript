@@ -127,7 +127,7 @@ describe("Card pages read back as drawing steps (export/card-drawing.ts)", () =>
   );
 
   it(
-    "reads the share cards of every family in every layout, with a whole-share QR",
+    "reads the share cards of every family in every layout, with a whole-share QR on the sheets",
     async () => {
       for (const template of FAMILY_DESIGNS)
         for (const layout of SSKR_CARD_LAYOUTS) {
@@ -136,7 +136,8 @@ describe("Card pages read back as drawing steps (export/card-drawing.ts)", () =>
           const cards = await ShareCardSet.create(nodeCardRenderer, SHARES, {
             style: styleOf(template),
             layout,
-            cardQr: true,
+            // Separate cards never carry a QR code, and refuse one.
+            cardQr: layout !== "individual",
           });
           // The first document of the first share: a sheet, or its first separate card.
           for await (const document of cards.documents(0)) {

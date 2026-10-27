@@ -1,5 +1,6 @@
-// sskr-export and sskr-split on the private screen, with the terminal replaced
-// (test/helpers/question-terminal.ts). A save may be made to fail first (`terminal.saveFailures`).
+// sskr-export and sskr-split, also as encode --sskr, on the private screen, with the terminal
+// replaced (test/helpers/question-terminal.ts). A save may be made to fail first
+// (`terminal.saveFailures`).
 // Public test data only: the "abandon … about" phrase, its fingerprint, and vectors/sskr-v1.json.
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -7,6 +8,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { runEncode } from "../src/cli/encode-command.js";
 import { runSskrExport } from "../src/cli/sskr-export-command.js";
 import { runSskrSplit } from "../src/cli/sskr-split-command.js";
 import { CANCELLED, type Cancelled } from "../src/cli/terminal-keys.js";
@@ -15,7 +17,7 @@ import { ESCAPE } from "./helpers/keys.js";
 import { questionsOnPrivateScreen, seen, terminal } from "./helpers/question-terminal.js";
 import { OTHER_SET_SHARE, promptsShown, SHARES, SHARES_PROMPT } from "./helpers/share-questions.js";
 import { TEST_FINGERPRINT, TEST_PHRASE } from "./helpers/test-phrase.js";
-import { SECOND_SHARE_PROMPT } from "./helpers/prompts.js";
+import { SECOND_SHARE_PROMPT, SEED_PHRASE_PROMPT } from "./helpers/prompts.js";
 
 const harness = await vi.hoisted(async () => import("./helpers/question-terminal.js"));
 vi.mock("node:tty", async (importOriginal) => harness.replacedTty(await importOriginal()));
@@ -228,6 +230,39 @@ describe("shares on the private screen", () => {
       expect(existsSync(output)).toBe(false);
       expect(seen.notices).toContain("The file of the shares was not saved.");
       expect(seen.out.filter((line) => line.startsWith("ur:sskr/"))).toHaveLength(3);
+    });
+  });
+});
+
+describe("shares on the private screen", () => {
+  describe("printing separate cards", () => {
+    it("refuses a QR code on separate share cards before a seed phrase or a share is asked", async () => {
+      const folder = await mkdtemp(join(tmpdir(), "mnemocode-sskr-separate-"));
+      try {
+        const split = { "ask-secrets": true, threshold: "2", shares: "3" } as const;
+        // Separate cards by their layout, or by the business size, which gives them.
+        for (const separate of [
+          { "cards-dir": join(folder, "cards"), "card-layout": "individual", "card-qr": true },
+          { pdf: join(folder, "shares.pdf"), "page-size": "business", "card-qr": true },
+        ])
+          for (const run of [
+            () => runSskrSplit({ ...split, format: "colors", ...separate }),
+            () => runEncode({ ...split, sskr: true, "share-format": "colors", ...separate }),
+            () => runSskrExport({ "ask-secrets": true, ...separate }),
+          ])
+            await expect(run()).rejects.toThrow(
+              expect.objectContaining({
+                code: "export.sskr-content.qr-code-printed-on-sheet-only-choose-layout",
+                message:
+                  "A QR code is printed on a sheet only. Choose the qr layout, or a collection sheet of the A6, A5 or A4 size, for a QR code; separate cards never carry one.",
+              }),
+            );
+        expect(seen.screen).not.toContain(SEED_PHRASE_PROMPT);
+        expect(promptsShown()).toEqual([]);
+        expect(readdirSync(folder)).toEqual([]);
+      } finally {
+        await rm(folder, { recursive: true, force: true });
+      }
     });
   });
 });

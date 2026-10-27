@@ -39,7 +39,6 @@ describe("cards of a share set, for any host", () => {
     const separate = await ShareCardSet.create(nodeCardRenderer, SHARES, {
       style: "it",
       pageSize: "business",
-      cardQr: true,
     });
     expect(separate.qrCodes).toEqual([]);
     const codes = (
@@ -107,6 +106,17 @@ describe("cards of a share set, for any host", () => {
       ).rejects.toThrow(`Shares written as ${shareFormat} have no cards`);
       expect(ownShareCards(SHARES[0]!, shareFormat)).toBeUndefined();
     }
+  });
+
+  it("refuses a QR code on separate cards, by their layout or by the business size", async () => {
+    for (const separate of [{ layout: "individual" }, { pageSize: "business" }] as const)
+      await expect(
+        ShareCardSet.create(nodeCardRenderer, SHARES, { style: "it", cardQr: true, ...separate }),
+      ).rejects.toThrow(
+        expect.objectContaining({
+          code: "export.sskr-content.qr-code-printed-on-sheet-only-choose-layout",
+        }),
+      );
   });
 
   it("gives separate cards one document per card, decoys too, kept in a folder of the share", async () => {

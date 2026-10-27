@@ -16,7 +16,11 @@ import { MENU_ENTRIES } from "../../src/cli/menu.js";
 import { MENU_ENTRY_NAMES as ENTRY, type MenuEntryName } from "../../src/cli/menu-entries.js";
 import { encodeFormat } from "../../src/cli/input.js";
 import { AnswerRecord } from "../../src/cli/terminal-choice.js";
-import { parseSskrLayout, resolveSskrLayout } from "../../src/export/sskr-content.js";
+import {
+  assertSskrLayoutQr,
+  parseSskrLayout,
+  resolveSskrLayout,
+} from "../../src/export/sskr-content.js";
 import { COIN_ADDRESS_ANSWERS } from "./coin-addresses.js";
 import { script } from "./menu-script.js";
 import { FINGERPRINT_PROMPT } from "./prompts.js";
@@ -214,7 +218,7 @@ export async function everyPath(
 /**
  * Checks the options of a command line for cards as the commands check them before asking for a
  * secret: the details and the page size, the image format, and for a single copy the card options
- * of its form, for shares the layout of their cards.
+ * of its form, for shares the layout of their cards and a QR code only on their sheets.
  */
 export function assertCardOptions(
   command: string,
@@ -223,9 +227,13 @@ export function assertCardOptions(
   if (parsed.template === undefined || command === "preview") return;
   const settings = businessOptions(parsed);
   if (parsed["image-format"] !== undefined) imageFormat(parsed);
-  if (parsed.sskr === true)
-    resolveSskrLayout(parseSskrLayout(value(parsed, "card-layout")), settings.pageSize);
-  else validateCardOptions(parsed, encodeFormat(value(parsed, "format")));
+  if (parsed.sskr === true) {
+    const layout = resolveSskrLayout(
+      parseSskrLayout(value(parsed, "card-layout")),
+      settings.pageSize,
+    );
+    assertSskrLayoutQr(layout, settings);
+  } else validateCardOptions(parsed, encodeFormat(value(parsed, "format")));
 }
 
 /** The command line that `answers` give in `entry`, with `typed` for its typed questions. */
