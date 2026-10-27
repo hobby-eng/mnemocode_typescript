@@ -32,6 +32,7 @@ import { CODE_FORMS, type CodeForm, DIGIT_MARKED_WIDTHS } from "./repair-models.
 import { ErrorCatalog, suppliedMessage } from "../core/error-catalog.js";
 import { MarkedReading } from "./repair-owners.js";
 import type { ReadRepairableShare } from "./repair-types.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 /** Owned reading APIs, kept available through the original repair entry point. */
 export { MarkedReading, ReadingSpace, everyPick } from "./repair-owners.js";
@@ -142,7 +143,7 @@ export function markCount(text: string): number {
  * with the elements: a partly read code holds fewer ? than its digits and counts as one.
  */
 export function exceedsMarks(text: string, maxElements: number): boolean {
-  const trimmed = text.trim();
+  const trimmed = trimWhiteSpace(text);
   return trimmed.length > MAX_REPAIR_TEXT_LENGTH || markCount(trimmed) > maxElements;
 }
 
@@ -251,7 +252,7 @@ export function repairCandidates(
   if (!Number.isInteger(freeBits) || freeBits < 0 || freeBits > MAX_LISTED_FREE_BITS)
     throw ERRORS.create("free-bits-budget", []);
   if (!isMarked(value)) return [unrepairedShare(value)];
-  const text = value.trim();
+  const text = trimWhiteSpace(value);
   if (exceedsMarks(text, MAX_MARKED_ELEMENTS))
     throw ERRORS.create("each-at-place", [`${capitalized(markLimit(MAX_MARKED_ELEMENTS))}`]);
   const problem = markProblem(text);

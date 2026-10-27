@@ -77,6 +77,7 @@ import { choose, waitForEnter, type Choice, type Explanation } from "./terminal-
 import { CANCELLED, type Cancelled } from "./terminal-keys.js";
 import { defined } from "../core/defined.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 const ERRORS = new ErrorCatalog("cli.re-encode-command", {
   refused: (value0: string, value1: string) => `${value0}${value1}`,
@@ -262,7 +263,7 @@ async function reEncodingFromOptions(
     const lastWord =
       value(old, "last-word-file") === undefined
         ? value(old, LAST_WORD_OPTION)
-        : textInput(old, "last-word").trim();
+        : trimWhiteSpace(textInput(old, "last-word"));
     return ReEncoding.of(backup, read.dates, lastWord);
   });
   if (reEncoding === CANCELLED) return CANCELLED;

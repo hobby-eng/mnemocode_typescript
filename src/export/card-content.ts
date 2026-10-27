@@ -9,6 +9,7 @@ import { contentKindRules, type ContentKind } from "./content-kinds.js";
 import type { SskrCardContent } from "./sskr-content.js";
 import type { CardContent } from "./backup-cards.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 const ERRORS = new ErrorCatalog("export.card-content", {
   "cards-print-codes-print-one-code-each-color": () =>
@@ -66,7 +67,7 @@ function assertLabelsPerColor(content: ColorCardContent): void {
   const owned = Array.from(labels);
   if (
     owned.length !== content.colors.length ||
-    !owned.every((label) => typeof label === "string" && label.trim() !== "")
+    !owned.every((label) => typeof label === "string" && trimWhiteSpace(label) !== "")
   )
     throw ERRORS.create("cards-print-codes-print-one-code-each-color", []);
 }

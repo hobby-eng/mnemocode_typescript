@@ -74,6 +74,7 @@ import {
   type WorkBudget,
 } from "./joint-solve.js";
 import { ErrorCatalog, suppliedMessage } from "../core/error-catalog.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 const ERRORS = new ErrorCatalog("sskr.joint-repair", {
   "plan-wiped": () => "This joint repair plan has been wiped.",
@@ -520,7 +521,7 @@ export async function planJointRepair(
   // The bound of every set of shares, before any record is read (AUD-012-API002).
   assertShareCount(records.length);
   const { platform, places } = options;
-  const texts = Array.from(records, (record) => record.trim());
+  const texts = Array.from(records, (record) => trimWhiteSpace(record));
   for (const [index, text] of texts.entries()) {
     const problem = jointMarkLimitProblem(placeOf(places, index + 1), text);
     if (problem !== undefined) throw ERRORS.create("plan-joint-repair-refused", [problem]);

@@ -2,6 +2,7 @@ import type { BusinessStyle, MaterialStyle } from "./template-catalog.js";
 import { listInWords } from "../core/places.js";
 import { capitalized } from "../core/prose.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 const ERRORS = new ErrorCatalog("export.card-settings", {
   "page-size": (value0: string) => `Page size must be ${value0}.`,
@@ -220,7 +221,7 @@ export function cardText(text: unknown, label: string, blankEnding: string): str
   // and a text settled once must pass again as it is (AUD-037-API006). NFC keeps every control
   // character, and the check of the whole text refuses one at either end too.
   const normalized = typeof text === "string" ? text.normalize("NFC") : "";
-  const drawn = normalized.trim();
+  const drawn = trimWhiteSpace(normalized);
   if (drawn === "" || /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/u.test(normalized))
     throw ERRORS.create("card-non-empty-text-on-one-line", [`${label}`, `${blankEnding}`]);
   if (Array.from(drawn).length > MAX_CARD_TEXT_LENGTH)

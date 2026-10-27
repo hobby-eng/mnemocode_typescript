@@ -8,6 +8,7 @@ import { DECIMAL_DIGITS, inWholeRange, wholeNumberOf } from "./typed-number.js";
 import type { MappingRow } from "./types.js";
 import { defined } from "./defined.js";
 import { ErrorCatalog, suppliedMessage } from "./error-catalog.js";
+import { trimWhiteSpace } from "./white-space.js";
 
 // Keep the existing refusal codes while moving their one implementation out of words.ts.
 const ERRORS = new ErrorCatalog("core.words", {
@@ -153,7 +154,7 @@ export class WordTable {
     if (typeof lookup !== "string" || !Object.hasOwn(WordTable.#lookups, lookup))
       throw ERRORS.create("word-table-lookup", []);
     const { find, refusal } = WordTable.#lookups[lookup];
-    const index = find(text.trim());
+    const index = find(trimWhiteSpace(text));
     if (index === undefined) throw ERRORS.create("word-table-row-refused", [refusal]);
     return WordTable.row(index + WORD_NUMBER_RANGE.min);
   }

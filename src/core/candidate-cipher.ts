@@ -22,6 +22,7 @@ import { CandidateFileRefusedError } from "./candidate-file-refusal.js";
 import { ERRORS } from "./candidate-encryption-errors.js";
 import { Redacted } from "./redacted.js";
 import { bytesWhileLive, SecretValue } from "./secret-value.js";
+import { trimWhiteSpace, withoutByteOrderMark } from "./white-space.js";
 
 /** An X25519 recipient: "age1", then 58 Bech32 characters (age-encryption.org/v1). */
 const X25519_RECIPIENT = /^age1[02-9ac-hj-np-z]{58}$/u;
@@ -160,12 +161,13 @@ export class CandidateCipher {
   }
 
   /**
-   * The recipient as typed, pasted or read from a file: one age1… key, in any case. Its Bech32
-   * checksum is checked here too, so that a typing error shows before any search. Refuses any
-   * other text (core.candidate-encryption.key-one-age-key-62-characters-starts-age1).
+   * The recipient as typed, pasted or read from a file: one age1… key, in any case, trimmed and
+   * without a file's byte order mark. Its Bech32 checksum is checked here too, so that a typing
+   * error shows before any search. Refuses any other text
+   * (core.candidate-encryption.key-one-age-key-62-characters-starts-age1).
    */
   static parseRecipient(text: string): string {
-    const recipient = text.trim().toLowerCase();
+    const recipient = trimWhiteSpace(withoutByteOrderMark(text)).toLowerCase();
     const refused = ERRORS.create("key-one-age-key-62-characters-starts-age1", []);
     if (!X25519_RECIPIENT.test(recipient)) throw refused;
     try {

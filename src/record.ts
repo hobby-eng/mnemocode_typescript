@@ -6,6 +6,7 @@ import {
 } from "./core/types.js";
 import { defined } from "./core/defined.js";
 import { ErrorCatalog } from "./core/error-catalog.js";
+import { trimWhiteSpace, withoutByteOrderMark } from "./core/white-space.js";
 
 const ERRORS = new ErrorCatalog("record", {
   "unsupported-mode": () => "Unsupported MnemoCode record mode.",
@@ -54,7 +55,7 @@ const RECORD_PATTERN = new RegExp(
 export function serializeRecord(mode: MaskingMode, format: EncodedFormat, payload: string): string {
   if (!isMaskingMode(mode)) throw ERRORS.create("unsupported-mode", []);
   if (!isEncodedFormat(format)) throw ERRORS.create("unsupported-format", []);
-  const normalized = payload.trim();
+  const normalized = trimWhiteSpace(payload);
   if (normalized.length === 0) throw ERRORS.create("empty-payload", []);
   return `${RECORD_PREFIX}${MNEMOCODE_RECORD_VERSION}:${mode}:${format}:${normalized}`;
 }
@@ -65,7 +66,8 @@ export function serializeRecord(mode: MaskingMode, format: EncodedFormat, payloa
  * (record.malformed-header, record.unsupported-version, record.unsupported-format).
  */
 export function parseRecord(value: string): MnemoCodeRecord | undefined {
-  const normalized = value.trim();
+  // A record is the text of a file: without the byte order mark an editor may put at its start.
+  const normalized = trimWhiteSpace(withoutByteOrderMark(value));
   if (!normalized.startsWith(RECORD_PREFIX)) return undefined;
   const match = RECORD_PATTERN.exec(normalized);
   if (match === null || !isMaskingMode(match[2])) throw ERRORS.create("malformed-header", []);

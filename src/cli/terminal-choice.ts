@@ -33,6 +33,7 @@ import { defined } from "../core/defined.js";
 import { PrivateSteps } from "./private-steps.js";
 import { PrivatePage } from "./private-page.js";
 import { isControl } from "./screen-rows.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 /** Marker, number and the gaps before a label: "› 1  ". */
 const LABEL_INDENT = 5;
@@ -593,7 +594,7 @@ async function askLineOnce(
     erase();
     if (typed === undefined) return { kind: "back" };
     if (reader.leftOut()) return { kind: "refused", reason: NOT_UTF8 };
-    return settledAnswer(typed.trim(), label, options);
+    return settledAnswer(trimWhiteSpace(typed), label, options);
   });
 }
 

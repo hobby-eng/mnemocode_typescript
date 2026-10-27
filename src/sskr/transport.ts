@@ -128,6 +128,7 @@ export {
   wordIndexesToBytes,
 } from "./mixed-layout.js";
 import { isOneOf } from "../core/one-of.js";
+import { trimWhiteSpace, withoutByteOrderMark } from "../core/white-space.js";
 const MAX_COLOR_TEXT_LENGTH = 1024;
 /** The shares of one set at most: every member of every group. */
 const MAX_SET_SHARES = MAX_GROUPS * MAX_GROUP_MEMBERS;
@@ -245,7 +246,7 @@ function decodedBytes(tokens: readonly string[], units: ShareUnits, unknown: str
  * as a wrong checksum (shareInfo).
  */
 export function urToTransport(value: string): Uint8Array {
-  const match = UR_SSKR.exec(value.trim());
+  const match = UR_SSKR.exec(trimWhiteSpace(value));
   const body = match?.[1];
   if (
     !body ||
@@ -654,7 +655,7 @@ export function writeShare(share: string, format: ShareFormat): string {
  * like no other form, as readShare takes it; none for a share in codes, colors or a UR.
  */
 export function shareWordList(share: string): WordList | undefined {
-  const text = share.trim();
+  const text = trimWhiteSpace(share);
   const format = READ_ORDER.find((candidate) => SHARE_FORMS[candidate].looks(text));
   return format === undefined ? undefined : SHARE_FORMS[format].words;
 }
@@ -680,7 +681,8 @@ export interface ReadShare {
  * looks like no form, is refused with not-sskr-share.
  */
 export function readShare(value: string): ReadShare {
-  const text = value.trim();
+  // A share read from a file may start with the byte order mark an editor wrote.
+  const text = trimWhiteSpace(withoutByteOrderMark(value));
   let firstError: unknown;
   for (const format of READ_ORDER) {
     const form = SHARE_FORMS[format];

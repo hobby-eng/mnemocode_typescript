@@ -51,6 +51,7 @@ import { refusalMessage } from "../core/refusal.js";
 import { afterPlace } from "../core/prose.js";
 import { defined } from "../core/defined.js";
 import { type CodedFailure, ErrorCatalog, suppliedMessage } from "../core/error-catalog.js";
+import { trimWhiteSpace, withoutByteOrderMark } from "../core/white-space.js";
 
 // The codes of the problems of shares (ShareTrouble) take the message that names the shares by
 // their places, which only the check that finds them can write.
@@ -473,7 +474,7 @@ export class ShareInput implements Disposable {
    * is blank (sskr.share-input.share-input-name-host-s-reader-seed-phrase).
    */
   constructor(options: { readonly decodeEntry: string }) {
-    if (typeof options?.decodeEntry !== "string" || options.decodeEntry.trim() === "")
+    if (typeof options?.decodeEntry !== "string" || trimWhiteSpace(options.decodeEntry) === "")
       throw ERRORS.create("share-input-name-host-s-reader-seed-phrase", []);
     this.#decodeEntry = options.decodeEntry;
   }
@@ -500,9 +501,10 @@ export class ShareInput implements Disposable {
    * sskr.transport.assert-share-count-refused).
    */
   static partsOfText(text: string): string[] {
-    const parts = text
+    // Text of a file may start with the byte order mark an editor wrote.
+    const parts = withoutByteOrderMark(text)
       .split(SHARE_SEPARATORS)
-      .map((part) => part.trim())
+      .map((part) => trimWhiteSpace(part))
       .filter(Boolean);
     if (parts.length === 0) return [];
     // Bounds the work below: wrapped or not, the parts make no more shares than a set may have.

@@ -11,6 +11,7 @@ import { FILE_INPUTS, FILE_OUTPUTS, FOLDER_OUTPUTS, SAVED_OPTIONS } from "./outp
 import { DOCUMENT_EXTENSIONS } from "../export/document-formats.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
 import { errorCode } from "../core/refusal.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 const ERRORS = new ErrorCatalog("cli.output-paths", {
   "path-empty-paths-not-accepted-results-always-appear": (value0: string) =>
@@ -45,7 +46,7 @@ const MAX_COPY_NUMBER = 999;
  * current folder, or "-", which the command line reads as standard input or output.
  */
 export function isUnusableOutputPath(path: string): boolean {
-  return path.trim() === "" || path === "-";
+  return trimWhiteSpace(path) === "" || path === "-";
 }
 
 /** Refuses the output `key` given as no path (isUnusableOutputPath). */

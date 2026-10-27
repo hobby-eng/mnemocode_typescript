@@ -29,6 +29,7 @@ import { assertShareQr } from "../sskr/transport.js";
 import { isCardPageSize, SHEET_SIZES_TEXT, type CardSettings } from "./card-settings.js";
 import { defined } from "../core/defined.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 const ERRORS = new ErrorCatalog("export.content-kinds", {
   "cards-draw-color-references": () => "These cards draw color references.",
@@ -94,7 +95,7 @@ const COLOR_CODES = RGB_MAX_VALUE + 1;
 function payloadHoldsColors(colors: readonly string[], payload: string): boolean {
   const written = colors.join(" ");
   if (payload === written) return true;
-  if (payload.trim().split(/\s+/u).every(isRgbReference)) return false;
+  if (trimWhiteSpace(payload).split(/\s+/u).every(isRgbReference)) return false;
   return unicodeToColors(payload).join(" ") === written;
 }
 

@@ -24,7 +24,7 @@ import {
   FIRST_RECEIVING_LOCATION,
   isScannedEvidence,
 } from "../core/wallet-evidence.js";
-import { withoutByteOrderMark } from "../core/white-space.js";
+import { trimWhiteSpace, withoutByteOrderMark } from "../core/white-space.js";
 import { defined } from "../core/defined.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
 import { Redacted } from "../core/redacted.js";
@@ -96,7 +96,7 @@ export const WALLET_EVIDENCE_OPTIONS = [
 function bitcoinProfilesFrom(arguments_: ParsedArguments): readonly BitcoinProfile[] {
   const requested = value(arguments_, "bitcoin-profile") ?? "auto";
   if (requested === "auto") return BITCOIN_PROFILES;
-  const names = requested.split(",").map((item) => item.trim());
+  const names = requested.split(",").map((item) => trimWhiteSpace(item));
   // A name that is no profile, an empty one included, is refused in the option's syntax; the
   // evidence's own rule then refuses a profile named twice, in its own code.
   if (!names.every(isBitcoinProfile))

@@ -18,7 +18,7 @@
 
 import { Redacted } from "./redacted.js";
 import { bytesWhileLive, SecretValue } from "./secret-value.js";
-import { withoutByteOrderMark } from "./white-space.js";
+import { trimWhiteSpace, withoutByteOrderMark } from "./white-space.js";
 import { listInWords } from "./places.js";
 import {
   CandidateFileAdmission,
@@ -68,7 +68,7 @@ export function parseRecipient(text: string): string {
  * (core.candidate-encryption.use-at-least-characters-passphrase-all-protects-seed).
  */
 export function parseListPassphrase(text: string): string {
-  const passphrase = withoutByteOrderMark(text).trim();
+  const passphrase = trimWhiteSpace(withoutByteOrderMark(text));
   // Characters as a person counts them: code points, not UTF-16 units.
   if (Array.from(passphrase).length < MIN_LIST_PASSPHRASE_LENGTH)
     throw ERRORS.create("use-at-least-characters-passphrase-all-protects-seed", [

@@ -5,6 +5,7 @@ import { ErrorCatalog, suppliedMessage } from "../core/error-catalog.js";
 import { afterFailure, errorCode, failureClause } from "../core/refusal.js";
 import { checkedExportFileName } from "./file-name.js";
 import { sameFolder, TemporaryFolders } from "./temporary-folders.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 const ERRORS = new ErrorCatalog("export.private-file", {
   "new-folder-path-empty-one-refused": () => "A new folder needs a path; an empty one is refused.",
@@ -243,7 +244,7 @@ async function removeOwnFolder(target: string, made: Stats): Promise<void> {
  * published. A failure to look is the file system's own error (entryAt).
  */
 export async function absentPath(path: string, taken: string): Promise<string> {
-  if (path.trim() === "") throw ERRORS.create("new-folder-path-empty-one-refused", []);
+  if (trimWhiteSpace(path) === "") throw ERRORS.create("new-folder-path-empty-one-refused", []);
   const target = resolve(path);
   if ((await entryAt(target)) !== "none") throw ERRORS.create("absent-path-refused", [taken]);
   return target;

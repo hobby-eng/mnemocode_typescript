@@ -34,6 +34,7 @@ import { BITS_PER_BYTE } from "./bits.js";
 import type { MaskingMode } from "./types.js";
 import { defined } from "./defined.js";
 import { ErrorCatalog, suppliedMessage } from "./error-catalog.js";
+import { trimWhiteSpace } from "./white-space.js";
 
 const ERRORS = new ErrorCatalog("core.backup-reading", {
   "date-recovery-available-only-records-created-seedshift": () =>
@@ -178,7 +179,7 @@ export class BackupReading extends Redacted implements Disposable {
     let unknownBits: number[] = [];
     let readings: MarkedReading[] = [];
     try {
-      readings = MarkedReading.of(part.trim());
+      readings = MarkedReading.of(trimWhiteSpace(part));
       unknownBits = readings.flatMap((reading) =>
         reading.withSpace((space) => (space === undefined ? [] : [space.unknownBits])),
       );

@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defined } from "../core/defined.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
+import { trimWhiteSpace } from "../core/white-space.js";
 
 const ERRORS = new ErrorCatalog("cli.text-file", {
   "local-file-required": () => "Use a local text file path or type the text itself.",
@@ -24,7 +25,7 @@ const DRIVE_PATH = /^[a-z]:[/\\]/iu;
  * Backslashes on Windows separate folders and stay as typed. No shell is started.
  */
 export function droppedPath(answer: string, platform: NodeJS.Platform = process.platform): string {
-  const text = answer.trim();
+  const text = trimWhiteSpace(answer);
   const quoted = DROPPED_QUOTES.exec(text);
   const path =
     quoted !== null
@@ -68,7 +69,9 @@ export class TextFileInput {
     if (URI_SCHEME.test(path) && !DRIVE_PATH.test(path)) return undefined;
     if (path.startsWith("//") || path.startsWith("\\\\"))
       throw ERRORS.create("local-file-required", []);
-    return /[/\\]|\.[^.\s]+$/u.test(path) || DROPPED_QUOTES.test(answer.trim()) ? path : undefined;
+    return /[/\\]|\.[^.\s]+$/u.test(path) || DROPPED_QUOTES.test(trimWhiteSpace(answer))
+      ? path
+      : undefined;
   }
 }
 

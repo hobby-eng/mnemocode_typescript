@@ -3,6 +3,7 @@ import { inWholeRange, integerRefusal, type WholeRange } from "./typed-number.js
 import { defined } from "./defined.js";
 import { ErrorCatalog, suppliedMessage } from "./error-catalog.js";
 import { keptCount } from "./search-turns.js";
+import { trimWhiteSpace } from "./white-space.js";
 
 const ERRORS = new ErrorCatalog("core.dates", {
   "there-no-month": () => "There is no such calendar month.",
@@ -141,7 +142,7 @@ function assertCalendarDate(date: DateShiftDate): void {
  * does not have (day-outside-selected-calendar-month).
  */
 export function parseDate(value: string): DateShiftDate {
-  const date = readDateParts(value.trim(), (part, width) =>
+  const date = readDateParts(trimWhiteSpace(value), (part, width) =>
     new RegExp(`^\\d{${width}}$`, "u").test(part) ? Number(part) : undefined,
   );
   if (date === undefined)
@@ -305,7 +306,7 @@ const WHOLE_DATE_PATTERN = WRITTEN_ORDER.map((name) => "?".repeat(widthOf(name))
  * by |, such as 05|15, or a lone ? for a date not remembered at all.
  */
 export function isDatePattern(value: string): boolean {
-  const text = value.trim();
+  const text = trimWhiteSpace(value);
   return text === WHOLE_DATE || /[?|]/u.test(text);
 }
 
@@ -328,7 +329,7 @@ function partMasks(part: string, width: number): string[] | undefined {
  * (ownedPattern: date-pattern-cannot-match-valid, date-pattern-cannot-match-real-calendar-date).
  */
 export function parseDatePattern(value: string): DatePattern {
-  const typed = value.trim();
+  const typed = trimWhiteSpace(value);
   // Each part with its values joined by |, in an order of DATE_ORDERS.
   const read = readDateParts(typed === WHOLE_DATE ? WHOLE_DATE_PATTERN : typed, partMasks);
   if (read === undefined)

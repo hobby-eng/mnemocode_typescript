@@ -9,6 +9,10 @@
 - A Unicode code that is no BIP39 word is refused with "The Unicode code at place N is not a BIP39 word.", which names the place as a place; it read as if N were the code.
 - A command that needs the seed phrase or the encoded input, given by no option, asks for it in a file, for the encoded input also in a QR image, or through `--ask-secrets`; its refusal, and the one of two encoded input sources, no longer offer direct text, which the command line refuses for secrets.
 
+### Typed values
+
+- One rule removes what a person typed or pasted around a value read whole: Unicode's White_Space at either end, as Rust's `str::trim` takes it. Dates and date patterns, records, words of the numbered dictionaries, a re-encode's original final word, shares, the list passphrase, the Discovery Scanner's recipient, card details, `--bitcoin-profile` values and paths were trimmed with JavaScript's `String.prototype.trim`, which keeps NEL (U+0085), white space, and removes a byte order mark (U+FEFF), which is none. A record, a share, the Scanner's recipient and the list passphrase read from a file still lose the byte order mark an editor may put at their start. Words, codes and dates read as a list are still split at JavaScript's white space.
+
 ### Toolchain and dependencies
 
 - Node.js 26.12.1 and pnpm 12.15.0; Vitest 5.0.5, Prettier 3.9.10, oxlint 1.89.0, oxlint-tsgolint 7.0.2005 and `@types/node` 26.6.5.
