@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Refusals
+
+- Codes without the BIP39 checksum that their mode keeps are refused with the code `core.masking.missing-checksum`; it had no namespace (`missing-checksum`), unlike the other codes of its module.
+- A date's year or month out of range is refused with `core.dates.year-out-of-range` or `core.dates.month-out-of-range`, so a host can tell the two apart by the code; they were `core.dates.assert-calendar-date-refused` and `assert-calendar-date-refused-2`.
+- A Unicode code that is no BIP39 word is refused with "The Unicode code at place N is not a BIP39 word.", which names the place as a place; it read as if N were the code.
+- A command that needs the seed phrase or the encoded input, given by no option, asks for it in a file, for the encoded input also in a QR image, or through `--ask-secrets`; its refusal, and the one of two encoded input sources, no longer offer direct text, which the command line refuses for secrets.
+
 ### Toolchain and dependencies
 
 - Node.js 26.12.1 and pnpm 12.15.0; Vitest 5.0.5, Prettier 3.9.10, oxlint 1.89.0, oxlint-tsgolint 7.0.2005 and `@types/node` 26.6.5.

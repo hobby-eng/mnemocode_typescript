@@ -232,7 +232,9 @@ describe("S011: one reader of word numbers and Unicode codes", () => {
   it("reads Unicode codes of a phrase and refuses incomplete or unknown codes", () => {
     expect(unicodeIndexesOf("7684 7684")).toEqual([0, 0]);
     expect(() => unicodeIndexesOf("768")).toThrow("four hexadecimal digits each");
-    expect(() => unicodeIndexesOf("7684 0000")).toThrow("Unicode code 2 is not a BIP39 word.");
+    expect(() => unicodeIndexesOf("7684 0000")).toThrow(
+      "The Unicode code at place 2 is not a BIP39 word.",
+    );
   });
 });
 

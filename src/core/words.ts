@@ -49,7 +49,8 @@ const ERRORS = new ErrorCatalog("core.words", {
     `Indexes use Seedshift-compatible numbering from ${value0}.`,
   "unicode-codes-four-hexadecimal-digits-each-separated-by": () =>
     "Unicode codes have four hexadecimal digits each, separated by spaces or joined.",
-  "unicode-code-not-bip39-word": (value0: string) => `Unicode code ${value0} is not a BIP39 word.`,
+  "unicode-code-not-bip39-word": (value0: string) =>
+    `The Unicode code at place ${value0} is not a BIP39 word.`,
   "mode-exact-old-final-word-stands-no-word": () =>
     "This mode needs the exact old final word: ? stands for no word here.",
 });

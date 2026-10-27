@@ -219,8 +219,8 @@ export class EncodedBackup extends Redacted {
    * Refuses a mode or a format that names none (core.masking.unsupported-mode,
    * core.encoded-form.unsupported-encoded-format), a count of codes that is no BIP39 length
    * (core.encoded-backup.encoded-seed-phrase), and codes that `mode` cannot have written
-   * (Masking.assertCodes: core.bip39-sizes codes, and MissingChecksumError, code missing-checksum,
-   * for a mode that keeps the checksum).
+   * (Masking.assertCodes: core.bip39-sizes codes, and MissingChecksumError, code
+   * core.masking.missing-checksum, for a mode that keeps the checksum).
    */
   static of(indexes: readonly number[], format: EncodedFormat, mode: MaskingMode): EncodedBackup {
     return new EncodedBackup(indexes, format, mode);

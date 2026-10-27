@@ -379,10 +379,11 @@ export class WrittenCodes extends Redacted implements Disposable {
   /**
    * Whether these codes and `dates` restore `mnemonic`, without handing out what they restore.
    * Throws when they cannot be undone, as EncodedBackup.withMode refuses them
-   * (MissingChecksumError, code missing-checksum), and as EncodedBackup.decode refuses a mode that
-   * leaves several phrases, the Original Seedshift with a valid last word, which only a search
-   * undoes (core.encoded-backup.original-seedshift-valid-last-word-gives-several-phrases), and the
-   * dates (what Masking.undo refuses of them).
+   * (MissingChecksumError, code core.masking.missing-checksum), and as EncodedBackup.decode
+   * refuses a mode that leaves several phrases, the Original Seedshift with a valid last word,
+   * which only a search undoes
+   * (core.encoded-backup.original-seedshift-valid-last-word-gives-several-phrases), and the dates
+   * (what Masking.undo refuses of them).
    */
   restores(mnemonic: string, dates: readonly DateShiftDate[]): boolean {
     // The mode is taken only here: read as direct, a mistyped code is named by its place instead

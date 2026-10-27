@@ -40,7 +40,7 @@ import { promisify } from "node:util";
 import { parseArguments } from "../src/cli/arguments.js";
 import { runDecode } from "../src/cli/decode-command.js";
 import { askSecretUntil } from "../src/cli/ask.js";
-import { datesPrompt } from "../src/cli/input.js";
+import { datesPrompt, textInput } from "../src/cli/input.js";
 import { withPrivateScreen } from "../src/cli/private-screen.js";
 import { ENTER_ALTERNATE_SCREEN, LEAVE_ALTERNATE_SCREEN } from "../src/cli/terminal.js";
 
@@ -97,6 +97,16 @@ describe("secret input", () => {
       terminal.answers = "test only\r";
       expect(await askSecretUntil("Seed phrase:", typed)).toBe("test only");
     }
+  });
+
+  it("asks for a secret no option gives in a file or through --ask-secrets, never as direct text", () => {
+    expect(() => textInput(parseArguments([]), "mnemonic")).toThrow(
+      "Provide the mnemonic in a file or through --ask-secrets.",
+    );
+    // The encoded input may come from a QR image as well.
+    expect(() => textInput(parseArguments([]), "input")).toThrow(
+      "Provide the encoded input in a file, in a QR image or through --ask-secrets.",
+    );
   });
 
   it("refuses without a terminal before it touches one", async () => {

@@ -142,6 +142,7 @@ describe("EncodedBackup", () => {
       }
       expect(refused).toBeInstanceOf(MissingChecksumError);
       expect(refused).toMatchObject({
+        code: "core.masking.missing-checksum",
         mode,
         message: `These codes lack the BIP39 checksum that ${ENCODED_MODE_NAMES[mode]} gives them.`,
       });

@@ -448,7 +448,7 @@ export class Masking {
    * Refuses codes that this mode cannot have written: a phrase's count and BIP39 indexes
    * (assertPhraseIndexes: core.bip39-sizes.expected-word-indexes, assert-word-indexes-refused),
    * and, where the mode keeps the checksum (keepsChecksum), a valid one (MissingChecksumError,
-   * code missing-checksum).
+   * code core.masking.missing-checksum).
    */
   assertCodes(indexes: readonly number[]): void {
     // Checked before the words are looked up, which would report a bad index as a bad checksum.
@@ -510,12 +510,12 @@ export class Masking {
 }
 
 /** The code of the refusal of codes without their mode's checksum, this module's own error. */
-export type MaskingErrorCode = "missing-checksum";
+export type MaskingErrorCode = "core.masking.missing-checksum";
 
 /** Codes that lack the BIP39 checksum that their mode gives every phrase it writes. */
 export class MissingChecksumError extends Error {
   /** Stable code for encoded codes lacking their mode's required BIP39 checksum. */
-  readonly code: MaskingErrorCode = "missing-checksum";
+  readonly code: MaskingErrorCode = "core.masking.missing-checksum";
   /** The transformation mode whose encoded checksum is missing. */
   readonly mode: MaskingMode;
 
@@ -536,7 +536,7 @@ export class MissingChecksumError extends Error {
  * MnemoCode Seedshift undone: the seed phrase of `indexes` with `dates`. Refuses what Masking#undo
  * refuses in that mode: indexes that are no phrase (core.bip39-sizes.expected-word-indexes,
  * assert-word-indexes-refused), codes without their checksum (MissingChecksumError,
- * missing-checksum), and dates that deriveShifts refuses (core.dates.no-date,
+ * core.masking.missing-checksum), and dates that deriveShifts refuses (core.dates.no-date,
  * derive-shifts-refused and the calendar checks it names).
  */
 export function decodeIndexes(
@@ -550,8 +550,8 @@ export function decodeIndexes(
  * The Original Seedshift with a valid last word undone: every phrase it may have been. Refuses
  * what Masking#undo refuses in that mode: indexes that are no phrase
  * (core.bip39-sizes.expected-word-indexes, assert-word-indexes-refused), codes without their
- * checksum (MissingChecksumError, missing-checksum), and dates that deriveShifts refuses
- * (core.dates.no-date, derive-shifts-refused and the calendar checks it names).
+ * checksum (MissingChecksumError, core.masking.missing-checksum), and dates that deriveShifts
+ * refuses (core.dates.no-date, derive-shifts-refused and the calendar checks it names).
  */
 export function decodeIndexesLegacyValid(
   indexes: readonly number[],
@@ -566,7 +566,7 @@ export function decodeIndexesLegacyValid(
  * Refuses what parseInput refuses (a `format` that names no form,
  * core.encoded-form.unsupported-encoded-format, and codes that do not read in it), then what
  * decodeIndexes refuses (core.bip39-sizes.expected-word-indexes, assert-word-indexes-refused,
- * missing-checksum, core.dates.no-date and the other refusals of deriveShifts).
+ * core.masking.missing-checksum, core.dates.no-date and the other refusals of deriveShifts).
  */
 export function decodeInput(
   value: string,

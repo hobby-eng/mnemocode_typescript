@@ -64,7 +64,7 @@ export function detectInputFormats(value: string): Array<EncodedFormat> {
  * JSON and the text of one result cannot disagree, whatever its stored words say (AUD-014-API007).
  * Indexes that are no phrase are refused in every form (core.bip39-sizes.*, AUD-037-API008). For
  * JSON, a date of result.dates that the calendar does not have is refused as formatDate refuses it
- * (core.dates.assert-calendar-date-refused, assert-calendar-date-refused-2,
+ * (core.dates.year-out-of-range, month-out-of-range,
  * day-outside-selected-calendar-month).
  */
 export function formatEncoded(result: EncodedResult, format: OutputFormat): string {

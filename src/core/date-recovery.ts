@@ -56,8 +56,8 @@ const LONGEST_MONTH = DATE_PARTS.day.max;
  * ownedPatterns refuses (core.dates.date-pattern-cannot-match-valid, key-conflict and the others
  * it names), known dates that ownedDates refuses (core.dates.date-year-month-day and the others it
  * names), and what Masking#undo refuses for the codes and a combination's dates
- * (core.bip39-sizes.assert-word-indexes-refused, missing-checksum, core.dates.derive-shifts-refused
- * and the other refusals of deriveShifts).
+ * (core.bip39-sizes.assert-word-indexes-refused, core.masking.missing-checksum,
+ * core.dates.derive-shifts-refused and the other refusals of deriveShifts).
  */
 export function* dateRecoveryCandidates(
   indexes: readonly number[],

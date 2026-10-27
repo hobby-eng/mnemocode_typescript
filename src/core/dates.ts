@@ -6,8 +6,8 @@ import { keptCount } from "./search-turns.js";
 
 const ERRORS = new ErrorCatalog("core.dates", {
   "there-no-month": () => "There is no such calendar month.",
-  "assert-calendar-date-refused": suppliedMessage,
-  "assert-calendar-date-refused-2": suppliedMessage,
+  "year-out-of-range": suppliedMessage,
+  "month-out-of-range": suppliedMessage,
   "day-outside-selected-calendar-month": () => "The day is outside the selected calendar month.",
   "use-four-digit-year-example-23-09-2026": (value0: string) =>
     `Use ${value0} with a four-digit year, for example 23-09-2026.`,
@@ -122,14 +122,12 @@ function yearRangeText(): string {
 
 function assertCalendarDate(date: DateShiftDate): void {
   if (!inWholeRange(date.year, DATE_PARTS.year)) {
-    throw ERRORS.create("assert-calendar-date-refused", [
+    throw ERRORS.create("year-out-of-range", [
       integerRefusal("A date year", DATE_PARTS.year, yearRangeText()),
     ]);
   }
   if (!inWholeRange(date.month, DATE_PARTS.month)) {
-    throw ERRORS.create("assert-calendar-date-refused-2", [
-      integerRefusal("A date month", DATE_PARTS.month),
-    ]);
+    throw ERRORS.create("month-out-of-range", [integerRefusal("A date month", DATE_PARTS.month)]);
   }
   if (!inWholeRange(date.day, DATE_PARTS.day) || date.day > daysInMonth(date.year, date.month)) {
     throw ERRORS.create("day-outside-selected-calendar-month", []);
@@ -139,8 +137,8 @@ function assertCalendarDate(date: DateShiftDate): void {
 /**
  * The date that `value` writes as DD-MM-YYYY; refuses another layout
  * (core.dates.use-four-digit-year-example-23-09-2026) and a date that the calendar does not have:
- * a year or a month out of range (assert-calendar-date-refused, assert-calendar-date-refused-2) or
- * a day that its month does not have (day-outside-selected-calendar-month).
+ * a year or a month out of range (year-out-of-range, month-out-of-range) or a day that its month
+ * does not have (day-outside-selected-calendar-month).
  */
 export function parseDate(value: string): DateShiftDate {
   const date = readDateParts(value.trim(), (part, width) =>
@@ -166,8 +164,8 @@ export function ownedDates(dates: readonly DateShiftDate[]): readonly DateShiftD
 /**
  * A date held to the rules of a date, copied (ownedDate's rule for each of `dates` above). Refuses
  * a value that is no object (core.dates.date-year-month-day), a year or a month out of range
- * (assert-calendar-date-refused, assert-calendar-date-refused-2), and a day that its month does
- * not have (day-outside-selected-calendar-month).
+ * (year-out-of-range, month-out-of-range), and a day that its month does not have
+ * (day-outside-selected-calendar-month).
  */
 export function ownedDate(date: DateShiftDate): DateShiftDate {
   // A hole of a sparse list reaches here as undefined.
@@ -256,7 +254,7 @@ export function ownedPatterns(patterns: readonly DatePattern[]): readonly DatePa
 
 /**
  * `date` written as DD-MM-YYYY, with leading zeros. Refuses a date that the calendar does not have
- * (core.dates.assert-calendar-date-refused, assert-calendar-date-refused-2,
+ * (core.dates.year-out-of-range, month-out-of-range,
  * day-outside-selected-calendar-month).
  */
 export function formatDate(date: DateShiftDate): string {
@@ -275,7 +273,7 @@ export function sortDates(dates: readonly DateShiftDate[]): DateShiftDate[] {
  * The shifts of the words of a phrase of `wordCount` words that `dates` give, in calendar order of
  * the dates; refuses no date (core.dates.no-date), more than the phrase takes
  * (derive-shifts-refused), and a date that the calendar does not have
- * (assert-calendar-date-refused, assert-calendar-date-refused-2,
+ * (year-out-of-range, month-out-of-range,
  * day-outside-selected-calendar-month).
  */
 export function deriveShifts(dates: readonly DateShiftDate[], wordCount: Bip39WordCount): number[] {

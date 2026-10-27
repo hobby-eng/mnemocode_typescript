@@ -74,8 +74,8 @@ describe("Core independent entropy and calendar boundaries", () => {
     },
   );
   const DAY = "core.dates.day-outside-selected-calendar-month";
-  const MONTH = "core.dates.assert-calendar-date-refused-2";
-  const YEAR = "core.dates.assert-calendar-date-refused";
+  const MONTH = "core.dates.month-out-of-range";
+  const YEAR = "core.dates.year-out-of-range";
   it.each([
     ["29-02-1900", DAY],
     ["29-02-2100", DAY],

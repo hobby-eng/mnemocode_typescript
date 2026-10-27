@@ -803,7 +803,7 @@ describe("encode, decode and the backup check on the private screen", () => {
       );
       await expect(
         runDecode({ "ask-secrets": true, "input-file": "a.txt", "qr-file": "b.png" }),
-      ).rejects.toThrow("Choose one encoded input source");
+      ).rejects.toThrow("Choose one encoded input source: a QR image or a text file.");
       expect(seen.screen).toBe("");
     });
   });

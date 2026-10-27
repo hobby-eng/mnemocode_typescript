@@ -47,10 +47,10 @@ const ERRORS = new ErrorCatalog("cli.input", {
   "mnemonic-word-count": (value0: string) => `The mnemonic word count must be ${value0}.`,
   "provide-either-as-direct-text-file-but-not": (value0: string) =>
     `Provide ${value0} either as direct text or in a file, but not both.`,
-  "provide-as-direct-text-file-through-ask-secrets": (value0: string) =>
-    `Provide ${value0} as direct text, in a file, or through --ask-secrets.`,
+  "provide-as-direct-text-file-through-ask-secrets": (value0: string, value1: string) =>
+    `Provide ${value0} ${value1} or through --ask-secrets.`,
   "choose-one-encoded-input-source-qr-image-direct": () =>
-    "Choose one encoded input source: a QR image, direct text, or a text file.",
+    "Choose one encoded input source: a QR image or a text file.",
   "representation-format-one-use-number-name": (value0: string) =>
     `The representation format must be one of: ${value0}. Use the number or the name.`,
   "backup-from-options-refused": suppliedMessage,
@@ -85,8 +85,10 @@ export function textInput(
         : "the encoded input";
   if (direct !== undefined && path !== undefined)
     throw ERRORS.create("provide-either-as-direct-text-file-but-not", [`${subject}`]);
+  // The encoded input may come from a QR image too (encodedInput).
+  const sources = key === "input" ? "in a file, in a QR image" : "in a file";
   if (direct === undefined && path === undefined)
-    throw ERRORS.create("provide-as-direct-text-file-through-ask-secrets", [`${subject}`]);
+    throw ERRORS.create("provide-as-direct-text-file-through-ask-secrets", [`${subject}`, sources]);
   return (
     direct ??
     readInputTextFile(
