@@ -11,7 +11,7 @@ export const ERRORS = new ErrorCatalog("core.candidate-encryption", {
   "key-one-age-key-62-characters-starts-age1": () =>
     "The key must be one age key of 62 characters that starts with age1, as the Scanner shows it.",
   "use-at-least-characters-passphrase-all-protects-seed": (value0: string) =>
-    `Use at least ${value0} characters for the passphrase: it is all that protects these seed phrases.`,
+    `The passphrase for the candidates is too short: use at least ${value0} characters, since it is all that protects these seed phrases.`,
   "passphrase-candidates-empty": () => "The passphrase for the candidates is empty.",
   "not-protection-choice": {
     kind: "type",

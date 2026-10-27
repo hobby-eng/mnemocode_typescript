@@ -50,7 +50,12 @@ import { datesPrompt, mostDates } from "./input.js";
 import { evidenceLabel } from "./option-copy.js";
 import { onPrivateScreen, closingRows } from "./private-screen.js";
 import { PrivateSteps } from "./private-steps.js";
-import { candidateLines, candidatesFitScreen, matchedAt } from "./candidate-view.js";
+import {
+  candidateLines,
+  candidatesFitScreen,
+  matchedAt,
+  matchedOnTerminal,
+} from "./candidate-view.js";
 import {
   ProgressLine,
   terminalLayout,
@@ -301,7 +306,7 @@ export function reportDateMatches(result: DateSearchResult, report: MatchesRepor
     for (const line of layout ? wrapText(sentence) : [sentence]) console.log(line);
     return;
   }
-  for (const line of matchLines(result.shown)) console.log(line);
+  for (const line of matchLines(result.shown, report.evidence)) console.log(line);
   if (result.matchCount > report.maxResults)
     terminalNotice(
       `Displayed ${report.maxResults} of ${result.matchCount} checksum-valid candidates.`,
@@ -322,11 +327,12 @@ function matchFacts(result: DateSearchResult, report: MatchesReport): [string, s
 
 /**
  * The shown matches as reportDateMatches prints them, each with its dates, its phrase and where
- * the wallet matched: on a terminal as a part of the result with its facts as grey labels
- * (candidateLines, CORE-36), numbered among those shown; for a file, a pipe or TERM=dumb one row
- * of tab-separated fields each, for a script.
+ * the wallet `evidence` matched: on a terminal as a part of the result with its facts as grey
+ * labels (candidateLines, CORE-36), numbered among those shown, the match in a person's words
+ * (matchedOnTerminal); for a file, a pipe or TERM=dumb one row of tab-separated fields each, for a
+ * script, the match with its path (matchedAt).
  */
-function matchLines(matches: readonly DateMatch[]): string[] {
+function matchLines(matches: readonly DateMatch[], evidence: WalletEvidence | undefined): string[] {
   if (!terminalLayout("stdout"))
     return matches.map((match) => {
       const where = match.evidence === undefined ? "" : `\t${matchedAt(match.evidence)}`;
@@ -335,7 +341,9 @@ function matchLines(matches: readonly DateMatch[]): string[] {
   return matches.flatMap((match, index) =>
     candidateLines(`Match ${index + 1}`, [
       ["Dates", match.dates],
-      ...(match.evidence === undefined ? [] : [["Wallet", matchedAt(match.evidence)] as const]),
+      ...(match.evidence === undefined
+        ? []
+        : [["Wallet", matchedOnTerminal(match.evidence, evidence?.kind)] as const]),
       ["Phrase", match.mnemonic],
     ]),
   );
@@ -351,7 +359,7 @@ function matchesFitScreen(result: DateSearchResult, report: MatchesReport): bool
     rowsOf(resultHeaderLines(MATCHES_TITLE, matchFacts(result, report))) +
     rowsOf(dateMatchNoteLines(report.evidence, result.warning)) +
     closingRows();
-  return candidatesFitScreen(matchLines(result.shown), beside);
+  return candidatesFitScreen(matchLines(result.shown, report.evidence), beside);
 }
 
 /**

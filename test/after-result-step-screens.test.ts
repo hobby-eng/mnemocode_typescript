@@ -95,7 +95,7 @@ describe("recover-date", () => {
     expect(terminal.questions).toEqual(["What now?", WALLET_QUESTION]);
     expect(screensAfter(1)).toEqual([]);
     expect(screensAfter(2)).toEqual(["step screen after 2 questions, 0 answers to come"]);
-    expect(seen.out.join("\n")).toContain("matched at m");
+    expect(seen.out.join("\n")).toContain("master fingerprint matched");
   });
 });
 

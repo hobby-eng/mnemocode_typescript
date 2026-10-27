@@ -42,7 +42,7 @@ import {
   walletOptionGiven,
 } from "./bitcoin-options.js";
 import { textInput, PHRASE_SECRET_OPTIONS } from "./input.js";
-import { candidateLabel, candidateLines, matchedAt } from "./candidate-view.js";
+import { candidateLabel, candidateLines, matchedAt, matchedOnTerminal } from "./candidate-view.js";
 import { linesFitPrivateScreen } from "./screen-fit.js";
 import {
   ProgressLine,
@@ -402,13 +402,15 @@ class Row implements Disposable {
 
   /**
    * Its values in the columns of its kind of search, then what the wallet check said, where there
-   * was one, and the phrase.
+   * was one, and the phrase: a match in a person's words on a `terminal` (matchedOnTerminal), with
+   * its path for a script (matchedAt).
    */
-  get fields(): readonly string[] {
+  fields(terminal: boolean): readonly string[] {
     const fields = this.#fields.value;
     if (this.match === undefined) return fields;
-    const checked = this.match.matched ? matchedAt(this.match.path) : "not matched";
-    return [...fields.slice(0, -1), checked, defined(fields.at(-1))];
+    const { matched, path, kind } = this.match;
+    const said = terminal ? matchedOnTerminal(path, kind) : matchedAt(path);
+    return [...fields.slice(0, -1), matched ? said : "not matched", defined(fields.at(-1))];
   }
 
   wipe(): void {
@@ -661,7 +663,7 @@ function candidateRows(rows: readonly Row[], table: Table, checked: boolean): st
   if (!terminalLayout("stdout")) return tableRows(rows, table, checked);
   const columns = columnsOf(table, checked);
   return rows.flatMap((row) => {
-    const { fields } = row;
+    const fields = row.fields(true);
     const facts = columns.map(({ label }, index) => [label, defined(fields[index])] as const);
     return candidateLines(candidateLabel(row.number), facts);
   });
@@ -671,7 +673,7 @@ function candidateRows(rows: readonly Row[], table: Table, checked: boolean): st
 function tableRows(rows: readonly Row[], table: Table, checked: boolean): string[] {
   const headings = [NUMBER_HEADING, ...columnsOf(table, checked).map((column) => column.heading)];
   const heading = headings.join("\t");
-  return [heading, ...rows.map((row) => [String(row.number), ...row.fields].join("\t"))];
+  return [heading, ...rows.map((row) => [String(row.number), ...row.fields(false)].join("\t"))];
 }
 
 /** Why the candidates are not shown, and what narrows them down. */

@@ -481,7 +481,7 @@ describe("Candidate file encryption", () => {
     expect(parseListPassphrase(`\uFEFF  ${LIST_PASSPHRASE} \n`)).toBe(LIST_PASSPHRASE);
     expect(parseListPassphrase(parseListPassphrase(` ${LIST_PASSPHRASE}`))).toBe(LIST_PASSPHRASE);
     expect(() => parseListPassphrase("  eleven char ")).toThrow(
-      "Use at least 12 characters for the passphrase: it is all that protects these seed phrases.",
+      "The passphrase for the candidates is too short: use at least 12 characters, since it is all that protects these seed phrases.",
     );
     // Characters as a person counts them: twelve keys are twelve, though 24 UTF-16 units.
     expect(parseListPassphrase("\u{1F511}".repeat(12))).toHaveLength(24);

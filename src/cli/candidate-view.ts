@@ -5,6 +5,8 @@
 // narrower one wraps the rows again where it ends. A file, a pipe and TERM=dumb take each
 // command's rows for a script instead.
 
+import type { WalletEvidence } from "../bitcoin-evidence.js";
+import { isMasterKeyPath } from "../core/wallet-check.js";
 import { linesFitPrivateScreen } from "./screen-fit.js";
 import { partLine } from "./terminal.js";
 import { factLine, STYLE_CODES } from "./terminal-style.js";
@@ -18,11 +20,26 @@ export function candidateLabel(number: number): string {
 }
 
 /**
- * What the wallet check says of a candidate that matched: the derivation `path` at which the wallet
- * matched, or the evidence requested where the check names no path.
+ * What the wallet check says of a candidate that matched, for a script: the derivation `path` at
+ * which the wallet matched, or the evidence requested where the check names no path.
  */
 export function matchedAt(path: string | undefined): string {
   return `matched at ${path ?? "requested evidence"}`;
+}
+
+/**
+ * What the wallet check says of a candidate that matched, for a person on a terminal: a match of
+ * the master fingerprint by its name, and the master key's path as the BIP32 root key, which a
+ * bare "m" leaves unexplained; any other `path` as matchedAt says it. `kind` is that of the
+ * evidence given.
+ */
+export function matchedOnTerminal(
+  path: string | undefined,
+  kind: WalletEvidence["kind"] | undefined,
+): string {
+  if (kind === "master-fingerprint") return "master fingerprint matched";
+  const at = matchedAt(path);
+  return isMasterKeyPath(path) ? `${at}, the BIP32 root key` : at;
 }
 
 /**

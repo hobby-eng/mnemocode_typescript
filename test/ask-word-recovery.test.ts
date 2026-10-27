@@ -83,7 +83,7 @@ describe("recover-word on the private screen", () => {
       expect.arrayContaining([
         "Unknown English BIP39 word at place 11.",
         "This search has more than 16,777,216 combinations: give more of the words, or a few letters of them.",
-        "Use at least 12 characters for the passphrase: it is all that protects these seed phrases.",
+        "The passphrase for the candidates is too short: use at least 12 characters, since it is all that protects these seed phrases.",
         "The two passphrases differ: type both again.",
         `Saved 128 candidate phrases, encrypted with the passphrase: ${path} (record N is candidate N).`,
       ]),
@@ -263,7 +263,7 @@ describe("recover-word on the private screen", () => {
         "  Position    1",
         "  Word        abandon",
         "  Word number 1",
-        "  Wallet      matched at m",
+        "  Wallet      master fingerprint matched",
         `  Phrase      ${TEST_WORDS.slice(0, 8).join(" ")}`,
         `${" ".repeat(14)}${TEST_WORDS.slice(8).join(" ")}`,
       ].join("\n"),

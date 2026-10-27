@@ -26,6 +26,7 @@
 
 - The guide to candidate searches says what the program has always done: words joined by `|` at a place may be any number, and a place whose words reduce to one, such as `zoo|zoo`, is a known word. It said at least two.
 - `recover-word` on a terminal offers a wallet check or an encrypted candidate list for the Discovery Scanner when its candidates do not fit on the screen, also for words read with `--mnemonic-file`, which got only a notice. The list's file and encryption are asked as the menu asks them, its passphrase on the private screen; it is not offered with `--candidates-file`, for a legacy last word, or where a list cannot hold the BIP39 passphrase. To save it, `recover-word` on a terminal keeps the right to write files wherever the list may be offered: without `--candidates-file`, other than for a legacy last word, and with `--ask-secrets` or without a wallet given by an option.
+- On a terminal, a date or word match says "master fingerprint matched" when the master fingerprint matched, and "matched at m, the BIP32 root key" when a master key matched; both read only `matched at m`, which left m unexplained. Tab-separated output for scripts keeps `matched at m`. A candidate-list passphrase shorter than 12 characters is refused with "The passphrase for the candidates is too short: use at least 12 characters, since it is all that protects these seed phrases."; the refusal named the minimum but did not say that the passphrase fell short of it.
 
 ### QR images
 
