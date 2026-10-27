@@ -43,7 +43,7 @@ import {
   shareFormatHasCards,
   writeShare,
 } from "../src/sskr/transport.js";
-import { TEST_PHRASE } from "./helpers/test-phrase.js";
+import { TEST_PHRASE, ZERO_ENTROPY_PHRASES } from "./helpers/test-phrase.js";
 import { TEST_TIME_LIMIT_MS } from "./helpers/limits.js";
 import { sskrVectors } from "./helpers/vectors.js";
 
@@ -381,6 +381,35 @@ describe("the codes before the decoys, read back", () => {
     expect(longer.shorterPhrases([]).map(({ words }) => words)).toEqual([12]);
     expect(longer.shorterPhrases([])[0]!.result.recoveredMnemonic).toBe(TEST_PHRASE);
     expect(backup.shorterPhrases([])).toEqual([]);
+  });
+
+  it("pass on a refusal of the dates, and leave out a start that its mode cannot have written with them", () => {
+    const codes = [...backup.indexes, 2047, 5, 9];
+    // Dates that a start's decoding refuses are refused here too, never taken for no shorter
+    // phrase.
+    const direct = EncodedBackup.of(codes, "unicode", "direct");
+    expect(() => direct.shorterPhrases([{ year: 2026, month: 9, day: 23 }])).toThrow(
+      expect.objectContaining({ code: "core.masking.assert-takes-dates-refused" }),
+    );
+    const legacy = EncodedBackup.of(codes, "unicode", "seedshift-legacy");
+    expect(() => legacy.shorterPhrases([{ year: 2026, month: 2, day: 30 }])).toThrow(
+      expect.objectContaining({ code: "core.dates.day-outside-selected-calendar-month" }),
+    );
+    // MnemoCode Seedshift keeps the checksum, which no start of this phrase has.
+    const masked = EncodedBackup.read(ZERO_ENTROPY_PHRASES[24], "english", "seedshift");
+    expect(masked.shorterPhrases([{ year: 2026, month: 9, day: 23 }])).toEqual([]);
+    // Eight dates, which 24 words take and no shorter start does: Encode refuses them for it.
+    const eight = [1, 2, 3, 4, 5, 6, 7, 8].map((day) => ({ year: 2020, month: 1, day }));
+    const legacy24 = EncodedBackup.read(ZERO_ENTROPY_PHRASES[24], "english", "seedshift-legacy");
+    expect(legacy24.shorterPhrases(eight)).toEqual([]);
+    // Four dates, the most 12 words take: the 12-word start is kept, decoys after its codes.
+    const four = [1, 2, 3, 4].map((day) => ({ year: 2020, month: 3, day }));
+    const written = EncodedBackup.encode(TEST_PHRASE, four, "unicode", "seedshift-legacy").backup;
+    const typed = EncodedBackup.of([...written.indexes, 2047, 5, 9], "unicode", "seedshift-legacy");
+    const found = typed.shorterPhrases(four);
+    expect(found.map(({ words, result }) => [words, result.recoveredMnemonic])).toEqual([
+      [12, TEST_PHRASE],
+    ]);
   });
 });
 

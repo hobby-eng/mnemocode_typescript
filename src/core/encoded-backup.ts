@@ -17,6 +17,7 @@
 // Host-neutral: it imports only @scure/bip39 and the core modules above.
 
 import { serializeRecord } from "../record.js";
+import { maximumDates } from "./dates.js";
 import { Masking, type MaskingMode, MissingChecksumError } from "./masking.js";
 import { parseInput } from "./representations.js";
 import {
@@ -334,18 +335,26 @@ export class EncodedBackup extends Redacted {
    * The phrases of fewer words that the first codes give with `dates`, where their checksum is
    * valid: what codes typed from printed cards may be, which end with decoys and so read as a
    * longer phrase whose checksum fails (owner, 2026-10-13). None for a mode that gives several
-   * phrases; a shorter start that its mode refuses is left out.
+   * phrases; a shorter start that takes fewer dates than given (maximumDates), or lacks the
+   * checksum that its mode keeps (MissingChecksumError), is left out before its dates are read,
+   * since its mode cannot have written it with them. What Masking.undo refuses of the dates, for
+   * a start that it decodes, passes on.
    */
   shorterPhrases(dates: readonly DateShiftDate[]): ShorterPhrase[] {
     if (this.givesSeveral) return [];
-    return BIP39_WORD_COUNTS.filter((words) => words < this.words).flatMap((words) => {
+    const starts = BIP39_WORD_COUNTS.filter(
+      (words) => words < this.words && dates.length <= maximumDates(words),
+    );
+    return starts.flatMap((words) => {
       const indexes = this.indexes.slice(0, words);
       let result: DecodedResult;
       try {
         using start = EncodedBackup.of(indexes, this.#format, this.#mode);
         result = start.decode(dates);
-      } catch {
-        return [];
+      } catch (error) {
+        // Only `of` throws it here: decode checks again the codes that `of` took.
+        if (error instanceof MissingChecksumError) return [];
+        throw error;
       } finally {
         indexes.fill(0);
       }
