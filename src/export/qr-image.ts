@@ -1,10 +1,11 @@
 // A QR code as a PNG image file: the encoded backup or a share, which Decode and Restore read back
-// (--qr-file, --share-qr). Drawn with the qrcode package of Node.js; a page draws its own.
+// (--qr-file, --share-qr). Drawn with the qrcode package of Node.js, with the quiet zone of a
+// printed QR code; a page draws its own.
 
 import QRCode from "qrcode";
 import { publishNewPrivateFile } from "./private-file.js";
 import { wipedAfterAsync } from "../core/bits.js";
-import { QR_ERROR_CORRECTION_LEVEL } from "./platform.js";
+import { QR_ERROR_CORRECTION_LEVEL, QR_QUIET_MODULES } from "./platform.js";
 import { ErrorCatalog } from "../core/error-catalog.js";
 import { QrPngReader } from "./qr-reader.js";
 
@@ -28,7 +29,7 @@ export async function exportQrPayload(payload: string, path: string): Promise<vo
   const reader = await QrPngReader.load();
   const png = await QRCode.toBuffer(payload, {
     errorCorrectionLevel: QR_ERROR_CORRECTION_LEVEL,
-    margin: 1,
+    margin: QR_QUIET_MODULES,
     type: "png",
     width: QR_IMAGE_PIXELS,
   });

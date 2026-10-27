@@ -1,6 +1,7 @@
 import QRCode from "qrcode";
+import { PNG } from "pngjs";
 import { join } from "node:path";
-import { readdir } from "node:fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { exportQrPayload } from "../src/export/qr-image.js";
 import { decodeQrPngFile } from "../src/cli/qr-input.js";
@@ -62,5 +63,35 @@ describe("automatic QR verification", () => {
     expect(await saveQrInside(PAYLOAD, folder)).toBeUndefined();
     expect(seen.notices.join("\n")).not.toContain("QR code verified");
     expect(await readdir(folder)).toEqual([]);
+  });
+});
+
+describe("the saved QR image", () => {
+  it("leaves the quiet zone of ISO/IEC 18004, four modules, on every side", async () => {
+    const path = join(await testFolder("mnemocode-qr-quiet-"), "qr.png");
+    await exportQrPayload(PAYLOAD, path);
+    expect(await decodeQrPngFile(path)).toBe(PAYLOAD);
+    const image = PNG.sync.read(await readFile(path));
+    // The dark pixels span the whole symbol: its finder patterns fill three of its corners.
+    let [left, right, top, bottom] = [image.width, 0, image.height, 0];
+    for (let y = 0; y < image.height; y++)
+      for (let x = 0; x < image.width; x++)
+        if (image.data[(y * image.width + x) * 4]! < 128) {
+          [left, right] = [Math.min(left, x), Math.max(right, x)];
+          [top, bottom] = [Math.min(top, y), y];
+        }
+    const modules = QRCode.create(PAYLOAD, { errorCorrectionLevel: "M" }).modules.size;
+    const modulePixels = (right - left + 1) / modules;
+    const quiet = [left, image.width - 1 - right, top, image.height - 1 - bottom].map((pixels) =>
+      Math.round(pixels / modulePixels),
+    );
+    expect(quiet).toEqual([4, 4, 4, 4]);
+  });
+
+  it("still reads an image with the one-module quiet zone that MnemoCode 0.1.0 saved", async () => {
+    const path = join(await testFolder("mnemocode-qr-former-"), "qr.png");
+    const former = { errorCorrectionLevel: "M", margin: 1, type: "png", width: 720 } as const;
+    await writeFile(path, await QRCode.toBuffer(PAYLOAD, former));
+    expect(await decodeQrPngFile(path)).toBe(PAYLOAD);
   });
 });

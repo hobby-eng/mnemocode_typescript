@@ -23,6 +23,10 @@
 
 - The guide to candidate searches says what the program has always done: words joined by `|` at a place may be any number, and a place whose words reduce to one, such as `zoo|zoo`, is a known word. It said at least two.
 
+### QR images
+
+- A QR code saved as a PNG image (`--qr`, `--qr-dir`, the copy beside a sheet with `--card-qr`, and `qrPath` of the library's `exportColorPalette`) has an empty border of four modules, the quiet zone of ISO/IEC 18004 that printed QR codes already have, so cameras find it reliably; it had one module. The image is still 720 pixels wide, and `--qr-file` and `--share-qr` still read the images that 0.1.0 saved.
+
 ### Toolchain and dependencies
 
 - Node.js 26.12.1 and pnpm 12.15.0; Vitest 5.0.5, Prettier 3.9.10, oxlint 1.89.0, oxlint-tsgolint 7.0.2005 and `@types/node` 26.6.5.
