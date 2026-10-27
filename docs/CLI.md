@@ -165,7 +165,7 @@ Images need Poppler's `pdftocairo` in a folder of `PATH`, given by its full path
 | `a4`           | 210 × 297 mm |
 | `business`     | 90 × 50 mm   |
 
-`--orientation portrait|landscape` fixes the orientation. Otherwise the sheet is turned to fit at least three rows where possible, with the largest cards. `--cards-dir` cannot be combined with `preview --all`. For the cards of a backup it accepts business size or no size, and only business card designs. For shares it saves one file or folder per share at any page size: a sheet size gives one collection sheet per share, as [Share cards](SSKR.md#share-cards) describes. A collection saved by the same command must be outside that folder. Individual filenames contain the card number and printed code, such as `01-ABCDEF.pdf` or `01-7684.pdf`.
+`--orientation portrait|landscape` fixes the orientation. Otherwise the sheet is turned to fit at least three rows where possible, with the largest cards. `--cards-dir` cannot be combined with `preview --all`. For the cards of a backup it accepts business size or no size, and only business card designs. For shares it saves one file or folder per share at any page size: a sheet size gives one collection sheet per share, as [Share cards](SSKR.md#share-cards) describes. A collection saved by the same command must be outside that folder. Individual filenames contain the card number alone, such as `01.pdf`, never the printed code.
 
 For shares, QR PNG copies are named after each share's reference, including inside a share-card folder. A sheet QR contains only the real codes; the random padding cards are excluded.
 

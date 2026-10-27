@@ -272,7 +272,7 @@ export const CARDS_DIR: HelpOption = {
   value: "NEW_FOLDER",
   summary: "Save one file per card in a new folder",
   details: [
-    "Files are named after their number and the code they print, such as 01-ABCDEF.pdf, or 01-7684.pdf in Unicode codes; each holds only its own code. Use it with --page-size business or without a page size. A taken name is numbered, as cards-1, never replaced; the folder is created only when every card is ready.",
+    "Files are named after the number of their card alone, such as 01.pdf, never after its code; each holds only its own code. Use it with --page-size business or without a page size. A taken name is numbered, as cards-1, never replaced; the folder is created only when every card is ready.",
   ],
 };
 

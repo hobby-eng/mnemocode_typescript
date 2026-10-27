@@ -133,7 +133,7 @@ import { runEncode } from "../src/cli/encode-command.js";
 import { PrivateSteps } from "../src/cli/private-steps.js";
 import { EncodedBackup } from "../src/core/encoded-backup.js";
 import { backupCardContent } from "../src/export/backup-cards.js";
-import { separateCardName } from "../src/export/card-codes.js";
+import { numberedCode } from "../src/export/card-codes.js";
 import { TEST_PHRASE } from "./helpers/test-phrase.js";
 import { BACKUP_CHECK_QUESTION } from "./helpers/prompts.js";
 
@@ -185,7 +185,7 @@ function expectSameCollection(saves: readonly Save[], format: EncodedFormat): vo
   expect(saves.length).toBeGreaterThan(1);
   const [sheet, ...sheets] = saves.filter(({ destination }) => destination !== "cards");
   const own = backupCardContent(EncodedBackup.encode(TEST_PHRASE, [], format, "direct").backup);
-  const codes = own.colors.map((_, index) => separateCardName(own, index));
+  const codes = own.colors.map((_, index) => numberedCode(own, index));
   const drawn = numberedCodes(sheet!.texts);
   expect(drawn.slice(0, codes.length)).toEqual(codes);
   expect(drawn.length).toBeGreaterThan(codes.length);

@@ -414,11 +414,11 @@ export class ShareCardSet extends Redacted implements Disposable {
 
   /**
    * The file name of the document `index` of `member`: a whole share is named after the share, a
-   * card after its place, counted from 01, and the code it prints.
+   * card after its number alone, counted from 01 (separateCardName).
    */
   #documentName(member: Member, index: number): string {
     if (member.share.folder === undefined) return member.share.name;
-    return separateCardName(contentOf(member), index);
+    return separateCardName(index);
   }
 
   /** The document `index` of `member`: a separate card, a collection sheet or a QR card. */

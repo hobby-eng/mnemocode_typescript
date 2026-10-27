@@ -7,13 +7,13 @@
 // page images here.
 
 import { readdir, readFile } from "node:fs/promises";
-import { basename, delimiter, join } from "node:path";
+import { delimiter, join } from "node:path";
 import { PDFDocument, PDFPage } from "pdf-lib";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { saveEncodeResult } from "../src/cli/encode-export.js";
 import { EncodedBackup } from "../src/core/encoded-backup.js";
 import { backupCardContent } from "../src/export/backup-cards.js";
-import { separateCardName } from "../src/export/card-codes.js";
+import { numberedCode } from "../src/export/card-codes.js";
 import { parseDate } from "../src/core/dates.js";
 import { EncodedForm } from "../src/core/encoded-form.js";
 import { codeColors } from "../src/export/card-palette.js";
@@ -70,7 +70,7 @@ describe("the cards of Encode", () => {
       const cards = numberedCodes(first!);
       // The codes of the backup first, then at least one decoy.
       const own = backupCardContent(encoding.backup);
-      expect(cards.slice(0, 8)).toEqual(own.colors.map((_, index) => separateCardName(own, index)));
+      expect(cards.slice(0, 8)).toEqual(own.colors.map((_, index) => numberedCode(own, index)));
       expect(cards.length).toBeGreaterThan(8);
       expect(saved.map(({ notice }) => notice)).toEqual([
         `Saved PDF: ${pdf}`,
@@ -78,10 +78,10 @@ describe("the cards of Encode", () => {
         `Saved ${cards.length} individual card files to: ${cardFolder}`,
       ]);
       // Each output was saved where its option says: a business-card page for each card, and a
-      // file for each card, named after it.
+      // file for each card, named after its number alone.
       expect((await PDFDocument.load(await readFile(pdf))).getPageCount()).toBe(cards.length);
       const files = await readdir(cardFolder);
-      expect(files.map((file) => basename(file, ".pdf")).sort()).toEqual([...cards].sort());
+      expect(files.sort()).toEqual(cards.map((card) => `${card.slice(0, 2)}.pdf`));
       if (PAGE_IMAGES) expect(await readdir(images)).toHaveLength(cards.length);
     },
     LONG_TEST_TIME_LIMIT_MS,

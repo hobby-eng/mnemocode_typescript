@@ -103,7 +103,7 @@ The cards of a share end with a few random codes that belong to nothing, so that
 
 In Unicode codes, the cards of one code have one color, and different codes get colors that look as different as possible. The colors only decorate the cards; the printed codes are the share.
 
-Each file or folder in `--cards-dir` holds one share: keep them in different places. A file written with `--pdf` and a folder written with `--images-dir` hold **all** shares. Existing files and folders are never replaced; a taken name is numbered as `name-1`.
+Each file or folder in `--cards-dir` holds one share: keep them in different places. In the folder of a share's separate cards, each file is named after its card's number alone, such as `01.pdf`. A file written with `--pdf` and a folder written with `--images-dir` hold **all** shares. Existing files and folders are never replaced; a taken name is numbered as `name-1`.
 
 The reference printed on a share sheet shows the numbers of the set, the group and the share.
 

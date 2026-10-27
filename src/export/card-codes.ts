@@ -51,11 +51,11 @@ export function assertCardIndex(index: number, count: number): void {
 }
 
 /**
- * The file name of separate card `index`, counted from 0: its place from 01, then the code it
- * prints, any spaces as hyphens so that the name needs no quotes in a shell, such as "03-A3F09C".
+ * The file name of separate card `index`, counted from 0: its number alone, from 01, such as "03".
+ * Never the code it prints, which a folder listing would show (owner, 2026-10-27).
  */
-export function separateCardName(content: PrintedCodes, index: number): string {
-  return `${twoDigits(index + 1)}-${printedCode(content, index).replaceAll(" ", "-")}`;
+export function separateCardName(index: number): string {
+  return twoDigits(index + 1);
 }
 
 /** A count or a number as cards print it: at least two digits, "07". */

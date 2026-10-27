@@ -161,11 +161,17 @@ describe("platform-neutral card rendering", () => {
         pageSize: "business",
         cardQr: false,
       });
-      expect(cards.slice(0, content.colors.length).map((card) => card.name)).toEqual(
-        content.colors.map(
-          (color, index) => `${String(index + 1).padStart(2, "0")}-${color.slice(1).toUpperCase()}`,
-        ),
-      );
+      // Each named after its number alone, never after its code.
+      expect(cards.slice(0, content.colors.length).map((card) => card.name)).toEqual([
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+      ]);
       // Then the decoys, which the sheet of the design plans.
       expect(cards.length).toBeGreaterThan(content.colors.length);
     }

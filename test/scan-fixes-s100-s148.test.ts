@@ -164,9 +164,9 @@ describe("S107 and S109: the sheet capacity and the separate cards have one owne
     }
   });
 
-  it("names a separate card by its place and first code", () => {
-    expect(separateCardName({ colors: ["#a3f09c", "#000000"] }, 1)).toBe("02-000000");
-    expect(separateCardName({ colors: ["#000000"], labels: ["12 345 6"] }, 0)).toBe("01-12-345-6");
+  it("names a separate card by its number alone", () => {
+    expect(separateCardName(1)).toBe("02");
+    expect(separateCardName(9)).toBe("10");
   });
 });
 

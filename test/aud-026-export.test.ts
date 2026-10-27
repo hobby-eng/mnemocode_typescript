@@ -66,8 +66,7 @@ describe("AUD-026 export ownership and admission without PDF painting", () => {
     }
   });
 
-  it("rejects manual decoy path traversal before any card is rendered", async () => {
-    let renders = 0;
+  it("keeps a manual decoy's label out of every path: each card is named after its number", async () => {
     const directory = await folder();
     const content: CardContent = {
       ...CONTENT,
@@ -75,18 +74,11 @@ describe("AUD-026 export ownership and admission without PDF painting", () => {
       labels: [...CONTENT.labels!, "x/../../escaped"],
       decoys: 1,
     };
-    const template: CardTemplate = {
-      ...TEMPLATE,
-      renderIndividual: async () => {
-        renders++;
-        return Uint8Array.of(1, 2, 3);
-      },
-    };
-    await expect(
-      exportIndividualCards(template, content, join(directory, "cards")),
-    ).rejects.toThrow("safe path component");
-    expect(renders).toBe(0);
-    expect(await readdir(directory)).toEqual([]);
+    expect(await exportIndividualCards(TEMPLATE, content, join(directory, "cards"))).toBe(13);
+    expect(await readdir(directory)).toEqual(["cards"]);
+    expect((await readdir(join(directory, "cards"))).sort().join(" ")).toBe(
+      "01.pdf 02.pdf 03.pdf 04.pdf 05.pdf 06.pdf 07.pdf 08.pdf 09.pdf 10.pdf 11.pdf 12.pdf 13.pdf",
+    );
   });
 
   it.each(["../escape", "x/../../escape", "x\\escape", "..", "x\u0000", "x:", "x.", "CON"])(

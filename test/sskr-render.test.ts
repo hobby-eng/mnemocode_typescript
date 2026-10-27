@@ -133,16 +133,14 @@ describe("cards of a share set, for any host", () => {
       name: "collection-376C-1-1",
       folder: "collection-376C-1-1",
     });
-    // Rendered one at a time: the first two, named after their places and their colors.
+    // Rendered one at a time: the first two, named after their numbers alone.
     const names: string[] = [];
     for await (const document of cards.documents(0)) {
       expect((await PDFDocument.load(document.bytes)).getPageCount()).toBe(1);
       names.push(document.name);
       if (names.length === 2) break;
     }
-    expect(names).toEqual(
-      colors.slice(0, 2).map((color, place) => `0${place + 1}-${color.slice(1)}`),
-    );
+    expect(names).toEqual(["01", "02"]);
   });
 
   it("refuses a layout or a style of no card, sheets of business size and a share given twice, before it draws anything", async () => {
@@ -196,7 +194,7 @@ describe("share cards after AUD-010", () => {
     }
   });
 
-  it("names separate cards after their codes (AUD-010-DOC005)", async () => {
+  it("names separate cards after their numbers alone, not their codes (AUD-010-DOC005)", async () => {
     const cards = await ShareCardSet.create(nodeCardRenderer, SHARES, {
       style: "it",
       pageSize: "business",
@@ -204,9 +202,11 @@ describe("share cards after AUD-010", () => {
     });
     const names: string[] = [];
     for await (const document of cards.documents(0)) names.push(document.name);
-    const codes = writeShare(SHARES[0]!, "unicode").split(" ");
-    expect(names[0]).toBe(`01-${codes[0]}`);
-    expect(names.every((name) => !name.includes(" "))).toBe(true);
+    // The 21 Unicode codes of the share, then its one decoy.
+    expect(writeShare(SHARES[0]!, "unicode").split(" ")).toHaveLength(21);
+    expect(names.join(" ")).toBe(
+      "01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22",
+    );
   });
 
   it("refuses a sheet that cannot hold the codes, naming the page (AUD-010-FUN003)", async () => {

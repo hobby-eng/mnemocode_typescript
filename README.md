@@ -132,7 +132,7 @@ Files and folders are not overwritten; taken names receive a number. Folder expo
 
 ### Individual business cards
 
-`--cards-dir NEW_FOLDER` saves one PDF, PNG or JPEG per card, for business card designs only. Each file contains one code; one extra card contains a decoy code.
+`--cards-dir NEW_FOLDER` saves one PDF, PNG or JPEG per card, for business card designs only. Each file contains one code; one extra card contains a decoy code. A file is named after the card's number alone, such as `01.pdf`, so that a folder listing shows no code.
 
 **This is not Shamir sharing.** Every real card is needed, and each exposes part of the encoded phrase. Use shares when you want a threshold.
 

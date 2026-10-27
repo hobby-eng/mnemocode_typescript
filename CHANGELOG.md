@@ -29,6 +29,10 @@
 
 - A QR code saved as a PNG image (`--qr`, `--qr-dir`, the copy beside a sheet with `--card-qr`, and `qrPath` of the library's `exportColorPalette`) has an empty border of four modules, the quiet zone of ISO/IEC 18004 that printed QR codes already have, so cameras find it reliably; it had one module. The image is still 720 pixels wide, and `--qr-file` and `--share-qr` still read the images that 0.1.0 saved.
 
+### Card exports
+
+- Separate cards, of a backup and of Shamir shares, are named after their number alone, such as `01.pdf` or `01.png`, so that a folder listing shows no code; they were named after the code they print too, such as `01-1EAB91.pdf`. `renderIndividualCards` and `ShareCardSet.documents` give such names, and `exportIndividualCards` no longer refuses a decoy's label that is no file name (`export.file-name.invalid-component`), since no label reaches a file name.
+
 ### Toolchain and dependencies
 
 - Node.js 26.12.1 and pnpm 12.15.0; Vitest 5.0.5, Prettier 3.9.10, oxlint 1.89.0, oxlint-tsgolint 7.0.2005 and `@types/node` 26.6.5.

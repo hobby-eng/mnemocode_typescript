@@ -19,7 +19,6 @@ import { keptIndividualCards } from "./card-decoys.js";
 import { SHEETS_ONLY, sheetsOnly } from "./template-catalog.js";
 import { defined } from "../core/defined.js";
 import { wipeAll } from "../core/bits.js";
-import { checkedExportFileName } from "./file-name.js";
 import { OwnedCardContent } from "./card-values.js";
 import { Redacted } from "../core/redacted.js";
 import { ErrorCatalog, suppliedMessage } from "../core/error-catalog.js";
@@ -249,8 +248,7 @@ export function assertIndividualCards(template: CardTemplate, content: CardConte
  * One document per card, all sharing one identity, drawn with `drawing`. Refuses what
  * assertIndividualCards refuses, before any choice is made; then, before any card is drawn, the
  * person's details and the texts as ExportDetails.of refuses them (export.card-settings codes,
- * such as card-name-use-latin-letters-only-spaces-apostrophes). What the design refuses passes on,
- * and so does a card name that checkedExportFileName refuses (export.file-name.invalid-component).
+ * such as card-name-use-latin-letters-only-spaces-apostrophes). What the design refuses passes on.
  */
 export async function renderIndividualCards(
   drawing: CardDrawing,
@@ -271,7 +269,7 @@ export async function renderIndividualCards(
   try {
     for (let index = 0; index < resolvedContent.colors.length; index++) {
       cards.push({
-        name: checkedExportFileName(separateCardName(resolvedContent, index)),
+        name: separateCardName(index),
         bytes: await renderIndividual(drawing, resolvedContent, index),
       });
     }

@@ -63,7 +63,7 @@ export async function exportSskrCards(
     let files = 0;
     for (const [place, share] of cards.shares.entries()) {
       const shareFolder = share.folder === undefined ? staging : join(staging, share.folder);
-      // Private like the staging folder: the card names carry the share's references.
+      // Private like the staging folder: it holds the cards of one share.
       if (share.folder !== undefined) await makePrivateFolder(shareFolder);
       // Each document shows a share: its bytes are wiped once written.
       for await (const document of cards.documents(place))

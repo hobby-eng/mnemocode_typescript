@@ -14,16 +14,13 @@ export const PAGE_IMAGES = process.platform !== "win32";
  * A numbered code as a card or a sheet draws it, after any label such as "Ref.": its place, two
  * spaces and its code (numberedCode in src/export/card-codes.ts), such as "07  A3F09C".
  */
-const NUMBERED_CODE = /(?:^|\s)(?<place>\d{2}) {2}(?<code>\S+)$/u;
+const NUMBERED_CODE = /(?:^|\s)(?<numbered>\d{2} {2}\S+)$/u;
 
-/**
- * The numbered codes among `texts`, in the order drawn, each written as the file of its separate
- * card is named (separateCardName in src/export/card-codes.ts), such as "07-A3F09C".
- */
+/** The numbered codes among `texts`, in the order drawn, without any label, such as "07  A3F09C". */
 export function numberedCodes(texts: readonly string[]): string[] {
   return texts.flatMap((text) => {
-    const found = NUMBERED_CODE.exec(text)?.groups;
-    return found === undefined ? [] : [`${found["place"]}-${found["code"]}`];
+    const found = NUMBERED_CODE.exec(text)?.groups?.["numbered"];
+    return found === undefined ? [] : [found];
   });
 }
 

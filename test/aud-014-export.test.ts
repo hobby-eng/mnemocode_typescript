@@ -87,10 +87,17 @@ describe("AUD-014-API003: a card design made by a host", () => {
     expect(indexes.slice(0, colors.length)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
     expect(indexes.length).toBeGreaterThan(colors.length);
     expect(indexes).toEqual(indexes.map((_, index) => index));
-    // Each card is named after its place and the code it prints.
-    expect(cards.slice(0, colors.length).map((card) => card.name)).toEqual(
-      colors.map((color, card) => `0${card + 1}-${color.slice(1).toUpperCase()}`),
-    );
+    // Each card is named after its number alone.
+    expect(cards.slice(0, colors.length).map((card) => card.name)).toEqual([
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+    ]);
   });
 });
 

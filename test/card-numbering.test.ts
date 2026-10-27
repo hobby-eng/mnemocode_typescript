@@ -38,9 +38,10 @@ describe.skipIf(!hasPoppler)("numbers on separate cards", () => {
       for (const [index, card] of cards.entries()) {
         const text = printedText(card.bytes).replace(/\s+/gu, " ");
         const number = String(index + 1).padStart(2, "0");
-        // The number stands directly before its code; no card names the size of the set.
-        const code = colors[index]?.slice(1).toUpperCase() ?? card.name.slice(3);
-        expect(text).toContain(`${number} ${code}`);
+        // The number stands directly before its code, a decoy's of six hex digits too; no card
+        // names the size of the set.
+        const code = colors[index]?.slice(1).toUpperCase() ?? "[0-9A-F]{6}";
+        expect(text).toMatch(new RegExp(`${number} ${code}`, "u"));
         expect(text).not.toMatch(/\d{2} \/ \d{2}/u);
       }
     });
