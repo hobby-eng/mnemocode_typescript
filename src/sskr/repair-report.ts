@@ -301,7 +301,8 @@ export class RepairReport {
           good: true,
         },
       ];
-    if (assessment.verdict === "no-fit" || assessment.verdict === "not-enough") return [];
+    // A refusal counts no combination, also one of shares of which too many ways can be read.
+    if (assessment.combinations === 0) return [];
     const lines: ReportLine[] = [
       {
         kind: "status",

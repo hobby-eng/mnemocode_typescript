@@ -508,6 +508,11 @@ describe("RepairReport", () => {
         good: true,
       },
     ]);
+    // Refused before any combination is counted, shares of which nothing is read leave no count.
+    const unread = Array.from({ length: 5 }, () => Array.from({ length: 21 }, () => "?").join(" "));
+    const uncounted = await planJointRepair(unread, { platform: nodeSharePlatform });
+    expect(uncounted.assessment.verdict).toBe("too-uncertain");
+    expect(new RepairReport(uncounted.assessment, 1).lines()).toEqual([]);
     const open = await planJointRepair([SHARES[0], marked([5, 7])], {
       platform: nodeSharePlatform,
     });
