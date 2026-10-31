@@ -234,7 +234,9 @@ function reads(modules, vectors, next) {
 async function sets(modules, vectors, platform, twins) {
   const { transport } = modules;
   const { ShareSet } = modules.set;
+  const { combineSskrShares } = modules.shares;
   const { official, deterministic } = vectors;
+  const inWords = (share, places) => marked(transport, share, "words", places);
   const quorums = [...official.validQuorums, ...official.invalidQuorums].map((quorum) =>
     quorum.map((place) => official.shares[place]),
   );
@@ -269,6 +271,18 @@ async function sets(modules, vectors, platform, twins) {
     [...twins.triple.slice(0, 4), ...twins.otherTriple.slice(4)],
     [...twins.triple.slice(0, 2), ...twins.otherTriple.slice(2)],
     [...twins.otherTriple.slice(0, 2), ...twins.triple.slice(2, 4), ...twins.otherTriple.slice(4)],
+    // Marked, restored together: settled by the search, too few, another secret, too much open.
+    [inWords(twins.mine[0], [8]), twins.mine[1]],
+    [inWords(twins.mine[0], [8]), inWords(twins.mine[1], [9])],
+    [inWords(twins.mine[0], [8])],
+    [inWords(twins.mine[0], [8]), twins.other[1]],
+    [inWords(twins.mine[0], [8]), inWords(twins.other[1], [9])],
+    [
+      inWords(twins.mine[0], [8, 9, 10, 11, 12, 13]),
+      inWords(twins.mine[1], [8, 9, 10, 11, 12, 13]),
+    ],
+    [inWords(twins.single[0], [8])],
+    [inWords(twins.pairs[0], [8]), twins.pairs[1], twins.pairs[2]],
   ];
   const restored = [];
   for (const texts of lists) {
@@ -280,6 +294,7 @@ async function sets(modules, vectors, platform, twins) {
       restored: await outcome(async () =>
         setFacts(await ShareSet.combine(texts, platform, listed)),
       ),
+      phrase: await outcome(async () => ({ phrase: await combineSskrShares(texts) })),
     });
   }
   return restored;
@@ -450,6 +465,9 @@ async function shareExports(modules, vectors) {
           total: written.total,
           note: written.copiesNote ?? null,
           text: written.shown.map(({ ur, format }) => transport.writeShare(ur, format)),
+          inColors: written
+            .inForm("colors")
+            .shown.map(({ format, number }) => ({ format, number })),
         };
       }),
     });
@@ -644,6 +662,7 @@ export async function madeShares(modules, platform) {
 export async function shareModules(ts) {
   const modules = {
     transport: await ts.load("sskr/transport.js"),
+    shares: await ts.load("sskr/shares.js"),
     repair: await ts.load("sskr/repair.js"),
     joint: await ts.load("sskr/joint-repair.js"),
     report: await ts.load("sskr/repair-report.js"),
