@@ -44,6 +44,129 @@ const FILES = {
     "1289 1955 1971 ? 1916 1373 1409 443 364 1511 219 537 945 1539 1030 1247 609 1655 1661 543 1665\n1867 166 26 1886 920 572 1724 100 1966 612 795 29 1422 661 1840 1553 1660 1876 1908 1623 1409\n",
 };
 
+/** The start of a plain backup in colors, and of a set of shares in colors. */
+const COLORS = [
+  "encode",
+  "--mnemonic-file",
+  "phrase.txt",
+  "--mode",
+  "direct",
+  "--format",
+  "colors",
+];
+const SHARES = [
+  "sskr-split",
+  "--mnemonic-file",
+  "phrase.txt",
+  "--threshold",
+  "2",
+  "--shares",
+  "3",
+  "--mode",
+  "direct",
+  "--format",
+  "colors",
+];
+/** A detail too long for any card. */
+const TOO_LONG = "A".repeat(200);
+
+/** What the cards refuse before anything is drawn, and the pages of the help they fill. */
+const CARD_COMMANDS = [
+  ["preview", "--list"],
+  ["preview", "--help"],
+  ["preview", "-h"],
+  ["help", "preview"],
+  ["help"],
+  ["--help"],
+  [],
+  ["version"],
+  ["--version"],
+  [...COLORS, "--pdf", "out.pdf", "--template", "nosuch"],
+  [...COLORS, "--pdf", "out.pdf", "--page-size", "a7"],
+  [...COLORS, "--pdf", "out.pdf", "--orientation", "diagonal"],
+  [...COLORS, "--images-dir", "out", "--image-format", "bmp"],
+  [...COLORS, "--image-format", "png"],
+  [...COLORS, "--template", "business-it"],
+  [...COLORS, "--card-name", "Ada"],
+  [...COLORS, "--cards-dir", "out", "--card-qr"],
+  [...COLORS, "--cards-dir", "out", "--template", "material-tile"],
+  [...COLORS, "--pdf", "out.pdf", "--card-name", "Ада"],
+  [...COLORS, "--pdf", "out.pdf", "--card-name", TOO_LONG],
+  [...COLORS, "--pdf", "out.pdf", "--card-slogan", TOO_LONG],
+  [...COLORS, "--pdf", "out.pdf", "--title", ""],
+  [...COLORS, "--pdf", "out.pdf", "--title", TOO_LONG],
+  [...COLORS, "--pdf", "out.pdf", "--card-name", "Ada", "--card-name", "Eve"],
+  [...COLORS, "--pdf", "out.pdf", "--card-name"],
+  [...COLORS, "--pdf"],
+  [
+    "encode",
+    "--mnemonic-file",
+    "phrase.txt",
+    "--mode",
+    "direct",
+    "--format",
+    "indexes",
+    "--pdf",
+    "out.pdf",
+  ],
+  [...COLORS, "--heir-sheet-size", "a6"],
+  [...COLORS, "--heir-sheet", "heirs.pdf", "--heir-sheet-size", "a7"],
+  [...SHARES, "--pdf", "out.pdf", "--card-layout", "nosuch"],
+  [...SHARES, "--cards-dir", "out", "--card-layout", "individual", "--template", "material-tile"],
+  [...SHARES, "--pdf", "out.pdf", "--card-layout", "individual", "--page-size", "a4"],
+  [...SHARES, "--pdf", "out.pdf", "--card-layout", "collection", "--page-size", "business"],
+  [...SHARES, "--card-layout", "qr"],
+  [...SHARES, "--pdf", "out.pdf", "--card-qr", "--card-layout", "individual"],
+  [...SHARES, "--pdf", "out.pdf", "--card-name", TOO_LONG],
+  [
+    "sskr-split",
+    "--mnemonic-file",
+    "phrase.txt",
+    "--threshold",
+    "2",
+    "--shares",
+    "3",
+    "--mode",
+    "direct",
+    "--format",
+    "words",
+    "--pdf",
+    "out.pdf",
+  ],
+  [
+    "sskr-export",
+    "--share-file",
+    "shares.txt",
+    "--mode",
+    "direct",
+    "--pdf",
+    "out.pdf",
+    "--card-name",
+    TOO_LONG,
+  ],
+  [
+    "sskr-export",
+    "--share-file",
+    "shares.txt",
+    "--mode",
+    "direct",
+    "--format",
+    "colors",
+    "--cards-dir",
+    "out",
+    "--card-layout",
+    "nosuch",
+  ],
+  ["preview"],
+  ["preview", "--template", "nosuch", "--pdf", "out.pdf"],
+  ["preview", "--all", "--cards-dir", "out"],
+  ["preview", "--words", "13", "--pdf", "out.pdf"],
+  ["preview", "--words", "12", "--words", "15", "--pdf", "out.pdf"],
+  ["preview", "--list", "--pdf", "out.pdf"],
+  ["preview", "--all", "--template", "business-it", "--pdf", "out.pdf"],
+  ["preview", "--color-form", "nosuch", "--pdf", "out.pdf"],
+];
+
 /** The commands, each as a script gives it. */
 const COMMANDS = [
   ["encode", "--mnemonic-file", "phrase.txt"],
@@ -316,7 +439,7 @@ export function record(ts) {
   try {
     for (const [name, text] of Object.entries(FILES)) writeFileSync(join(folder, name), text);
     const program = join(ts.root, "dist", "mnemocode.js");
-    const commands = COMMANDS.map((args) => {
+    const commands = [...COMMANDS, ...CARD_COMMANDS].map((args) => {
       const { status, stdout, stderr } = spawnSync(process.execPath, [program, ...args], {
         cwd: folder,
         encoding: "utf8",
