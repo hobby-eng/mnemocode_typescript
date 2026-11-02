@@ -22,6 +22,7 @@ import {
 } from "../src/core/wallet-evidence.js";
 import { containing } from "./helpers/matchers.js";
 import { runBuiltCli as run } from "./helpers/built-cli.js";
+import { MENU_ENTRY_NAMES, MENU_OVERVIEW, RECOVERY_TOPICS } from "../src/cli/menu-entries.js";
 
 describe("help", () => {
   it("documents exactly the options each command accepts", () => {
@@ -212,11 +213,12 @@ describe("help notes and the cards they describe", () => {
 });
 
 describe("links to the README", () => {
-  it("point only to headings that the README has", async () => {
+  it("point only to sections that the README has", async () => {
     const { readFile, readdir } = await import("node:fs/promises");
+    const readme = await readFile("README.md", "utf8");
     // GitHub's anchor of a heading: lower case, spaces as hyphens, other punctuation dropped.
     const anchors = new Set(
-      (await readFile("README.md", "utf8"))
+      readme
         .split("\n")
         .filter((line) => /^#{1,6} /u.test(line))
         .map((line) =>
@@ -227,7 +229,15 @@ describe("links to the README", () => {
             .replaceAll(" ", "-"),
         ),
     );
+    // Existing links keep working when a section moves under a numbered menu heading.
+    for (const match of readme.matchAll(/<a id="([^"]+)"><\/a>/gu)) anchors.add(match[1]!);
     const used = new Set<string>();
+    for (const topic of [
+      MENU_OVERVIEW,
+      ...Object.values(MENU_ENTRY_NAMES),
+      ...Object.values(RECOVERY_TOPICS),
+    ])
+      used.add(topic.anchor);
     for (const file of await readdir("src/cli")) {
       const source = await readFile(`src/cli/${file}`, "utf8");
       for (const match of source.matchAll(/(?:readmeLink|terminalMore)\("([^"]+)"\)/gu))
@@ -235,6 +245,31 @@ describe("links to the README", () => {
     }
     expect(used.size).toBeGreaterThan(0);
     for (const anchor of used) expect(anchors, anchor).toContain(anchor);
+  });
+
+  it("describes menu tasks in their displayed order, including Help and Quit", async () => {
+    const { readFile } = await import("node:fs/promises");
+    const headings = (await readFile("README.md", "utf8"))
+      .split("\n")
+      .filter((line) => line.startsWith("## "));
+    expect(headings.filter((line) => /^## (?:\d\.|Quit)/u.test(line))).toEqual([
+      "## 1. Encode",
+      "## 2. Re-encode",
+      "## 3. Decode",
+      "## 4. Split into shares",
+      "## 5. Restore from shares",
+      "## 6. Recovery",
+      "## 7. Preview cards",
+      "## 8. Word lookup",
+      "## 9. Self-test",
+      "## 0. Help",
+      "## Quit",
+    ]);
+    expect(new Set(Object.values(MENU_ENTRY_NAMES).map((entry) => entry.anchor)).size).toBe(11);
+    for (const topic of [...Object.values(MENU_ENTRY_NAMES), ...Object.values(RECOVERY_TOPICS)]) {
+      expect(topic.description.length).toBeGreaterThan(20);
+      expect(topic.anchor).not.toBe("menu");
+    }
   });
 });
 

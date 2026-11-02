@@ -1,15 +1,10 @@
 # Current remediation register
 
-This is the current cross-audit status of known MnemoCode issues. Historical
-audit reports describe their original snapshots and remain unchanged. Times
-and verification dates here are UTC (+00:00).
+This register tracks known issues across audits. The latest correction record is first; [earlier checkpoints](#earlier-checkpoints) retain the status and evidence recorded at their dates. A historical statement such as “release acceptance incomplete” does not describe a later snapshot. Audit reports remain unchanged. Times and verification dates are UTC (+00:00).
 
-Each row names one concrete variant under its original finding ID. A new
-variant does not create a duplicate finding. A regression means the same
-verified path failed again after an identified change; finding an older missed
-path is recorded as a coverage gap instead. Tests, source identity and review
-must support a `verified` state. Local verification and external host/platform acceptance are separate states;
-pending host acceptance remains visible even after a local variant is verified.
+Each row tracks a concrete variant under its original finding ID. A regression means a previously verified path failed after an identified change; an older missed path is a coverage gap. Neither creates a duplicate finding.
+
+A `verified` status needs tests, source identity and review. Local verification and external host/platform acceptance are separate: a local pass does not close pending host acceptance.
 
 ## AUD-039 remediation for 0.1.1 (2026-11-02)
 
@@ -29,9 +24,13 @@ pending host acceptance remains visible even after a local variant is verified.
 
 The repository's longer name makes some "More:" links of the menu wider than 78 columns. By the owner's decision a line that holds only a link may be wider, since no wrap may split it; `test/menu.test.ts` checks every other line at 78 columns, and a redraw counts the rows the terminal shows a link on.
 
-## Standalone release acceptance (2026-10-22)
+## Earlier checkpoints
 
-### Current release preparation after manual testing
+The sections below are retained history, newest first. Their test counts, artifact hashes, holds and completion statements apply only to the snapshots they name.
+
+### Standalone release acceptance (2026-10-22)
+
+#### Current release preparation after manual testing
 
 Signed `633f120` contains the subsequent manual-testing corrections: menu spacing and independent output choices, retained results above follow-up questions, Escape cancellation, original words without a second code copy, automatic QR checks, share QR exports and Shamir repair within Re-encode before confirmation of the original phrase. `ae20050` dates version 0.1.0 for release. These changes are later than the native checkpoint below; its executable hashes and test totals do not describe this candidate.
 
@@ -39,7 +38,7 @@ The complete local run covered 3,654 tests in 279 files: 3,648 passed and six ob
 
 Release preparation is in progress. The signed release tag, complete tagged Windows/macOS/Linux checks, canonical SSKR comparison, new executable artifacts, attestations and OpenPGP signing must finish before publication. Earlier native artifacts remain evidence of their own source only. Browser/MHFE integration remains deferred by the owner's ordering.
 
-### Retained native checkpoint before manual testing
+#### Retained native checkpoint before manual testing
 
 Standalone pre-release verification is complete for the three tested native targets. The full [CI run](https://github.com/hobby-eng/mnemocode_typescript/actions/runs/39722442871) checked signed source `f980236`; all three source-test and real-terminal jobs passed. No confirmed high/medium code finding remains open in the reviewed release paths. This is bounded verification, not a claim that every possible defect or CORE violation has been ruled out.
 
@@ -63,7 +62,7 @@ No new tool, dependency or skill was installed for this closure. It uses the exi
 
 Browser/MHFE integration remains deferred by the owner; the API handoff is record-only for later intake. No release tag, OpenPGP release signing or publication was performed. The document-only acceptance update does not change the tested runtime or build inputs. Earlier dated checkpoints below retain their original results and former holds; this current acceptance supersedes their pending native/dependency statuses.
 
-### Native portability corrections
+#### Native portability corrections
 
 The full native run identified these platform-specific cases after the
 frozen AUD-038 report's earlier local snapshot. No public API, mnemonic operation, native engine or executable-build
@@ -83,7 +82,7 @@ resource records and independent reviews stay in local ignored evidence.
 The full native follow-up has now passed on the correction. Conditional
 platform-only cases are explicitly counted in the current acceptance table.
 
-## Earlier local release checkpoint (2026-10-22)
+### Earlier local release checkpoint (2026-10-22)
 
 [AUD-038](audits/AUD-038-2026-10-22.md) records the targeted pass-5 and standalone
 release checks after the completed pass-4 continuation. It preserves earlier
@@ -139,7 +138,7 @@ rerun instructions. No remaining confirmed high/medium code defect was found
 in the reviewed paths; partial semantic coverage and unexecuted acceptance
 remain explicit.
 
-## Standard statuses (2026-10-20)
+### Standard statuses (2026-10-20)
 
 This table gives each correction that the register tracks from AUD-032 to
 AUD-036 a status from the audit standard, with its fix and verification
@@ -218,7 +217,7 @@ terms), not an ID or a severity. The regression belongs to AUD-029-SEC001,
 whose severity is low, and AUD-029 records it as fixed and accepted by an
 independent follow-up. The AUD-029 record itself is not changed.
 
-## Test-gate follow-up (2026-10-19)
+### Test-gate follow-up (2026-10-19)
 
 The normal Vitest suite now discovers only `test/**/*.test.ts`. Before this
 correction, discovery included 209 maintained test files, one published audit
@@ -240,7 +239,7 @@ native-engine files, dependency versions and executable-building code remain
 unchanged. The parallel AUD-037 remains separate;
 its unfinished candidate list is not represented as an accepted audit report.
 
-## Latest private-output correction (2026-10-19)
+### Latest private-output correction (2026-10-19)
 
 An additional pagination coverage gap was confirmed from the concurrent audit's
 ordinary 2-of-3 Unicode and colors-as-Unicode examples. The private viewer sized
@@ -279,7 +278,7 @@ GitHub's delayed Actions processing was an external execution delay, recorded in
 its [incident record](https://www.githubstatus.com/incidents/8tzbpcnl75jp),
 not passing platform acceptance.
 
-## Full-CI test portability follow-up (2026-10-19)
+### Full-CI test portability follow-up (2026-10-19)
 
 The full source-test runs for both signed snapshots exposed test-support
 problems that the existing local evidence had not reached. Their failing logs
@@ -304,7 +303,7 @@ inputs unchanged. The owner requested no
 additional agents; review is by the main agent, with no independent acceptance
 claimed.
 
-## Native acceptance completed (2026-10-19)
+### Native acceptance completed (2026-10-19)
 
 The [complete CI run](https://github.com/hobby-eng/mnemocode_typescript/actions/runs/39291308933)
 passes on signed checkpoint `f8d9a933ba9bde8290da39d42fa3a380de78385a`.
@@ -356,7 +355,7 @@ Tagging, release publication, release signing, history rewriting and the
 owner-deferred G1/Rust-port work are separate from these checks and were not
 performed.
 
-## Browser acceptance follow-up (2026-10-19)
+### Browser acceptance follow-up (2026-10-19)
 
 Both remaining encrypted candidate-list scenarios now pass in Firefox 157.0,
 one in each edition. Each actual Deriver writes the list to the Scanner key;
@@ -381,7 +380,7 @@ The runtime handoffs pass their original assertions. This closes the two
 previously missing cases, without claiming every option combination or native
 OS protections in a browser.
 
-## Retained AUD-036 follow-up
+### Retained AUD-036 follow-up
 
 This section retains the status recorded before the later push authorization
 and the CLI correction above. Its execution and artifact identities are historical.
@@ -449,7 +448,7 @@ bindings, failures, review scope and pending acceptance. The following AUD-035
 sections retain their original history; older totals and artifacts are not the
 current final replay.
 
-## Corrections from AUD-035 (retained history)
+### Corrections from AUD-035 (retained history)
 
 On 2026-10-20 the status column took the standard value `verified`; the scope words it
 held before (current Linux snapshot or current scoped follow-up) now open the verification
@@ -479,14 +478,14 @@ is not inferred from uncommitted files.
 
 The scoped reviewer also caught a type-contract mistake in the new cancellation test before acceptance: `using` required a disposal member absent from the public `JointPlan` interface. Strict compilation reproduced TS2741. The test now calls the existing `wipe()` contract in `finally`; strict compilation and independent follow-up passed. No public API was widened to accommodate the test.
 
-## Previously verified controls retained
+### Previously verified controls retained
 
 | Finding ID / variant                       | Current state                                                                 | Evidence retained                                                                                                                                                 |
 | ------------------------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | AUD-029-SEC001 / bounded-file-close-result | Verified at the AUD-035 baseline; not reopened by the scratch variants above. | Five default regressions and the original close-error probe: original exception preserved, zero unreturned bytes left nonzero.                                    |
 | Date-recovery test skips                   | Verified at the AUD-035 baseline.                                             | All 48 cases execute with unchanged fixtures, assertion/oracle bodies and 60-second timeout. Full baseline suite: 2,956 passed in 204 files, zero failed/skipped. |
 
-## Earlier corrections carried forward
+### Earlier corrections carried forward
 
 These entries index corrections retained at the AUD-035 baseline. Original
 reports and source-bound evidence keep their qualifications; this table does
@@ -528,7 +527,7 @@ executed all 2,956 cases with no skips. These rows preserve those correction
 scopes; they do not claim that every sibling variant has been found or that
 external host/platform acceptance is complete.
 
-## Deferred work and external acceptance
+### Deferred work and external acceptance
 
 | Item                                                         | State and boundary                                                                                                                                                                                                              |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -537,7 +536,7 @@ external host/platform acceptance is complete.
 | Windows/macOS and complete browser-host acceptance           | Not established by local Linux success. Actual host/platform results must identify exact producer and host bytes.                                                                                                               |
 | Committed release identity, CI, attestations and publication | Pending a requested release action; a dirty-tree test result does not establish these.                                                                                                                                          |
 
-## Retained AUD-035 verification history
+### Retained AUD-035 verification history
 
 Status reconciliation at `2026-10-19T02:08:08+00:00` confirmed that all 648
 non-audit inputs still match the accepted follow-up fingerprint
@@ -612,7 +611,7 @@ receipts, review hashes and native/producer identities are in
 A committed, signed and published release and external Windows/macOS acceptance
 are not established by these local results.
 
-## Evidence and completion policy
+### Evidence and completion policy
 
 No new audit tool or skill was installed for this remediation. It uses the
 existing pinned Node/TypeScript/Vitest and Rust/Clippy/rustfmt/Docker tools,

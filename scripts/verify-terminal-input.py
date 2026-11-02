@@ -115,6 +115,7 @@ from terminal_menu_checks import (
     check_cursor_editing,
     check_date_search_ctrl_c,
     check_decode_menu,
+    check_menu_help_targets,
     check_lines_pasted_as_one_answer,
     check_long_line,
     check_lookup_repeat,
@@ -152,6 +153,7 @@ def main():
     # Each result is written at once, so that a CI log shows how far the
     # checks came.
     sys.stdout.reconfigure(line_buffering=True)
+    check_menu_help_targets()
     check_decode_menu()
     check_back_from_entry()
     check_card_questions()

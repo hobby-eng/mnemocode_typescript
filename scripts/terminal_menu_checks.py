@@ -49,6 +49,45 @@ from terminal_answers import (
 )
 
 
+def check_menu_help_targets():
+    """Task and recovery screens link to their README sections; Escape
+    returns to the ordinary menu without carrying the task's help.
+    """
+    cases = [
+        ("1", None, "1-encode"),
+        ("2", None, "2-re-encode"),
+        ("3", None, "3-decode"),
+        ("4", None, "4-split-into-shares"),
+        ("5", None, "5-restore-from-shares"),
+        ("6", None, "6-recovery"),
+        ("7", None, "7-preview-cards"),
+        ("8", None, "8-word-lookup"),
+        ("6", "1", "forgotten-word-recovery"),
+        ("6", "2", "codes-that-cannot-be-read"),
+        ("6", "3", "date-recovery-helper"),
+        ("6", "4", "damaged-shares"),
+    ]
+    base = "More: https://github.com/hobby-eng/mnemocode_typescript#"
+    for entry, recovery, anchor in cases:
+        session = Session()
+        try:
+            session.wait_for("What do you want to do?")
+            session.type(entry)
+            if recovery is not None:
+                session.wait_for("What is forgotten?")
+                session.type(recovery)
+            session.wait_for(base + anchor)
+            session.wait_for("Esc goes back")
+            session.type(ESCAPE)
+            session.wait_for(base + "menu")
+            session.wait_for("What do you want to do?")
+            session.type(ESCAPE)
+            assert session.wait_for_exit() == 0
+        finally:
+            session.close()
+    print("menu: task-specific README links and Escape passed")
+
+
 def check_decode_menu():
     """Decode in the menu: the answer is shown and edited on the private
     screen, which is left after the result; Escape ends the menu with 0.

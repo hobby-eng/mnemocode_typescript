@@ -255,18 +255,29 @@ export class AnswerRecord {
    */
   static #reached = 1;
 
-  /** Draws again what stands above the record when the screen is drawn anew. */
-  static #drawHeading: () => void = () => undefined;
+  /** Builds the current heading, including its closure warnings, when it must be drawn again. */
+  static #heading: () => readonly string[] = () => [];
+  /** The heading actually drawn above this record, counted again if the terminal is resized. */
+  static #headingLines: readonly string[] = [];
+
+  static #writeHeading(): void {
+    AnswerRecord.#headingLines = AnswerRecord.#heading();
+    for (const line of AnswerRecord.#headingLines) process.stderr.write(`${line}\n`);
+  }
 
   /**
-   * Starts the record on the row of the cursor, below what the screen shows already, such as the
-   * heading of the menu or the output of a command. `heading` writes that heading again, for when
-   * the screen must be drawn anew (eraseSince); it stays for the records after this one.
+   * Starts the record below what the screen shows already. With `heading`, draws it first and
+   * keeps its builder for later redraws. Without it, starts below a command's output, keeping the
+   * builder for a redraw if the record scrolls out of reach.
    */
-  static start(heading?: () => void): void {
+  static start(heading?: () => readonly string[]): void {
     AnswerRecord.#lines.length = 0;
     AnswerRecord.#reached = 1;
-    if (heading !== undefined) AnswerRecord.#drawHeading = heading;
+    AnswerRecord.#headingLines = [];
+    if (heading !== undefined) {
+      AnswerRecord.#heading = heading;
+      AnswerRecord.#writeHeading();
+    }
   }
 
   /** A place in the record, for eraseSince: the lines written before it. */
@@ -313,11 +324,24 @@ export class AnswerRecord {
       redrawFrom(recordRows(erased));
       return;
     }
-    process.stderr.write(CLEAR_SCREEN);
-    AnswerRecord.#drawHeading();
-    for (const line of kept) process.stderr.write(`${shownAnswer(line)}\n`);
+    AnswerRecord.redraw();
+  }
+
+  /**
+   * Replaces the heading and keeps answers through `mark`. When they remain on screen, only
+   * their own rows are erased: earlier command output stays above. A scrolled heading needs a
+   * full redraw, as a scrolled record does in eraseSince.
+   */
+  static redraw(mark: number = AnswerRecord.#lines.length): void {
+    const headingRows = rowsOf(AnswerRecord.#headingLines);
+    if (headingRows + AnswerRecord.#reached <= terminalRows())
+      redrawFrom(headingRows + recordRows(AnswerRecord.#lines));
+    else process.stderr.write(CLEAR_SCREEN);
+    AnswerRecord.#lines.splice(mark);
+    AnswerRecord.#writeHeading();
+    for (const line of AnswerRecord.#lines) process.stderr.write(`${shownAnswer(line)}\n`);
     // Counted from the record's own row again, as if it had started on the last row.
-    AnswerRecord.#reached = recordRows(kept) + 1;
+    AnswerRecord.#reached = recordRows(AnswerRecord.#lines) + 1;
   }
 }
 

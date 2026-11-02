@@ -32,6 +32,10 @@ import {
 } from "./seedshift-choices.js";
 import {
   MENU_ENTRY_NAMES,
+  MENU_OVERVIEW,
+  RECOVERY_TOPICS,
+  type MenuTopic,
+  type MenuEntryName,
   PHRASE_WORDS_QUESTION,
   phraseWordsAnswer,
   TYPED_SOURCE,
@@ -54,8 +58,7 @@ import {
   printableText,
   readmeLink,
   STYLE,
-  terminalFailure,
-  terminalMore,
+  moreLine,
   terminalNotice,
   terminalPaint,
 } from "./terminal.js";
@@ -67,7 +70,7 @@ import { WordList, type WordHints } from "../core/word-hints.js";
 import { commandDisplay } from "./shell-command.js";
 import { runCommand } from "./menu-runner.js";
 import { walletEvidenceArguments } from "./bitcoin-options.js";
-import { headingLine } from "./terminal-style.js";
+import { headingLine, failureLine, hintLines, noticeLines } from "./terminal-style.js";
 import { describeError } from "../core/refusal.js";
 import { SAMPLE_FILE_BASE } from "../export/card-preview.js";
 
@@ -110,6 +113,10 @@ type Action =
   | undefined
   | Cancelled;
 
+/** Updates only the menu's public task description; no recovery material is passed here. */
+type ShowTopic = (topic: MenuTopic) => void;
+type MenuAction = (showTopic?: ShowTopic) => Promise<Action>;
+
 /** What standard shares are, shown with the question how many to make in entry 4. */
 const STANDARD_SHARES_EXPLANATION: Explanation = {
   lines: ["Standard SSKR shares of the seed phrase itself, which other SSKR tools read."],
@@ -117,10 +124,10 @@ const STANDARD_SHARES_EXPLANATION: Explanation = {
 };
 
 /** `action` with no file of an earlier entry claimed. */
-function askedAfresh(action: () => Promise<Action>): () => Promise<Action> {
-  return () => {
+function askedAfresh(action: MenuAction): MenuAction {
+  return (showTopic) => {
     ClaimedOutputs.forget();
-    return action();
+    return action(showTopic);
   };
 }
 
@@ -319,7 +326,7 @@ async function restoreAction(): Promise<Action> {
 }
 
 /** Entry 6: a forgotten word, a forgotten digit of a date, or an unreadable code of a share. */
-async function recoverAction(): Promise<Action> {
+async function recoverAction(showTopic?: ShowTopic): Promise<Action> {
   const forgotten = await choose(
     "What is forgotten?",
     [
@@ -343,6 +350,7 @@ async function recoverAction(): Promise<Action> {
     { label: "Forgotten" },
   );
   if (forgotten === undefined || forgotten === CANCELLED) return forgotten;
+  showTopic?.(RECOVERY_TOPICS[forgotten]);
   if (forgotten === "word") return wordRecoveryAction();
   if (forgotten === "code") return markedCodesAction();
   // The shares come back whole, in their own form, without the seed phrase being shown.
@@ -606,10 +614,8 @@ async function tableAction(): Promise<Action> {
   return lookupAction(lookup);
 }
 
-interface Entry {
-  readonly label: string;
-  readonly digit: number | null;
-  readonly action: () => Promise<Action>;
+interface Entry extends MenuEntryName {
+  readonly action: MenuAction;
   /**
    * The command asks for a seed phrase or a share, which needs a protected, self-tested process.
    */
@@ -699,17 +705,23 @@ function leftOut(closure: Closure): string {
 }
 
 /** The menu's heading; `closure` says which entries are no longer offered, and why. */
-function writeHeading(closure: Closure | undefined): void {
-  console.error(`\n${headingLine(process.stderr, "Offline seed phrase encoding")}\n`);
-  console.error("Encodes a BIP39 seed phrase as numbers, codes or colors, all offline.");
-  terminalMore("menu");
-  console.error(paint(STYLE.muted, "Work on a trusted computer without a network connection."));
+function headingLines(closure: Closure | undefined, topic: MenuTopic): string[] {
+  const lines = [
+    "",
+    headingLine(process.stderr, topic.label),
+    "",
+    ...hintLines(process.stderr, topic.description),
+    moreLine(topic.anchor),
+    paint(STYLE.muted, "Work on a trusted computer without a network connection."),
+  ];
   if (closure !== undefined) {
-    terminalFailure(closure.reason);
-    terminalNotice(leftOut(closure), "warning");
+    lines.push(
+      failureLine(process.stderr, "mnemocode", closure.reason),
+      ...noticeLines(process.stderr, leftOut(closure), "warning"),
+    );
   }
   // The record of answers starts after a blank line; each question adds its own above it.
-  console.error("");
+  return [...lines, ""];
 }
 
 /**
@@ -721,12 +733,20 @@ export async function runMenu(): Promise<Cancelled | undefined> {
   // itself saves nothing.
   ProcessProtection.dropForMenu();
   let closure = closedAtStart();
-  writeHeading(closure);
+  let topic = MENU_OVERVIEW;
   // Drawn again, as it is then, where going back draws the whole screen anew.
-  AnswerRecord.start(() => writeHeading(closure));
+  AnswerRecord.start(() => headingLines(closure, topic));
+  const showTopic: ShowTopic = (next) => {
+    topic = next;
+    AnswerRecord.redraw();
+  };
   let selected: Entry = defined(MENU_ENTRIES[0]);
   let again: (() => Promise<Action>) | undefined;
   for (;;) {
+    if (again === undefined && topic !== MENU_OVERVIEW) {
+      topic = MENU_OVERVIEW;
+      AnswerRecord.start(() => headingLines(closure, topic));
+    }
     const entries = closure === undefined ? MENU_ENTRIES : MENU_ENTRIES.filter(closure.offers);
     const before = AnswerRecord.mark();
     const entry =
@@ -739,13 +759,15 @@ export async function runMenu(): Promise<Cancelled | undefined> {
         : selected;
     if (entry === undefined || entry === CANCELLED) return entry;
     selected = entry;
-    const action = await (again ?? entry.action)();
+    showTopic(entry);
+    const action = await (again === undefined ? entry.action(showTopic) : again());
     again = undefined;
     if (action === CANCELLED) return CANCELLED;
     if (action === "quit") return undefined;
     if (action === undefined) {
       // Back: the task and the answers given for it leave the record before the list returns.
-      AnswerRecord.eraseSince(before);
+      topic = MENU_OVERVIEW;
+      AnswerRecord.redraw(before);
       continue;
     }
     // What follows is written below the record, which starts again under it for the next task.

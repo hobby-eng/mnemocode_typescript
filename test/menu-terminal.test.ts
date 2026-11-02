@@ -541,26 +541,71 @@ it("omits an unsafe command preview without refusing the actual filename or runn
   expect(preview).not.toContain("\u202e");
 });
 
-describe("what the menu does when a command cannot run or stops", () => {
-  /**
-   * Runs the menu with `keys` for its questions in turn, on a screen of 80 columns; returns the
-   * questions asked and the screen as each of them first showed it.
-   */
-  async function menuWith(keys: string[]): Promise<{ asked: DrawnQuestion[]; shown: string[][] }> {
-    terminal.asked = [];
-    const screen = watchScreen(80);
-    const shown: string[][] = [];
-    terminal.onFirstKey = () => shown.push(screen.lines());
-    terminal.keysFor = () => {
-      const next = keys.shift();
-      if (next === undefined) throw new Error("the menu asked more than was answered");
-      return next;
-    };
-    await runMenu();
-    stopWatching();
-    return { asked: terminal.asked, shown };
+/**
+ * Runs the menu with `keys` for its questions in turn, on a screen of 80 columns; returns the
+ * questions asked and the screen as each of them first showed it.
+ */
+async function menuWith(keys: string[]): Promise<{ asked: DrawnQuestion[]; shown: string[][] }> {
+  terminal.asked = [];
+  const screen = watchScreen(80);
+  const shown: string[][] = [];
+  terminal.onFirstKey = () => shown.push(screen.lines());
+  terminal.keysFor = () => {
+    const next = keys.shift();
+    if (next === undefined) throw new Error("the menu asked more than was answered");
+    return next;
+  };
+  await runMenu();
+  stopWatching();
+  return { asked: terminal.asked, shown };
+}
+
+describe("task descriptions and README links in the menu", () => {
+  /** Menu text apart from its remembered cursor selection. */
+  function withoutSelection(lines: readonly string[]): string[] {
+    return lines.map((line) => line.replace(/^›/u, " "));
   }
 
+  it.each([
+    [1, "1-encode"],
+    [2, "2-re-encode"],
+    [3, "3-decode"],
+    [4, "4-split-into-shares"],
+    [5, "5-restore-from-shares"],
+    [6, "6-recovery"],
+    [7, "7-preview-cards"],
+    [8, "8-word-lookup"],
+  ])(
+    "shows task-specific help for menu entry %i and restores the menu after Escape",
+    async (digit, anchor) => {
+      const { shown } = await menuWith([String(digit), ESCAPE, ESCAPE]);
+      expect(shown[1]!.join("")).toContain(
+        `More: https://github.com/hobby-eng/mnemocode_typescript#${anchor}`,
+      );
+      expect(shown[1]!.join("\n")).not.toContain("#menu");
+      expect(withoutSelection(shown[2]!)).toEqual(withoutSelection(shown[0]!));
+      expect(shown[2]!.find((line) => line.startsWith("›"))).toContain(String(digit));
+    },
+  );
+
+  it.each([
+    [1, "forgotten-word-recovery"],
+    [2, "codes-that-cannot-be-read"],
+    [3, "date-recovery-helper"],
+    [4, "damaged-shares"],
+  ])("keeps the specific help when recovery task %i is selected", async (digit, anchor) => {
+    const { shown } = await menuWith(["6", String(digit), ESCAPE, ESCAPE]);
+    expect(shown[1]!.join("\n")).toContain("#6-recovery");
+    expect(shown[2]!.join("")).toContain(
+      `More: https://github.com/hobby-eng/mnemocode_typescript#${anchor}`,
+    );
+    expect(shown[2]!.join("\n")).not.toContain("#menu");
+    expect(withoutSelection(shown[3]!)).toEqual(withoutSelection(shown[0]!));
+    expect(shown[3]!.find((line) => line.startsWith("›"))).toContain("6");
+  });
+});
+
+describe("what the menu does when a command cannot run or stops", () => {
   // The word table, a word, abandon: a command without a private screen.
   const LOOK_UP = [String(MENU_ENTRY_NAMES.table.digit), ENTER, `abandon${ENTER}`];
 

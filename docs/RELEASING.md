@@ -1,22 +1,24 @@
 # Releasing MnemoCode
 
-A release is built and checked on GitHub and signed on the maintainer's computer. The OpenPGP key never enters GitHub Actions: a tag only creates a draft release, `scripts/sign-release.mjs` checks the draft and signs it, and the maintainer then publishes it. The steps below run in this order.
+This is the maintainer's procedure for a TypeScript maintenance release. A signed Git tag starts the build and creates a draft. The maintainer checks and OpenPGP-signs that draft on their own computer, then publishes it. The OpenPGP private key never enters GitHub Actions.
+
+For checking a downloaded executable, follow [Download verification](CLI.md#download-verification).
 
 ## Release notes
 
-In `CHANGELOG.md`, replace "(unreleased)" in the version's heading with the release date, for example `## 0.1.0 (2026-10-07)`: the release notes link to `CHANGELOG.md` at the tag.
+Replace `(unreleased)` in the version's `CHANGELOG.md` heading with the release date. Write `docs/releases/v<version>.md` from that section; the workflow uses it as the release text and refuses a tag without it. Keep its links pinned to the release tag.
 
-Write `docs/releases/v<version>.md` from the version's section of `CHANGELOG.md`. It becomes the text of the release; a tag without it stops the workflow.
-
-Update the status line at the top of `README.md` ("This README describes version …"), which says whether the version described is released.
+Update the version and maintenance-status notice at the top of `README.md`.
 
 ## Version
 
-Set the version in `package.json` and in `src/version.ts`. `pnpm check` fails when the two differ, and the workflow stops when the tag is not `v` followed by that version.
+Set the same version in `package.json` and `src/version.ts`. `pnpm check` requires them to agree; the workflow requires the tag to be `v` followed by that version.
+
+The examples below use `0.1.1`. Substitute the version you are actually releasing, and check that its tag does not already exist. Never move a published tag to release another build.
 
 ## Checks before the tag
 
-Run the release-level checks, one at a time:
+Run the release checks one at a time:
 
 ```sh
 corepack pnpm install --frozen-lockfile
@@ -25,32 +27,40 @@ corepack pnpm audit --audit-level high
 npm pack --dry-run --json --ignore-scripts
 ```
 
-The SSKR engine rebuild (`pnpm verify:sskr`) takes long and runs on GitHub for the tag, so it is not repeated here. Check that every commit since the last release is signed: `git cat-file -p <commit>` shows a `gpgsig` header. Commits and the tag are made with `TZ=UTC`, so that their dates read `+0000` and publish no time zone: `git log --format='%ad %cd' --date=iso` shows `+0000` for every commit since the last release, as the tagger line of `git cat-file -p v0.1.0` does once the tag is made. Push the release commit to `main` and wait for its CI.
+The tag workflow runs the long canonical SSKR rebuild and comparison, `pnpm verify:sskr`; it need not be repeated locally.
+
+Check that every new commit has a `gpgsig` header with `git cat-file -p <commit>`. Check both dates with `git log --format='%ad %cd' --date=iso`: they must use `+0000`. Run every date-writing Git command with `TZ=UTC`, including the tag below.
+
+Push the release commit to `main` and wait for its CI to pass before tagging.
 
 ## Signed tag
 
-Make an annotated tag, signed like the commits with the SSH key that Git is set up with, and push it:
+Create an annotated tag using Git's configured SSH signing key, inspect it and push it:
 
 ```sh
-TZ=UTC git tag -s v0.1.0 -m "MnemoCode 0.1.0"
-git cat-file -p v0.1.0
-git push origin v0.1.0
+TZ=UTC git tag -s v0.1.1 -m "MnemoCode 0.1.1"
+git cat-file -p v0.1.1
+git push origin v0.1.1
 ```
 
-`git cat-file -p` must show an SSH signature at the end of the tag. This signature of the Git history is separate from the OpenPGP signature of the release files.
+The tag must have an SSH signature and a UTC tagger date. Git-history signatures are separate from the OpenPGP signature of the release files.
 
 ## The tag's workflow
 
-The tag starts `.github/workflows/executable.yml`:
+`.github/workflows/executable.yml` runs these jobs:
 
-- `verify` runs the complete CI on the tagged commit.
-- `sskr` rebuilds the SSKR engine in its pinned container and compares it byte for byte with the committed one.
-- `build` builds the executable on Linux, Windows and macOS, runs each one from an empty folder and drives its menu in a pseudo-terminal.
-- `release` runs after all three have passed. It writes `SHA256SUMS`, has GitHub attest the build provenance of every file it lists, and creates the draft release with the three executables, their license notices, `SHA256SUMS` and the release notes. It stops when the tag has a release or a draft already, because GitHub would keep a second draft with other builds beside the first; to run it again, delete the draft on GitHub first.
+- `verify`: complete CI on the tagged commit.
+- `sskr`: rebuild the share engine in its pinned container and compare it byte for byte with the committed engine.
+- `build`: build Linux, Windows and macOS executables, run them from empty folders, and exercise their menus in real terminals.
+- `release`: after all checks pass, write `SHA256SUMS`, create GitHub build attestations for its files, and create a draft with the three executables, their license notices and release notes.
+
+The release job refuses a tag that already has a release or draft. To rerun a failed draft-creation attempt, delete its draft first; do not leave two drafts with different builds of one tag.
 
 ## Sign the draft
 
-The signing computer needs the [GitHub CLI](https://cli.github.com/) with the `gh attestation` command, logged in (`gh auth login`) with the right to edit releases of `hobby-eng/mnemocode_typescript`; GnuPG with the release key; and `sha256sum`. The release key's fingerprint:
+The signing computer needs GnuPG with the release key, `sha256sum`, and the [GitHub CLI](https://cli.github.com/) with `gh attestation`. Authenticate with permission to edit releases of `hobby-eng/mnemocode_typescript`.
+
+Release key fingerprint:
 
 ```text
 28FC51B1DB80DF2101128CB30EDD4814591DD095
@@ -59,42 +69,34 @@ The signing computer needs the [GitHub CLI](https://cli.github.com/) with the `g
 From the checkout:
 
 ```sh
-node scripts/sign-release.mjs v0.1.0 --dry-run
-node scripts/sign-release.mjs v0.1.0
+node scripts/sign-release.mjs v0.1.1 --dry-run
+node scripts/sign-release.mjs v0.1.1
 ```
 
-`--dry-run` prints every command in order and runs none of them. A real run:
+`--dry-run` prints the commands without executing them. A real run:
 
-1. Checks that the tools and the secret key are there and that `v0.1.0` has exactly one release on GitHub, a draft of at most nine files (the six, `SHA256SUMS` and the signature and public key of an earlier, unfinished run), none larger than 512 MiB.
-2. Downloads the draft into `release-signing-v0.1.0/`, a new folder that Git ignores.
-3. Checks that `SHA256SUMS` takes at most 1 MiB and lists at most six files, each once, and that the folder holds exactly those files; then runs `sha256sum --check --strict SHA256SUMS`, and `gh attestation verify` for each file.
-4. Signs with `gpg --local-user 28FC51B1DB80DF2101128CB30EDD4814591DD095 --armor --detach-sign`, which writes `SHA256SUMS.asc`. GnuPG asks for the passphrase itself; the script never reads or copies the private key.
-5. Checks the signature with `gpg --verify` and that the release key made it.
-6. Exports the public key as `RELEASE-SIGNING-KEY.asc`.
-7. Uploads `SHA256SUMS.asc` and `RELEASE-SIGNING-KEY.asc` to the draft, replacing those of an earlier, unfinished run.
+1. Checks the tools and secret key, then requires exactly one draft for the tag. It allows at most nine assets: six build files, `SHA256SUMS`, and a signature and public key from an unfinished run. No asset may exceed 512 MiB.
+2. Downloads the draft to a new ignored folder, `release-signing-v0.1.1/`.
+3. Requires `SHA256SUMS` to fit within 1 MiB and list at most six unique files. It checks the downloaded files, runs `sha256sum --check --strict SHA256SUMS`, and verifies each file's GitHub attestation.
+4. Creates `SHA256SUMS.asc` with `gpg --local-user 28FC51B1DB80DF2101128CB30EDD4814591DD095 --armor --detach-sign`. GnuPG asks for the passphrase; the script never reads or copies the private key.
+5. Verifies that signature and the signing key's fingerprint.
+6. Exports `RELEASE-SIGNING-KEY.asc`.
+7. Uploads the signature and public key, replacing copies from an unfinished run.
 
-A failure stops the script with one line that says why, as does a command that writes more than 1 MiB of output, Ctrl+C with "Cancelled.", and nothing is uploaded before every check has passed. To run it again, move the folder away first. The key is valid until 2028-10-04; extend it before then and publish the extended public key on GitHub.
+The script stops on a failure, on output above its 1 MiB limit, or on Ctrl+C. It uploads nothing until all checks pass. Before retrying, move aside the previous download folder.
+
+The key is valid until 2028-10-04. Extend it before then and publish the extended public key on GitHub.
 
 ## Publish
 
-Look at the draft on GitHub: the notes, the six files, `SHA256SUMS`, `SHA256SUMS.asc` and `RELEASE-SIGNING-KEY.asc`. Then publish it there, or with:
+Review the draft's notes, six build files, `SHA256SUMS`, `SHA256SUMS.asc` and `RELEASE-SIGNING-KEY.asc`. Publish it on GitHub or run:
 
 ```sh
-gh release edit v0.1.0 --repo hobby-eng/mnemocode_typescript --draft=false
+gh release edit v0.1.1 --repo hobby-eng/mnemocode_typescript --draft=false
 ```
 
-`node scripts/sign-release.mjs v0.1.0 --publish` signs and publishes in one run.
+To sign and publish in one run, use `node scripts/sign-release.mjs v0.1.1 --publish`.
 
 ## Verify a download
 
-Anyone can check a release this way; [docs/CLI.md](CLI.md#download-verification) shows the same steps.
-
-```sh
-gpg --show-keys RELEASE-SIGNING-KEY.asc
-gpg --import RELEASE-SIGNING-KEY.asc
-gpg --verify SHA256SUMS.asc SHA256SUMS
-sha256sum --check --ignore-missing SHA256SUMS
-gh attestation verify mnemocode-0.1.0-linux-x64 --repo hobby-eng/mnemocode_typescript
-```
-
-`gpg --show-keys` must show the fingerprint above, and `gpg --verify` must say "Good signature". Compare the fingerprint with a source you trust, such as the key GitHub shows for the maintainer at https://github.com/hobby-eng.gpg: a key that comes with the download proves nothing by itself. `--ignore-missing` lets the check pass when only some files were downloaded. The signature shows which key signed `SHA256SUMS`; `gh attestation verify` shows that a file was built by a GitHub Actions workflow of this repository and was not changed since.
+The user-facing [verification instructions](CLI.md#download-verification) cover the key fingerprint, OpenPGP signature, checksums and GitHub attestations. A key supplied with a download is not an independent trust source: compare its fingerprint with one you already trust, such as the maintainer's key at https://github.com/hobby-eng.gpg.

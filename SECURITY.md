@@ -1,63 +1,108 @@
 # Security policy
 
+This page explains what MnemoCode protects, what it cannot protect, and how to report a vulnerability. For backup and recovery steps, use the [README](README.md) or [command-line reference](docs/CLI.md).
+
 ## Reporting a vulnerability
 
-Report a suspected vulnerability privately through the [GitHub private vulnerability reporting form](https://github.com/hobby-eng/mnemocode_typescript/security/advisories/new) of this repository. The report goes to the repository owner and maintainers. Do not describe an unfixed security problem in a public issue, discussion, pull request, screenshot or log.
+Report a suspected vulnerability through this repository's [private vulnerability reporting form](https://github.com/hobby-eng/mnemocode_typescript/security/advisories/new). It reaches the owner and maintainers. Keep an unfixed security problem out of public issues, discussions, pull requests, screenshots and logs.
 
-Never include a real phrase, BIP39 passphrase, private key, WIF, Shamir share, date, encoded record, QR code, card or wallet export. Show the problem with a published test phrase or invented data. Include:
+Use a published test phrase or invented data. Never include a real phrase, BIP39 passphrase, private key, WIF, Shamir share, date, encoded record, QR code, card or wallet export. Include:
 
-- the affected release or the full commit SHA;
-- the operating system and the Node.js version;
-- the exact steps, without secrets;
-- what you expected, what happened, and why it is a security problem.
+- the affected release or full commit SHA;
+- the operating system and Node.js version;
+- exact steps using only test data;
+- the expected result, actual result and security impact.
 
-Ordinary defects and feature requests belong in the [public issue forms](https://github.com/hobby-eng/mnemocode_typescript/issues/new/choose). If publishing a report could help an attacker or reveal recovery material, report it privately.
+Ordinary bugs and feature requests belong in the [public issue forms](https://github.com/hobby-eng/mnemocode_typescript/issues/new/choose). If a report could reveal recovery material or help an attacker, send it privately.
 
-Security fixes are made in the current source and the current release. Installed copies and exported records do not update themselves. Check the version that you run, replace affected installations, and keep what you need to decode your existing records.
+The TypeScript version receives fixes for critical defects only. Installed copies do not update themselves. Check which version you run, replace affected installations, and retain what you need to read existing backups.
 
 ## Security model
 
-MnemoCode is an offline Node.js command-line program and TypeScript library. Its own code uses no network: it has no online service, telemetry, analytics, update check or remote file. The recovery checks are calculated on your computer; MnemoCode never asks a wallet, a node or a block explorer.
+MnemoCode is an offline command-line program and TypeScript library. Its own code has no online service, telemetry, analytics, update check or remote file access. Wallet comparisons are calculated locally, without contacting a wallet, node or block explorer.
 
-MnemoCode is **not a complete sandbox**, and what limits it depends on how it runs:
+Use a trusted computer disconnected from every network, preferably a freshly started read-only live system. Unplug the network cable and turn off wireless connections before entering secrets. Avoid cloud terminals and remote shells. Shut down the temporary system after saving the result. A firewall, virtual machine or container adds protection only to the extent that you trust and check its configuration.
 
-- **The `mnemocode` command and the single executable** run under the Node.js permission model, described [below](#secret-lifecycle-and-local-boundaries): no network, no worker threads and no native addons. A Node.js process that already runs under the permission model and was given such a right on purpose, such as `--allow-net`, keeps it; MnemoCode does not take back rights that its caller granted. Below that model the operating system enforces what it offers a program: on Linux new sockets, file writes and other programs are refused by the kernel where a command does not need them; on macOS the network and other programs; on Windows other programs. A system that offers less runs with less, and `mnemocode self-test` says what was not available.
-- **The library**, built into another program, runs with the file, process and network rights of that program, and adds no limit of its own.
+### Command-line protections
 
-"Offline" describes what the program does. Only the limits that the system enforces, which differ from one system and version to another, stop a compromised program from opening a connection; descriptors opened before them, such as the terminal, stay usable.
+The CLI and standalone executable use the Node.js permission model. They normally allow no network, worker threads or native addons. A command that saves nothing gives up file writes; one that renders no images gives up child processes. Each menu task runs in its own process.
 
-For a real phrase:
+A caller that already runs Node.js under the permission model can grant additional rights, such as `--allow-net`; MnemoCode does not revoke those grants. Node.js describes its permission model as a safety belt for trusted code, not a boundary against malicious code.
 
-- Use a trusted computer that is disconnected from every network, preferably a freshly started read-only live system.
-- Turn off Wi-Fi and Bluetooth before you enter secrets. Do not use cloud terminals or remote shells.
-- Shut the temporary system down after you have saved the result.
-- For more protection, use a firewall that you have checked yourself, or a virtual machine or container with networking turned off.
+Operating-system protections supplement that model where available:
 
-When the library is built into another application, that application is responsible for security. MnemoCode does not create an iframe, Worker, Content Security Policy, process sandbox or permission boundary. A `connect-src 'none'` policy can block ordinary network requests of a browser, but other code of the same application can still read the values. Review the final application and its protections, not only this source package.
+| Platform | Additional protections                                                                                                                                                                                                             |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Linux    | Core dumps disabled; same-user memory inspection restricted; seccomp refuses new sockets and child processes where unnecessary; Landlock refuses unnecessary file writes on kernels that can apply the restriction to every thread |
+| macOS    | Core dumps disabled; debugger attachment refused; the sandbox restricts network access and child processes                                                                                                                         |
+| Windows  | A job object restricts child processes; crash reports omit the heap; mitigation policies reject extension DLLs and DLLs from network shares                                                                                        |
+
+MnemoCode checks a protection before reporting it. Unsupported protections remain unavailable; `self-test` names the limits. On Linux and macOS, failure to disable core dumps prevents secret input.
+
+Re-encode may need to write files or start an image converter after the original phrase is confirmed. Until the new backup's options are known, its interactive process retains those rights. It then gives up unnecessary Node.js permissions; operating-system restrictions retain what they allowed at process start.
+
+`recover-word` may also retain file writes so it can offer an encrypted candidate list after a search. This applies without `--candidates-file`, outside legacy-final-word recovery, when using `--ask-secrets` or when no wallet reference was supplied by an option.
+
+Descriptors opened before restrictions, including the terminal, remain usable. Linux io_uring instances opened by Node.js also remain available to native code; MnemoCode gives up permission to call native addons before secret input. “Offline” describes the program's behaviour. Restrictions against a compromised process depend on the operating system and its version.
+
+### Library and browser hosts
+
+The library inherits its host's file, process and network permissions. It creates no iframe, Worker, Content Security Policy or sandbox of its own. A browser's `connect-src 'none'` policy can block ordinary network requests, but other code in the same application can still read values. Review the final application and its protections as well as MnemoCode.
 
 ## Secret lifecycle and local boundaries
 
-- Use [`--ask-secrets`](README.md#secret-input-styles) or the [menu](README.md#menu) for a real phrase, encoded record and dates, on Linux, macOS and Windows. The secrets are typed on a private screen that shows them and the result, and is cleared when you press Enter, so that neither what you typed nor the result stays in the scrollback: only a summary stays on the main screen, of what was saved and where and of the warnings that still hold. Anyone who can see your screen meanwhile can read them. It cannot protect against a compromised terminal, operating system or program, or against a terminal program that logs what it shows.
-- MnemoCode does not collect, send or log your phrase. It clears its temporary copies of the phrase data as far as it can, also when a step fails, but text in JavaScript memory cannot be erased.
-- Every run is protected as far as Node.js allows. On Linux and macOS MnemoCode switches off core dumps, so that a crash cannot write its memory, the phrase included, to the disk; on Linux this also keeps other programs of the same user from reading that memory. Without it, MnemoCode asks for no secret. Started as a command, it runs under the Node.js permission model: no network, no worker threads and no native addons, unless a caller already under that model granted one on purpose; a command that saves nothing cannot write files, and one that draws no images cannot start other programs. Re-encode with `--ask-secrets` and no option of the new backup, as the menu runs it, asks for the new backup only after the old one is read and its seed phrase confirmed: until then it keeps both rights, then the permission model gives up those the answers do not need, while the system's limits keep what they allowed at the start. `recover-word` on a terminal keeps the right to write files where it may offer to save a candidate list after its search: without `--candidates-file`, other than for a legacy last word, and with `--ask-secrets` or without a wallet given by an option. Each entry of the menu runs in a process of its own. Node.js enforces these limits itself, and describes them as a safety belt for trusted code rather than a trust boundary against malicious code. The system enforces the same limits where it can, each checked before MnemoCode names it: on Linux seccomp refuses new sockets and other programs, and Landlock file writes, on kernels that can apply them to every thread at once; on macOS its sandbox refuses the network and other programs, and no debugger can attach; on Windows a job object refuses other programs, crash reports leave out the heap, and extension DLLs and DLLs from network shares are refused. The io_uring instances that Node.js opens at start stay usable to native code, which MnemoCode gives up calling before any secret is asked.
-- On Linux MnemoCode warns before a secret when swap is not encrypted, or when it cannot tell (Node.js cannot run with its memory locked out of swap): the system may write the memory of MnemoCode to the disk, where it can stay for years. Use encrypted swap or none, best a live USB system. Swap counts as safe on dm-crypt, also below LVM, and on zram.
-- MnemoCode warns when a file is saved into a folder that Dropbox, OneDrive, Google Drive, iCloud Drive, Yandex Disk, Nextcloud, MEGA or pCloud synchronises: the service keeps a copy. It recognises these folders by their usual names.
-- MnemoCode cannot keep the system from hibernating to the disk, and it cannot control screenshots, clipboard history, accessibility tools, browser extensions and malware.
-- Text records, QR codes, PDFs, images, Shamir shares, dates and printed cards can help someone recover the phrase. Treat each of them as a secret, even when it is not the whole phrase.
-- Exported files can be read only by your user account, where the system supports this. A file appears under its name only when it is complete; on file systems without hard links, such as FAT and exFAT, an empty file holds the name while the complete one is moved in, and is removed if that fails. A folder name is reserved without replacing an existing directory, then its completed children are moved in. This last step is not atomic: forced termination or power loss can leave an empty or partly filled destination. These precautions do not isolate exports from malicious processes of the same account. Ctrl+C removes the temporary folders of an export; when MnemoCode is killed otherwise or the power fails, a hidden folder can remain next to the output: `.mnemocode-export-…`, `.mnemocode-images-…`, `.mnemocode-share-qr-…`, `.card-collection-…` or `.sskr-cards-…`. Each of them can hold a complete private copy; delete it. You are responsible for the permissions of the folder, backups, snapshots, cloud synchronization, removable media and later changes of permissions.
-- PNG and JPEG export gives the PDF to the local program `pdftocairo` on its standard input and reads each image from its standard output, so MnemoCode writes neither to the system's temporary folder; each image goes straight into the staging folder beside the output. It runs the first `pdftocairo` in a folder of `PATH`, given by its full path, never one in the current folder or in an empty or relative entry of `PATH`. Use a trusted local installation of Poppler.
-- Run from source or from an installed package, MnemoCode compares the files of the Shamir share library on the local disk with fixed SHA-256 hashes before any secret is processed. The hashes show that the files have not changed. They do not prove that the library has no defects. In the single executable the library and its hashes are built into the one file, so this check only shows that the file is consistent; what protects the executable is its line in the release's `SHA256SUMS`, which you compare once after downloading. The random numbers for shares come from Node.js `crypto.randomFillSync`.
+### Input, screens and memory
+
+Use [`--ask-secrets`](README.md#secret-input-styles) or the [menu](README.md#menu) for real recovery material. The private screen shows input and results for checking, then clears them when you leave it. The main screen keeps only a summary of saved paths and warnings. Anyone watching the private screen can read the secrets; a logging or compromised terminal can retain them.
+
+MnemoCode does not collect, transmit or log your phrase. It wipes its owned byte buffers when their work ends, including failure and cancellation paths, as far as the runtime allows. JavaScript strings and copies made by dependencies or the runtime cannot be guaranteed erased. Screenshots, clipboard history, accessibility tools, extensions and malware remain outside its control.
+
+### Swap, hibernation and synchronized folders
+
+On Linux, MnemoCode warns if swap is unencrypted or cannot be assessed. It recognizes dm-crypt, including beneath LVM, and zram as safe swap configurations. Node.js memory cannot be locked out of swap, so secret bytes may reach disk. Use encrypted swap or none. Hibernation can also write memory to disk; MnemoCode cannot prevent it.
+
+MnemoCode warns for usual Dropbox, OneDrive, Google Drive, iCloud Drive, Yandex Disk, Nextcloud, MEGA and pCloud folder names. This is not complete synchronization detection. Use a local destination whose permissions, backups and synchronization you control.
+
+### Exported files
+
+Records, QR codes, PDFs, images, shares, dates and printed cards can help recover a wallet. Treat each as secret recovery material even if it is insufficient on its own.
+
+Where supported, exported files are readable only by your user account. Completed files are published without replacing existing names. On filesystems without hard links, such as FAT and exFAT, an empty file reserves the name while the completed file is moved in; a failed move removes that reservation.
+
+Folder publication reserves a new directory, then moves completed children into it. This is not atomic: forced termination or power loss can leave an empty or partial destination. These precautions do not isolate exports from malicious processes running as the same user.
+
+Ctrl+C removes temporary export folders. Other termination or power loss can leave a hidden folder beside the output:
+
+- `.mnemocode-export-…`
+- `.mnemocode-images-…`
+- `.mnemocode-share-qr-…`
+- `.card-collection-…`
+- `.sskr-cards-…`
+
+These folders may contain a complete private copy; remove any abandoned ones. You remain responsible for destination permissions, snapshots, backups, cloud copies and removable media.
+
+### Image conversion
+
+PNG and JPEG export passes PDFs to local Poppler `pdftocairo` through standard input and receives images through standard output. Images go directly into the staging folder beside the destination; MnemoCode writes neither input PDFs nor output images to the system temporary directory.
+
+It runs the first `pdftocairo` found through an absolute directory in `PATH`, using its full path. It ignores the current directory and empty or relative `PATH` entries. Use a trusted Poppler installation.
+
+### Share-engine integrity
+
+In a checkout or installed package, MnemoCode compares the local SSKR library files with pinned SHA-256 hashes before processing secrets. This detects changed files; it does not establish that the library is free of defects.
+
+In a standalone executable, both the library and its hashes are embedded, so the check establishes internal consistency. Verify the executable against the signed release `SHA256SUMS` before running it. Share randomness comes from Node.js `crypto.randomFillSync`.
 
 ## Cryptographic and recovery limits
 
-- Writing a phrase in another form or as a QR code is not encryption.
-- Date masking can be reversed by anyone who knows or guesses the dates, and memorable dates are easy to guess. It does not replace proper encryption (memory-hard and authenticated) or a strong BIP39 passphrase.
-- A valid BIP39 checksum does not prove that a recovered phrase is your wallet. Compare it with a detail of the wallet that you know, using the same network, address type, account, branch, index and passphrase.
-- A matching address proves recovery only for the selected place in the wallet. MnemoCode does not search wallet accounts, read balances or send transactions. Check recovered addresses in maintained wallet software before you use funds.
-- Any N shares of an N-of-M Shamir set restore the phrase. Keep the shares in different places.
+- Another representation or QR code is not encryption.
+- Date masking can be reversed by anyone who knows or guesses the dates. Memorable dates are easy to guess; they do not replace authenticated, memory-hard encryption or a strong BIP39 passphrase.
+- A valid BIP39 checksum does not identify your wallet. Compare recovered material with a known wallet reference, using the original network, address type, account, branch, index and passphrase.
+- An address match checks the selected wallet location. MnemoCode does not discover accounts, read balances or send transactions. Verify recovered addresses in maintained wallet software before using funds.
+- Any N distinct shares of an N-of-M set restore the phrase. Store shares separately. A BIP39 passphrase is not included in them.
 
 ## Residual risks and assurance
 
-A compromised operating system, Node.js, dependency, image program, terminal, build computer, package source, firmware or physical environment can defeat these protections. Locked dependency versions and fixed hashes make builds repeatable, but they do not create trust by themselves. When you can, check the origin and the checksums of a release on another computer than the one where you enter secrets.
+A compromised operating system, Node.js runtime, dependency, image converter, terminal, build computer, package source, firmware or physical environment can defeat these protections. Pinned versions and hashes help reproduce builds; they do not establish trust by themselves. Where possible, verify a release's origin and checksums on another computer before entering secrets.
 
-The project has automated tests and dated audit records. It has not had an independent security audit by cryptography specialists. The Rust library behind the Shamir shares describes itself as being under community review; the external audit of the C version does not cover it. The [source layout](docs/ARCHITECTURE.md) and the [audit records](https://github.com/hobby-eng/mnemocode_typescript/tree/main/docs/audits) describe the limits of the program; they are not a security certificate.
+The project has automated tests and dated audit records. It has not had an independent security audit by cryptography specialists. The Rust SSKR library describes itself as under community review; the external audit of the C implementation does not cover it. The [architecture](docs/ARCHITECTURE.md) and [audit records](docs/audits/README.md) describe the evidence and its limits.

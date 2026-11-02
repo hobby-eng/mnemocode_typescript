@@ -1,5 +1,7 @@
 # Third-party notices
 
+Dependency versions are pinned in `package.json`, `pnpm-lock.yaml` and the retained SSKR Cargo lockfile. This page records their licenses and the origin of bundled material.
+
 ## Seedshift
 
 MnemoCode implements a compatible date-shift mode based on the public behavior
@@ -25,8 +27,7 @@ MnemoCode depends on [`@scure/bip39`](https://github.com/paulmillr/scure-bip39),
 [`@scure/bip32`](https://github.com/paulmillr/scure-bip32),
 [`@scure/btc-signer`](https://github.com/paulmillr/scure-btc-signer), and
 [`@scure/base`](https://github.com/paulmillr/scure-base), which reads and writes the
-addresses of the other coins. They are MIT licensed. Their pinned versions are recorded in `package.json` and the
-lockfile after installation.
+addresses of the other coins. They are MIT licensed.
 
 ## age encryption and @noble libraries
 
@@ -40,7 +41,7 @@ carry no license header, so this notice names it. It uses
 [`@scure/base`](https://github.com/paulmillr/scure-base) by Paul Miller, which are MIT
 licensed. MnemoCode also uses `@noble/hashes` directly for the checksum test of the word
 search and, with `@noble/curves`, for the addresses of the other coins: SHA-256,
-RIPEMD-160 and Keccak-256 of their keys, and secp256k1 and Taproot output keys. Their pinned versions are recorded in `package.json` and the lockfile.
+RIPEMD-160 and Keccak-256 of their keys, and secp256k1 and Taproot output keys.
 
 ## QR generation and reading
 
@@ -48,8 +49,7 @@ QR PNG generation uses [`qrcode`](https://github.com/soldair/node-qrcode),
 which is MIT licensed. The standalone CLI's local PNG QR reader uses
 [`jsQR`](https://github.com/cozmo/jsQR) and
 [`pngjs`](https://github.com/pngjs/pngjs). jsQR is Apache-2.0 licensed; pngjs is
-MIT licensed. Their pinned versions are recorded in `package.json` and the
-lockfile after installation.
+MIT licensed.
 
 ## Embedded DejaVu Sans subset
 
