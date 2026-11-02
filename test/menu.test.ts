@@ -53,6 +53,15 @@ answeredByScript();
 /** The parts of each Encode form's walk: its paths through the real questions take seconds. */
 const ENCODE_WALK_PARTS = 5;
 
+/**
+ * Whether `line` fits a terminal of 80 columns unwrapped (TEXT_WIDTH), as lists, their
+ * explanations and questions do: a README link alone on its line may be wider, since no wrap may
+ * split it, and a redraw counts the rows the terminal shows it on (rowsOf).
+ */
+function fitsUnwrapped(line: string): boolean {
+  return Array.from(line).length <= TEXT_WIDTH || /^ *https:\/\/\S+$/u.test(line);
+}
+
 /** The options that `command` accepts; the test fails on a name that is no command. */
 function optionsOf(command: string): readonly string[] {
   if (!isCommandName(command)) throw new Error(`No command is named ${command}.`);
@@ -80,8 +89,7 @@ describe("start menu", () => {
         expect(output.labels.some((label) => label.includes("printable cards"))).toBe(form >= 2);
         expect(output.labels.some((label) => label.includes("QR code"))).toBe(form < 2);
         expect(output.labels).toHaveLength(4);
-        for (const line of script.drawnLines)
-          expect(Array.from(line).length, line).toBeLessThanOrEqual(TEXT_WIDTH);
+        for (const line of script.drawnLines) expect(fitsUnwrapped(line), line).toBe(true);
         expect(takeCutNotes()).toEqual([]);
       }
     }
@@ -171,9 +179,8 @@ describe("start menu", () => {
         expect(script.labels).not.toEqual([]);
       }
       // Lists, their explanations and questions fit a terminal of 80 columns unwrapped
-      // (TEXT_WIDTH), and no note of a list is cut to fit (cut-notes.ts).
-      for (const line of script.drawnLines)
-        expect(Array.from(line).length, line).toBeLessThanOrEqual(TEXT_WIDTH);
+      // (fitsUnwrapped), and no note of a list is cut to fit (cut-notes.ts).
+      for (const line of script.drawnLines) expect(fitsUnwrapped(line), line).toBe(true);
       expect([...new Set(takeCutNotes())]).toEqual([]);
       // Every question names its line in the record of answers, within the label column.
       for (const label of script.labels)

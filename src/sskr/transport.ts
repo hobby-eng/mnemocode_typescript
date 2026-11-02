@@ -364,9 +364,16 @@ function mixedUnits(ur: string, form: MixedForm): number[] {
  */
 function mixedToShare(form: MixedForm, values: readonly number[]): string {
   const own = values.slice(0, ownUnitCount(form, values) ?? values.length);
-  const transport = mixedTransport(form, form.pack(own), own.length);
-  if (transport === undefined) throw ERRORS.create("mixed-share-refused", [form.refusal]);
-  return wipedAfter(transport, transportToUr);
+  const packed = form.pack(own);
+  try {
+    const transport = mixedTransport(form, packed, own.length);
+    if (transport === undefined) throw ERRORS.create("mixed-share-refused", [form.refusal]);
+    return wipedAfter(transport, transportToUr);
+  } finally {
+    // Working copies of the share: the caller wipes its units, the readers above (AUD-039-SEC001).
+    own.fill(0);
+    packed.bytes.fill(0);
+  }
 }
 
 /**
@@ -377,7 +384,12 @@ function mixedToShare(form: MixedForm, values: readonly number[]): string {
  * (shareInfo).
  */
 export function shareToColors(ur: string): string[] {
-  return mixedUnits(ur, COLOR_FORM).map(rgbHex);
+  const units = mixedUnits(ur, COLOR_FORM);
+  try {
+    return units.map(rgbHex);
+  } finally {
+    units.fill(0);
+  }
 }
 
 /** The colors of a share as written, each as its value, in their printed order. */
@@ -396,7 +408,12 @@ function parseColorValues(value: string): number[] {
  * (mixed-share-refused), and bytes of no share, as shareInfo refuses them.
  */
 export function colorsToShare(value: string): string {
-  return mixedToShare(COLOR_FORM, parseColorValues(value));
+  const values = parseColorValues(value);
+  try {
+    return mixedToShare(COLOR_FORM, values);
+  } finally {
+    values.fill(0);
+  }
 }
 
 /** The form of shares when none is chosen: the standard UR. */
@@ -432,12 +449,21 @@ function indexesToShare(value: string): string {
     !indexes.every((index): index is number => index !== undefined)
   )
     throw ERRORS.create("word-numbers-share-whole-numbers-from", [`${WORD_NUMBERS_THROUGH}`]);
-  return mixedToShare(WORD_FORM, indexes);
+  try {
+    return mixedToShare(WORD_FORM, indexes);
+  } finally {
+    indexes.fill(0);
+  }
 }
 
 function unicodeToShare(value: string): string {
   if (value.length > MAX_COLOR_TEXT_LENGTH) throw ERRORS.create("unicode-codes-share-too-long", []);
-  return mixedToShare(WORD_FORM, unicodeIndexesOf(value));
+  const indexes = unicodeIndexesOf(value);
+  try {
+    return mixedToShare(WORD_FORM, indexes);
+  } finally {
+    indexes.fill(0);
+  }
 }
 
 /**
@@ -447,7 +473,14 @@ function unicodeToShare(value: string): string {
 function mixedWriter(format: ShareFormat): (ur: string) => string {
   const { mixed, text } = SHARE_UNITS[format];
   const form = defined(mixed);
-  return (ur) => text(mixedUnits(ur, form));
+  return (ur) => {
+    const units = mixedUnits(ur, form);
+    try {
+      return text(units);
+    } finally {
+      units.fill(0);
+    }
+  };
 }
 
 /** Elements of a share in hexadecimal digits: colors, Unicode codes or Color Unicode codes. */

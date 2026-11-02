@@ -28,8 +28,11 @@ export type ZeroField = BitField;
 
 /** Bytes packed from the units of a share, and the bits left over after the last whole byte. */
 export interface PackedUnits {
-  /** The whole bytes, each 0 to 255, the first unit's bits first. */
-  readonly bytes: readonly number[];
+  /**
+   * The whole bytes, each 0 to 255, the first unit's bits first: a new array, which its caller
+   * wipes.
+   */
+  readonly bytes: number[];
   /** The bits after the last whole byte, fewer than 8, which a well-formed share holds as zero. */
   readonly leftover: ZeroField;
 }
@@ -147,8 +150,14 @@ export const WORD_FORM: MixedForm = Object.freeze({
 export function mixShare(transport: Uint8Array, version: number): number[] {
   const checksum = transport.subarray(-CRC32_BYTES);
   const cbor = transport.subarray(0, -CRC32_BYTES);
+  // A working copy of the share, mixed in place: wiped once the result holds it (AUD-039-SEC001).
   const body = [version, cbor.length, ...cbor];
-  return [...checksum, ...body.map((byte, index) => byte ^ shareMask(checksum, index))];
+  try {
+    for (const [index, byte] of body.entries()) body[index] = byte ^ shareMask(checksum, index);
+    return [...checksum, ...body];
+  } finally {
+    body.fill(0);
+  }
 }
 
 /**
@@ -195,9 +204,15 @@ export function fillingFields(packed: PackedUnits, end: number): ZeroField[] {
  */
 export function ownUnitCount(form: MixedForm, values: readonly number[]): number | undefined {
   const { bytes } = form.pack(values);
-  if (bytes.length < CRC32_BYTES + SHARE_HEADER_BYTES) return undefined;
-  const cborLength = defined(unmixedBody(bytes, SHARE_HEADER_BYTES)[1]);
-  return form.unitCount(CRC32_BYTES + SHARE_HEADER_BYTES + cborLength);
+  try {
+    if (bytes.length < CRC32_BYTES + SHARE_HEADER_BYTES) return undefined;
+    const header = unmixedBody(bytes, SHARE_HEADER_BYTES);
+    const cborLength = defined(header[1]);
+    header.fill(0);
+    return form.unitCount(CRC32_BYTES + SHARE_HEADER_BYTES + cborLength);
+  } finally {
+    bytes.fill(0);
+  }
 }
 
 /**
@@ -214,15 +229,20 @@ export function mixedTransport(
   const { bytes } = packed;
   if (bytes.length < CRC32_BYTES) return undefined;
   const body = unmixedBody(bytes, bytes.length - CRC32_BYTES);
-  const cborLength = body[1] ?? 0;
-  const bodyEnd = SHARE_HEADER_BYTES + cborLength;
-  if (cborLength < 1 || body.length < bodyEnd) return undefined;
-  const end = CRC32_BYTES + bodyEnd;
-  if (form.unitCount(end) !== units) return undefined;
-  const fields = [...headerFields(body, form.version, cborLength), ...fillingFields(packed, end)];
-  if (fields.some(([value]) => value !== 0)) return undefined;
-  return Uint8Array.from([
-    ...body.slice(SHARE_HEADER_BYTES, bodyEnd),
-    ...bytes.slice(0, CRC32_BYTES),
-  ]);
+  try {
+    const cborLength = body[1] ?? 0;
+    const bodyEnd = SHARE_HEADER_BYTES + cborLength;
+    if (cborLength < 1 || body.length < bodyEnd) return undefined;
+    const end = CRC32_BYTES + bodyEnd;
+    if (form.unitCount(end) !== units) return undefined;
+    const fields = [...headerFields(body, form.version, cborLength), ...fillingFields(packed, end)];
+    if (fields.some(([value]) => value !== 0)) return undefined;
+    // The CBOR, then the checksum, copied without a copy between.
+    return Uint8Array.from({ length: cborLength + CRC32_BYTES }, (_, at) =>
+      at < cborLength ? defined(body[SHARE_HEADER_BYTES + at]) : defined(bytes[at - cborLength]),
+    );
+  } finally {
+    // The unmixed share, a working copy: the result is a copy of its own (AUD-039-SEC001).
+    body.fill(0);
+  }
 }

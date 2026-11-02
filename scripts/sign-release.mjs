@@ -154,7 +154,7 @@ const ERRORS = new ErrorCatalog("scripts.sign-release", {
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
 /** The repository whose draft release and build attestations are checked. */
-const REPOSITORY = "hobby-eng/mnemocode";
+const REPOSITORY = "hobby-eng/mnemocode_typescript";
 const CHECKSUMS = "SHA256SUMS";
 const SIGNATURE = "SHA256SUMS.asc";
 const PUBLIC_KEY = "RELEASE-SIGNING-KEY.asc";

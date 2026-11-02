@@ -93,6 +93,7 @@ from terminal_context_checks import (
     check_fingerprint_before_dates,
     check_fingerprint_before_dates_in_menu,
     check_new_backup_heading_on_screen,
+    check_pipe_refused_at_file_name,
     check_question_reason_kept,
 )
 from terminal_export_checks import (
@@ -180,6 +181,7 @@ def main():
     check_new_backup_heading_on_screen()
     check_decode_share_lines()
     check_file_or_text_input()
+    check_pipe_refused_at_file_name()
     check_restore_share_asked_again()
     check_private_result_pages()
     check_share_pages()

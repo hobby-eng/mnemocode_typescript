@@ -19,6 +19,8 @@ const ERRORS = new ErrorCatalog("cli.output-paths", {
   "too-many-numbered-copies-already-choose-another-name": (value0: string) =>
     `${value0} has too many numbered copies already. Choose another name.`,
   "output-path-could-not-resolved-safely": () => "The output path could not be resolved safely.",
+  "result-not-written": (value0: string) =>
+    `The result could not be written to standard output: ${value0}.`,
   "new-folder-name-without-which-ending-file-choose": (value0: string) =>
     `A new folder needs a name without .${value0}, which is the ending of a file; choose another name.`,
   "folder-unwritable": () => FOLDER_UNWRITABLE,
@@ -37,6 +39,51 @@ const ERRORS = new ErrorCatalog("cli.output-paths", {
   "folder-name-give-file-another-name-name-inside": () =>
     "A folder has this name; give the file another name, or a name inside that folder.",
 });
+
+/** Plain words for the errors of a file system that a write may meet (errno names). */
+export const WRITE_FAILURES: Readonly<Record<string, string>> = {
+  EEXIST: "a file or folder of that name appeared meanwhile",
+  ENOSPC: "the disk is full",
+  EDQUOT: "the disk quota is used up",
+  EACCES: "there is no permission to write there",
+  EPERM: "there is no permission to write there",
+  EROFS: "the disk can only be read",
+  ENOENT: "the folder is gone",
+  ENOTDIR: "the folder is gone",
+  EIO: "the disk reported an error",
+};
+
+/**
+ * The errors of standard output whose reader closed it, such as `| head`, which chose to stop:
+ * EPIPE, and EOF, as Windows names it.
+ */
+const READER_GONE = ["EPIPE", "EOF"];
+
+/**
+ * The first error of standard output: its stream reports it as an event, on a later turn, which
+ * console.log, the writer of results, leaves unheard.
+ */
+let outputFailure: NodeJS.ErrnoException | undefined;
+
+/** Keeps the first error of standard output from here on (AUD-039-API003). */
+export function watchStandardOutput(): void {
+  process.stdout.on("error", (error: NodeJS.ErrnoException) => {
+    outputFailure ??= error;
+  });
+}
+
+/**
+ * The refusal of a result that standard output did not take, as on a full disk; none where its
+ * reader closed it (READER_GONE), which ends nothing.
+ */
+export function standardOutputRefusal(): Error | undefined {
+  const failure = outputFailure;
+  const code = failure?.code;
+  if (failure === undefined || READER_GONE.includes(code ?? "")) return undefined;
+  const known =
+    code !== undefined && Object.hasOwn(WRITE_FAILURES, code) ? WRITE_FAILURES[code] : undefined;
+  return ERRORS.create("result-not-written", [known ?? printableText(failure.message)]);
+}
 
 /** More numbered copies of one name than this are surely a mistake. */
 const MAX_COPY_NUMBER = 999;

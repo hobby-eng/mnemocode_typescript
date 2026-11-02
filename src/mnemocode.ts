@@ -3,13 +3,15 @@ import { runCommandLine } from "./cli/command-line.js";
 import { menuAvailable, runMenu } from "./cli/menu.js";
 import { ProcessProtection, relaunchProtected, underProtection } from "./cli/protection.js";
 import { endCancelled } from "./cli/interruption.js";
-import { dumbTerminalReason, terminalTooDumb } from "./cli/terminal-input.js";
+import { dumbTerminalReason, nodeTurn, terminalTooDumb } from "./cli/terminal-input.js";
 import { CANCELLED, type Cancelled } from "./cli/terminal-keys.js";
-import { terminalFailure, terminalHint } from "./cli/terminal.js";
+import { standardOutputRefusal, watchStandardOutput } from "./cli/output-paths.js";
+import { flushed, terminalFailure, terminalHint } from "./cli/terminal.js";
 import { describeError } from "./core/refusal.js";
 
 /** Runs the menu or one command line; CANCELLED when the person cancelled it with Ctrl+C. */
 async function main(): Promise<Cancelled | undefined> {
+  watchStandardOutput();
   const argv = process.argv.slice(2);
   // Every run is protected (protection.ts): a plain `node` start runs the program again so.
   if (!underProtection()) {
@@ -27,8 +29,20 @@ async function main(): Promise<Cancelled | undefined> {
 
 // A cancelled run says so in one line and ends as a process that Ctrl+C stopped (exit-codes.ts).
 void main().then(
-  (end) => {
-    if (end === CANCELLED) endCancelled();
+  async (end) => {
+    if (end === CANCELLED) {
+      endCancelled();
+      return;
+    }
+    // A result that standard output did not take ends a command that would have succeeded: the
+    // writes still pending are awaited, then the turn on which their stream reports an error.
+    if (process.stdout.writableLength > 0) await flushed(process.stdout);
+    await nodeTurn();
+    const refusal = standardOutputRefusal();
+    if (refusal !== undefined && (process.exitCode ?? 0) === 0) {
+      terminalFailure(refusal.message);
+      process.exitCode = 1;
+    }
   },
   (error: unknown) => {
     terminalFailure(describeError(error));

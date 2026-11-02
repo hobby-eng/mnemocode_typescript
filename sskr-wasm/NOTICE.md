@@ -4,7 +4,7 @@ MnemoCode's SSKR engine is the Rust source in `rust/src/` (`lib.rs`,
 `share_text.rs`, `refusal.rs`). `Dockerfile.sskr` (`pnpm build:sskr`) builds it into the
 JavaScript/WASM adapter in `generated/`. The bridge was written for
 multi-chain-wallet-tools and taken from its revision `a0dad9e`; it is kept and
-built here now. Bridge package: `recovery-sskr-wasm` 0.1.9. The bridge is
+built here now. Bridge package: `recovery-sskr-wasm` 0.1.10. The bridge is
 licensed under MIT or Apache-2.0 at your option, as MnemoCode and its
 `rust/Cargo.toml`: [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE). File hashes are in
 `integrity.json`.
@@ -13,6 +13,9 @@ Since 0.1.9 the bridge writes and reads the text of a share itself, in buffers
 that it wipes, and overwrites the stack that the SSKR library worked on once a
 call returns, so that no copy of a secret or of a share stays in the engine's
 memory: neither the vendored libraries nor bc-ur and dcbor are changed for it.
+Since 0.1.10 its heap, `zeroizing-alloc` 0.1.1, overwrites each block as it is
+freed, so that the copies that the SSKR library drops without wiping, such as each
+share that bc-shamir computes in a split, are wiped too.
 `test/sskr-engine-memory.test.ts` searches the memory of the built engine.
 
 Core libraries: Blockchain Commons `sskr` 0.12.0, `bc-shamir` 0.13.0,

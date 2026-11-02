@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Repository
+
+- The links of the program, the help, the sheet and the guide for heirs and the documents to this version's README, releases, attestations, security form and issues name `hobby-eng/mnemocode_typescript`, and `scripts/sign-release.mjs` signs the drafts of this repository (AUD-039-BLD001).
+- A weekly `pnpm audit` workflow shows the state of the npm dependencies as a badge; a run still going for the same branch is cancelled by the next (AUD-039-BLD002).
+
 ### Refusals
 
 - English words and word numbers, which unmasked are the seed phrase itself, are refused without a Seedshift by the library for every front end, before any secret, with `core.encoded-backup.form-always-masked`, whose message names the forms to choose instead; only the menu kept them from it, and `encode --mode direct --format 1` or `2` was accepted. `encode` and `re-encode` with their default format, English words, now need a Seedshift or another `--format`.
@@ -16,6 +21,9 @@
 - Card details too long for their cards are refused before any secret is asked or read, for the cards of Unicode codes (format 3) too and for a phrase read from a file: Encode checked only colour cards, and only with `--ask-secrets`, and otherwise refused them when saving, after the result was shown. Without `--format`, `sskr-export` checks its cards in Unicode codes as well as in colors before the shares are asked, since each share keeps its own form: shares in Unicode codes with the enclosure or tile material were refused only after they were typed, and are now refused at once with `cli.sskr-export-command.cards-own-form-refused`, which says that `--format colors` prints them.
 - Text on the sheet for heirs with a character that the bundled font lacks, such as an arrow (→) in a host's route, is refused with `export.heir-sheet.instructions-heirs-contain-character-not-supported-by-font`; the sheet printed that character as a blank, without an error.
 - `EncodedBackup.shorterPhrases` passes on the decoding's own refusal of the dates, such as a day outside its month or dates without Seedshift, for each shorter start that it decodes; it returned no shorter phrase for any failure. A start that its mode cannot have written with the dates is still left out before its dates are read: one without the checksum that its mode keeps (`core.masking.missing-checksum`), or one that takes fewer dates than given, such as a 12-word start with the eight dates of a 24-word backup. The command line, which decodes with the same dates first, is unchanged.
+- `MissingCodes.run` refuses a check of the codes that answers anything but `true` or `false`, such as `{ matched: false }` or the text `"false"`, with `core.missing-codes.check-answers-true-or-false`; a host's such answer passed the codes (AUD-039-API001).
+- A word of a host's instructions for heirs wider than the page, such as a long subtitle without a space, is refused with `export.heir-sheet.instructions-heirs-word-wider-than-page`; the sheet drew it off the page (AUD-039-UI001).
+- A result that standard output does not take, as on a full disk, ends the command with exit code 1 and `cli.output-paths.result-not-written`, which says why in plain words; it ended as done. A pipe whose reader closed it, as `| head` does, still ends it as done (AUD-039-API003).
 
 ### Typed values
 
@@ -28,6 +36,8 @@
 - `recover-word` on a terminal offers a wallet check or an encrypted candidate list for the Discovery Scanner when its candidates do not fit on the screen, also for words read with `--mnemonic-file`, which got only a notice. The list's file and encryption are asked as the menu asks them, its passphrase on the private screen; it is not offered with `--candidates-file`, for a legacy last word, or where a list cannot hold the BIP39 passphrase. To save it, `recover-word` on a terminal keeps the right to write files wherever the list may be offered: without `--candidates-file`, other than for a legacy last word, and with `--ask-secrets` or without a wallet given by an option.
 - On a terminal, a date or word match says "master fingerprint matched" when the master fingerprint matched, and "matched at m, the BIP32 root key" when a master key matched; both read only `matched at m`, which left m unexplained. Tab-separated output for scripts keeps `matched at m`. A candidate-list passphrase shorter than 12 characters is refused with "The passphrase for the candidates is too short: use at least 12 characters, since it is all that protects these seed phrases."; the refusal named the minimum but did not say that the passphrase fell short of it.
 - Marked shares refused before any combination is counted, such as shares of which nothing is read, say only why they are refused; the report added "Open combinations: 0 (2^-Infinity)".
+- Shares whose groups restore from one share each, which keep no SSKR digest, no longer name one of them as the share that does not fit when the others agree: without a digest their agreement proves nothing, so the shares are refused as a set (AUD-039-FUN001).
+- A file name typed again after a file that could not be read, for a record or a QR image, and the name of the next share's QR image are read only from regular files: a named pipe without a writer is refused at once and the name asked again, where it held the question and Ctrl+C (AUD-039-API002).
 
 ### QR images
 
@@ -36,6 +46,11 @@
 ### Card exports
 
 - Separate cards, of a backup and of Shamir shares, are named after their number alone, such as `01.pdf` or `01.png`, so that a folder listing shows no code; they were named after the code they print too, such as `01-1EAB91.pdf`. `renderIndividualCards` and `ShareCardSet.documents` give such names, and `exportIndividualCards` no longer refuses a decoy's label that is no file name (`export.file-name.invalid-component`), since no label reaches a file name.
+
+### Secret handling
+
+- The working copies of a share that its colors, word numbers and Unicode codes are made from or read into, also in the repair of marked shares, are wiped once used (AUD-039-SEC001).
+- The SSKR engine, bridge package `recovery-sskr-wasm` 0.1.10, overwrites each block of its memory as it frees it, with the allocator of the crate `zeroizing-alloc` 0.1.1, so that copies that the SSKR library drops without wiping, such as each share that it computes in a split, are wiped too (AUD-039-SEC002).
 
 ### Toolchain and dependencies
 

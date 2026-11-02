@@ -269,7 +269,7 @@ export class TypedShares implements Disposable {
       const texts = await askValueUntil(
         "QR code file name:",
         async (answer) =>
-          this.input.sharesOfAnswer(await decodeQrPngFile(droppedPath(answer)), true),
+          this.input.sharesOfAnswer(await decodeQrPngFile(droppedPath(answer), true), true),
         { what: "the name of the QR code image of a share" },
       );
       if (texts !== undefined) return texts;

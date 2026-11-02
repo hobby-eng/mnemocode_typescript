@@ -4,6 +4,7 @@
 // then shows what fits in the window, which windowOf sets. The backup check is in
 // test/backup-check-questions.test.ts.
 
+import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -367,6 +368,29 @@ describe("encode, decode and the backup check on the private screen", () => {
         await rm(directory, { recursive: true, force: true });
       }
     });
+
+    it.runIf(process.platform !== "win32")(
+      "refuses a pipe named for the next share's image at once (AUD-039-API002)",
+      async () => {
+        const shares = await splitSskrMnemonic(MASKED_WORDS, 2, 3);
+        const directory = await mkdtemp(join(tmpdir(), "mnemocode-share-pipe-"));
+        try {
+          const [first, second] = [0, 1].map((index) => join(directory, `share ${index + 1}.png`));
+          await exportQrPayload(writeShare(shares[0]!, "indexes"), first!);
+          await exportQrPayload(writeShare(shares[1]!, "indexes"), second!);
+          // A named pipe that no program writes to: opening it to read would wait for ever.
+          const pipe = join(directory, "pipe.png");
+          expect(spawnSync("mkfifo", [pipe]).status).toBe(0);
+          terminal.answers = [`${pipe}\r`, `'${second}'\r`, `${DATE}\r`];
+          terminal.choices = ["Read another QR code image"];
+          await runDecode({ "ask-secrets": true, mode: "seedshift", "qr-file": first! });
+          expect(seen.notices.join("\n")).toContain("could not be read");
+          expect(seen.out.at(-1)).toBe(TEST_PHRASE);
+        } finally {
+          await rm(directory, { recursive: true, force: true });
+        }
+      },
+    );
   });
 });
 

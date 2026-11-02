@@ -50,7 +50,7 @@ The tag starts `.github/workflows/executable.yml`:
 
 ## Sign the draft
 
-The signing computer needs the [GitHub CLI](https://cli.github.com/) with the `gh attestation` command, logged in (`gh auth login`) with the right to edit releases of `hobby-eng/mnemocode`; GnuPG with the release key; and `sha256sum`. The release key's fingerprint:
+The signing computer needs the [GitHub CLI](https://cli.github.com/) with the `gh attestation` command, logged in (`gh auth login`) with the right to edit releases of `hobby-eng/mnemocode_typescript`; GnuPG with the release key; and `sha256sum`. The release key's fingerprint:
 
 ```text
 28FC51B1DB80DF2101128CB30EDD4814591DD095
@@ -80,7 +80,7 @@ A failure stops the script with one line that says why, as does a command that w
 Look at the draft on GitHub: the notes, the six files, `SHA256SUMS`, `SHA256SUMS.asc` and `RELEASE-SIGNING-KEY.asc`. Then publish it there, or with:
 
 ```sh
-gh release edit v0.1.0 --repo hobby-eng/mnemocode --draft=false
+gh release edit v0.1.0 --repo hobby-eng/mnemocode_typescript --draft=false
 ```
 
 `node scripts/sign-release.mjs v0.1.0 --publish` signs and publishes in one run.
@@ -94,7 +94,7 @@ gpg --show-keys RELEASE-SIGNING-KEY.asc
 gpg --import RELEASE-SIGNING-KEY.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS
 sha256sum --check --ignore-missing SHA256SUMS
-gh attestation verify mnemocode-0.1.0-linux-x64 --repo hobby-eng/mnemocode
+gh attestation verify mnemocode-0.1.0-linux-x64 --repo hobby-eng/mnemocode_typescript
 ```
 
 `gpg --show-keys` must show the fingerprint above, and `gpg --verify` must say "Good signature". Compare the fingerprint with a source you trust, such as the key GitHub shows for the maintainer at https://github.com/hobby-eng.gpg: a key that comes with the download proves nothing by itself. `--ignore-missing` lets the check pass when only some files were downloaded. The signature shows which key signed `SHA256SUMS`; `gh attestation verify` shows that a file was built by a GitHub Actions workflow of this repository and was not changed since.

@@ -7,7 +7,7 @@ body:
       value: |
         Thank you for helping improve MnemoCode. Never include a real mnemonic, passphrase, private key, WIF, SSKR share, recovery date, or private wallet export. Use a public test vector or synthetic data.
 
-        If the problem could expose, alter, or incorrectly recover secret material, report it privately through [GitHub private vulnerability reporting](https://github.com/hobby-eng/mnemocode/security/advisories/new) instead of opening a public issue.
+        If the problem could expose, alter, or incorrectly recover secret material, report it privately through [GitHub private vulnerability reporting](https://github.com/hobby-eng/mnemocode_typescript/security/advisories/new) instead of opening a public issue.
   - type: input
     id: version
     attributes:

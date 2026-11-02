@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Report a suspected vulnerability privately through the [GitHub private vulnerability reporting form](https://github.com/hobby-eng/mnemocode/security/advisories/new) of this repository. The report goes to the repository owner and maintainers. Do not describe an unfixed security problem in a public issue, discussion, pull request, screenshot or log.
+Report a suspected vulnerability privately through the [GitHub private vulnerability reporting form](https://github.com/hobby-eng/mnemocode_typescript/security/advisories/new) of this repository. The report goes to the repository owner and maintainers. Do not describe an unfixed security problem in a public issue, discussion, pull request, screenshot or log.
 
 Never include a real phrase, BIP39 passphrase, private key, WIF, Shamir share, date, encoded record, QR code, card or wallet export. Show the problem with a published test phrase or invented data. Include:
 
@@ -11,7 +11,7 @@ Never include a real phrase, BIP39 passphrase, private key, WIF, Shamir share, d
 - the exact steps, without secrets;
 - what you expected, what happened, and why it is a security problem.
 
-Ordinary defects and feature requests belong in the [public issue forms](https://github.com/hobby-eng/mnemocode/issues/new/choose). If publishing a report could help an attacker or reveal recovery material, report it privately.
+Ordinary defects and feature requests belong in the [public issue forms](https://github.com/hobby-eng/mnemocode_typescript/issues/new/choose). If publishing a report could help an attacker or reveal recovery material, report it privately.
 
 Security fixes are made in the current source and the current release. Installed copies and exported records do not update themselves. Check the version that you run, replace affected installations, and keep what you need to decode your existing records.
 
@@ -60,4 +60,4 @@ When the library is built into another application, that application is responsi
 
 A compromised operating system, Node.js, dependency, image program, terminal, build computer, package source, firmware or physical environment can defeat these protections. Locked dependency versions and fixed hashes make builds repeatable, but they do not create trust by themselves. When you can, check the origin and the checksums of a release on another computer than the one where you enter secrets.
 
-The project has automated tests and dated audit records. It has not had an independent security audit by cryptography specialists. The Rust library behind the Shamir shares describes itself as being under community review; the external audit of the C version does not cover it. The [source layout](docs/ARCHITECTURE.md) and the [audit records](https://github.com/hobby-eng/mnemocode/tree/main/docs/audits) describe the limits of the program; they are not a security certificate.
+The project has automated tests and dated audit records. It has not had an independent security audit by cryptography specialists. The Rust library behind the Shamir shares describes itself as being under community review; the external audit of the C version does not cover it. The [source layout](docs/ARCHITECTURE.md) and the [audit records](https://github.com/hobby-eng/mnemocode_typescript/tree/main/docs/audits) describe the limits of the program; they are not a security certificate.

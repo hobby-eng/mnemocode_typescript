@@ -319,7 +319,7 @@ describe("the date search", () => {
         `out 10-07-1963 22-09-2026\t${replacedAt(TEST_PHRASE, { 6: "ability", 12: "above" })}`,
         `out 10-07-1963 ${DATE}\t${TEST_PHRASE}`,
         "err A valid checksum does not prove the date: compare an address.",
-        "err More: https://github.com/hobby-eng/mnemocode#exact-local-recovery-checks",
+        "err More: https://github.com/hobby-eng/mnemocode_typescript#exact-local-recovery-checks",
       ],
     ],
     [
@@ -367,7 +367,7 @@ describe("the date search", () => {
         `out 08-07-1963\t${replacedAt(TEST_PHRASE, { 3: "able", 9: "able" })}`,
         "err Displayed 1 of 3 checksum-valid candidates.",
         "err A valid checksum does not prove the date: compare an address.",
-        "err More: https://github.com/hobby-eng/mnemocode#exact-local-recovery-checks",
+        "err More: https://github.com/hobby-eng/mnemocode_typescript#exact-local-recovery-checks",
       ],
     ],
   ])("prints from the command line as before: %s", async (_, argv, expected) => {

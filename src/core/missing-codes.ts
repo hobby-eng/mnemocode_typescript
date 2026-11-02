@@ -79,6 +79,10 @@ const ERRORS = new ErrorCatalog("core.missing-codes", {
   "mark-color-cannot-read-one-place-whole-color": () =>
     "Mark a color that cannot be read with one ? in place of the whole color.",
   "codes-cannot-marked-form": () => "These codes cannot be marked in this form.",
+  "check-answers-true-or-false": {
+    kind: "type",
+    text: () => "The check of the codes must answer true or false.",
+  },
   "codes-seed-phrase": (value0: string, value1: string) =>
     `These are ${value0} codes; a seed phrase has ${value1}.`,
   "colors-seed-phrase": (count: string, counts: string) =>
@@ -469,7 +473,8 @@ export class MissingCodes extends Redacted implements Disposable {
    * belong to the caller, including stopped partial results. A failed run wipes its kept backups;
    * the codes must stay live until the run ends, and a run of wiped codes is refused
    * (core.secret-value.wiped). Refuses a `maxFound` that is no whole number of 1 or more
-   * (core.search-turns.whole-number-more); what the host's check throws passes on.
+   * (core.search-turns.whole-number-more) and a check that answers anything but true or false
+   * (core.missing-codes.check-answers-true-or-false); what the host's check throws passes on.
    */
   async run(run: CodesCheckRun): Promise<CodesCheckResult> {
     this.#values.assertLive();
@@ -482,10 +487,12 @@ export class MissingCodes extends Redacted implements Disposable {
       for (const codes of this.candidates()) {
         try {
           if (turns.stopped) return { found, passed, count, stopped: true };
-          const passes = await run.check(codes);
+          const passes: unknown = await run.check(codes);
           this.#values.assertLive();
           // An answer that came after a stop is not counted (AUD-015-API001).
           if (turns.stopped) return { found, passed, count, stopped: true };
+          // A JavaScript host may answer anything: only a boolean says whether the codes pass.
+          if (typeof passes !== "boolean") throw ERRORS.create("check-answers-true-or-false", []);
           count += 1;
           if (passes) {
             passed += 1;

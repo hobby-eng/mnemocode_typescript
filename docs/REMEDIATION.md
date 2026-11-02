@@ -11,6 +11,24 @@ path is recorded as a coverage gap instead. Tests, source identity and review
 must support a `verified` state. Local verification and external host/platform acceptance are separate states;
 pending host acceptance remains visible even after a local variant is verified.
 
+## AUD-039 remediation for 0.1.1 (2026-11-02)
+
+[AUD-039](audits/AUD-039-2026-11-02.md) reviewed `044a9ed` and stays as written. Its nine findings are corrected for version 0.1.1, the last release of the TypeScript version. The new regressions of FUN001, API001, API002, API003, UI001 and SEC001 failed on `044a9ed` and pass with their corrections; the audit's own probe of BLD001 failed there too. SEC002 has no failing case: the canonical WebAssembly did not retain the copy before the correction either, as the report says, and its regression is the memory search of the rebuilt engine. One independent review (CORE-53) of the corrections found variants that were corrected too: the guide for heirs, the next share's QR image, the late answer of a stopped check, an empty write to a refused standard output, and further working copies of mixed shares.
+
+| Finding        | Correction                                                                                                                                                                                                                                      | Regression                                                                                                                                                                                               | Status           |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| AUD-039-BLD001 | The program's help, the sheet and the guide for heirs, the issue forms, `SECURITY.md`, the release documents and `scripts/sign-release.mjs` name `hobby-eng/mnemocode_typescript`. Only the README notice names the Rust successor, on purpose. | `sign-release v0.1.1 --publish --dry-run` addresses `hobby-eng/mnemocode_typescript` in every `gh` call that names a repository; the links in the source tests and terminal scenarios.                   | verified locally |
+| AUD-039-FUN001 | `ShareInput` names a share left out as the odd one only when the others' restore was checked by a digest.                                                                                                                                       | Six orders of two agreeing threshold-one shares and a third, refused as a set; the checked 2-of-3 control still names place 3 (`test/aud-039-remediation.test.ts`).                                      | verified locally |
+| AUD-039-API001 | `MissingCodes.run` refuses a check that answers anything but `true` or `false` (`core.missing-codes.check-answers-true-or-false`); an answer after a stop still ends the run as stopped.                                                        | An object, a text, a number and `undefined` refused; `true` and `false` counted; a late malformed answer stopped (`test/aud-039-remediation.test.ts`).                                                   | verified locally |
+| AUD-039-API002 | A file name asked again after an unreadable file, for a record or a QR image, and the name of the next share's QR image are read only from regular files.                                                                                       | A named pipe without a writer refused at once on a real terminal, then Ctrl+C ends with 130 (`check_pipe_refused_at_file_name`); the next share's pipe refused (`test/encode-decode-questions.test.ts`). | verified locally |
+| AUD-039-API003 | A result that standard output refuses ends the command with 1 and `cli.output-paths.result-not-written` in plain words; a reader that closes the pipe, EPIPE or EOF on Windows, still ends it as done.                                          | `/dev/full` on Linux ends with 1 and its reason; a closed pipe ends with 0 and no message; a read pipe gets the whole table (`test/aud-039-remediation.test.ts`).                                        | verified locally |
+| AUD-039-UI001  | A word of the heir instructions wider than the page is refused (`export.heir-sheet.instructions-heirs-word-wider-than-page`).                                                                                                                   | A 100-letter subtitle refused in A5 and A6 (`test/heir-sheet.test.ts`).                                                                                                                                  | verified locally |
+| AUD-039-SEC001 | The working copies of a mixed share, in its writers, readers and repair, are wiped once used or not made.                                                                                                                                       | The bytes packed to read a share's length are zeros after the read; the six forms still round-trip (`test/aud-039-remediation.test.ts`). The other working copies are internal and checked by review.    | verified locally |
+| AUD-039-SEC002 | The SSKR engine's heap overwrites each block as it frees it (`zeroizing-alloc` 0.1.1, MIT or Apache-2.0, with the owner's agreement); bridge package 0.1.10; the vendored crates stay unchanged.                                                | Rust checks and doctests, the canonical rebuild and `test/sskr-engine-memory.test.ts` on its WebAssembly.                                                                                                | verified locally |
+| AUD-039-BLD002 | The weekly advisory workflow cancels a run of the same ref that is still going.                                                                                                                                                                 | Static workflow check.                                                                                                                                                                                   | verified locally |
+
+The repository's longer name makes some "More:" links of the menu wider than 78 columns. By the owner's decision a line that holds only a link may be wider, since no wrap may split it; `test/menu.test.ts` checks every other line at 78 columns, and a redraw counts the rows the terminal shows a link on.
+
 ## Standalone release acceptance (2026-10-22)
 
 ### Current release preparation after manual testing
@@ -23,7 +41,7 @@ Release preparation is in progress. The signed release tag, complete tagged Wind
 
 ### Retained native checkpoint before manual testing
 
-Standalone pre-release verification is complete for the three tested native targets. The full [CI run](https://github.com/hobby-eng/mnemocode/actions/runs/39722442871) checked signed source `f980236`; all three source-test and real-terminal jobs passed. No confirmed high/medium code finding remains open in the reviewed release paths. This is bounded verification, not a claim that every possible defect or CORE violation has been ruled out.
+Standalone pre-release verification is complete for the three tested native targets. The full [CI run](https://github.com/hobby-eng/mnemocode_typescript/actions/runs/39722442871) checked signed source `f980236`; all three source-test and real-terminal jobs passed. No confirmed high/medium code finding remains open in the reviewed release paths. This is bounded verification, not a claim that every possible defect or CORE violation has been ruled out.
 
 | Native target | Passed | Failed | Conditional skips | Test files | Real terminal |
 | ------------- | ------ | ------ | ----------------- | ---------- | ------------- |
@@ -33,7 +51,7 @@ Standalone pre-release verification is complete for the three tested native targ
 
 Totals belong to each platform and are not added. Conditional skips cover platform-specific Unix signals, permissions, special paths/pipes and local Poppler availability; Linux has no skips. Windows uses a real ConPTY check, while Linux/macOS use real pseudo-terminals. Every applicable test passes; the Unix permission fixture runs on Unix, with portable lookup-fault checks on all three hosts.
 
-The full Linux job also passed mandatory code/duplication/dead-export/type/lint gates, Rust tests and doctests, build, full self-test, PDF/image/QR export, independent SSKR known answers and the standard dependency audit, which reported no known vulnerabilities. The runtime source, native engine, dependencies, assets, embedded manual/vectors and executable-build inputs remain byte-identical to the three accepted [native executable jobs](https://github.com/hobby-eng/mnemocode/actions/runs/39719696645) at `2e8c249`. Those executables were built and tested on their own OS, including empty-folder execution and real terminal checks; their source identity is preserved rather than relabeled as a later rebuild. The Linux artifact also matches the two local builds byte for byte.
+The full Linux job also passed mandatory code/duplication/dead-export/type/lint gates, Rust tests and doctests, build, full self-test, PDF/image/QR export, independent SSKR known answers and the standard dependency audit, which reported no known vulnerabilities. The runtime source, native engine, dependencies, assets, embedded manual/vectors and executable-build inputs remain byte-identical to the three accepted [native executable jobs](https://github.com/hobby-eng/mnemocode_typescript/actions/runs/39719696645) at `2e8c249`. Those executables were built and tested on their own OS, including empty-folder execution and real terminal checks; their source identity is preserved rather than relabeled as a later rebuild. The Linux artifact also matches the two local builds byte for byte.
 
 | Executable                    | SHA-256                                                            |
 | ----------------------------- | ------------------------------------------------------------------ |
@@ -143,7 +161,7 @@ commit again. Every code, test and native file matches byte for byte; only
 `CHANGELOG.md`, `docs/REMEDIATION.md` and `docs/releases/v0.1.0.md` differ.
 The complete source tests later ran on
 `f8d9a933ba9bde8290da39d42fa3a380de78385a` itself: in the
-[complete CI run](https://github.com/hobby-eng/mnemocode/actions/runs/39291308933)
+[complete CI run](https://github.com/hobby-eng/mnemocode_typescript/actions/runs/39291308933)
 on Linux, macOS and Windows, and in the 3,001 tests of AUD-037.
 
 A status covers the variant named in its row. Related defects that AUD-037
@@ -249,7 +267,7 @@ library and native-engine bytes are unchanged. The corrected standalone Linux fi
 and the complete real pseudo-terminal suite. Its SHA-256 is
 `f3a35d61000a7231bad3e0edd974c03e63479e5fdffbba91ec47d6be3166c634`;
 the file is `release/local-7facfcc/mnemocode-0.1.0-linux-x64`.
-The [Executable run](https://github.com/hobby-eng/mnemocode/actions/runs/39288756606)
+The [Executable run](https://github.com/hobby-eng/mnemocode_typescript/actions/runs/39288756606)
 for signed source `7facfccedd950a084df94933a230ca2f7a0f473a` also passes
 build, executable acceptance and real terminal checks on Linux, Windows and
 macOS. This establishes execution of the files on those systems, separately
@@ -288,7 +306,7 @@ claimed.
 
 ## Native acceptance completed (2026-10-19)
 
-The [complete CI run](https://github.com/hobby-eng/mnemocode/actions/runs/39291308933)
+The [complete CI run](https://github.com/hobby-eng/mnemocode_typescript/actions/runs/39291308933)
 passes on signed checkpoint `f8d9a933ba9bde8290da39d42fa3a380de78385a`.
 Every job builds and executes the program, runs its full self-test and source
 tests, and drives the real terminal, including private input and cancellation.
@@ -311,7 +329,7 @@ case, plus the PDF/image/QR round trip, independent SSKR known answers and
 `pnpm audit --audit-level high`, which reports no known vulnerabilities.
 Native image conversion with `pdftocairo` was not executed on macOS or Windows.
 
-The separate [Executable run](https://github.com/hobby-eng/mnemocode/actions/runs/39288756606)
+The separate [Executable run](https://github.com/hobby-eng/mnemocode_typescript/actions/runs/39288756606)
 passes on all three systems for `7facfccedd950a084df94933a230ca2f7a0f473a`.
 Each standalone file passes nine empty-folder checks and the real terminal
 suite. Subsequent test-support and status-document changes leave all production,

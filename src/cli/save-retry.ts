@@ -9,7 +9,7 @@
 
 import { askAfterFailure, askValueUntil, droppedPath, WHAT_NOW } from "./ask.js";
 import { warnOfCloudCopy } from "./cloud-folders.js";
-import { RenamedOutputs } from "./output-paths.js";
+import { RenamedOutputs, WRITE_FAILURES } from "./output-paths.js";
 import { clearPrivateScreen, onPrivateScreen } from "./private-screen.js";
 import { PrivateSteps } from "./private-steps.js";
 import { printableText, terminalLastingWarning, terminalNotice } from "./terminal.js";
@@ -21,19 +21,6 @@ import {
   FailedSaveLeftReservationError,
   LeftStagingCopyError,
 } from "../export/private-file.js";
-
-/** Plain words for the errors of a file system that a save may meet (errno names). */
-const SAVE_FAILURES: Readonly<Record<string, string>> = {
-  EEXIST: "a file or folder of that name appeared meanwhile",
-  ENOSPC: "the disk is full",
-  EDQUOT: "the disk quota is used up",
-  EACCES: "there is no permission to write there",
-  EPERM: "there is no permission to write there",
-  EROFS: "the disk can only be read",
-  ENOENT: "the folder is gone",
-  ENOTDIR: "the folder is gone",
-  EIO: "the disk reported an error",
-};
 
 /** A result as a sentence names it, and whether that name takes "was" or "were". */
 export interface ResultName {
@@ -59,7 +46,7 @@ export interface Saving extends ResultName {
 function saveFailure(what: string, path: string, error: unknown): string {
   const code = errorCode(error);
   const known =
-    code !== undefined && Object.hasOwn(SAVE_FAILURES, code) ? SAVE_FAILURES[code] : undefined;
+    code !== undefined && Object.hasOwn(WRITE_FAILURES, code) ? WRITE_FAILURES[code] : undefined;
   return `${what} could not be saved as ${printableText(path)}: ${known ?? otherFailure(error)}.`;
 }
 

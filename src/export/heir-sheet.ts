@@ -27,6 +27,8 @@ const ERRORS = new ErrorCatalog("export.heir-sheet", {
     `The size of the instructions for heirs must be ${value0}.`,
   "instructions-heirs-contain-character-not-supported-by-font": () =>
     "The instructions for heirs contain a character not supported by the font.",
+  "instructions-heirs-word-wider-than-page": () =>
+    "The instructions for heirs contain a word wider than the page.",
 });
 
 /** A part of the back: a heading and its paragraphs. */
@@ -156,11 +158,16 @@ const INK = rgb(0.1, 0.1, 0.1);
 const MUTED = rgb(0.4, 0.4, 0.4);
 const RULE = rgb(0.7, 0.7, 0.7);
 
-/** Splits `text` into lines no wider than `width` at `size`; words are never broken. */
+/**
+ * Splits `text` into lines no wider than `width` at `size`; words are never broken, so a word wider
+ * than a line, as a host's route may write one, is refused rather than drawn off the page.
+ */
 function wrap(text: string, font: PDFFont, size: number, width: number): string[] {
   const lines: string[] = [];
   let line = "";
   for (const word of text.split(" ")) {
+    if (font.widthOfTextAtSize(word, size) > width)
+      throw ERRORS.create("instructions-heirs-word-wider-than-page", []);
     const candidate = line === "" ? word : `${line} ${word}`;
     if (line !== "" && font.widthOfTextAtSize(candidate, size) > width) {
       lines.push(line);

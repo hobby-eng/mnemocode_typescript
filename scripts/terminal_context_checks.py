@@ -3,6 +3,7 @@ real terminal: the encoded fingerprint before the dates are typed, and
 why a question is asked (AUD-037-UI001). Each check reads the current
 frame, not the history of what was written. Public fixtures only.
 """
+import os
 import tempfile
 from pathlib import Path
 
@@ -212,7 +213,7 @@ def check_cloud_link_kept():
     on every step screen.
     """
     cloud = "Dropbox keeps a copy of"
-    more = "More: https://github.com/hobby-eng/mnemocode#cloud-folders"
+    more = "More: https://github.com/hobby-eng/mnemocode_typescript#cloud-folders"
     with tempfile.TemporaryDirectory() as folder:
         (Path(folder) / "Dropbox").mkdir()
         arguments = (
@@ -239,3 +240,38 @@ def check_cloud_link_kept():
         "cloud warning given with the options: kept with its link on every "
         "step screen"
     )
+
+
+def check_pipe_refused_at_file_name():
+    """A pipe without a writer typed as a file name, after a file that
+    could not be read, is refused at once and the name asked again, and
+    Ctrl+C still ends the command: a record and a QR image are read from
+    regular files only (AUD-039-API002). POSIX only, which has named
+    pipes.
+    """
+    if terminal.WINDOWS:
+        return
+    with tempfile.TemporaryDirectory(prefix="mnemocode-pipe-") as name:
+        folder = Path(name)
+        pipe = folder / "pipe.txt"
+        os.mkfifo(pipe)
+        for option, missing, prompt in (
+            ("--input-file", "missing.txt", "Record file name:"),
+            ("--qr-file", "missing.png", "QR code file name:"),
+        ):
+            session = terminal.Session((
+                "decode", "--ask-secrets", "--mode", "direct",
+                "--format", "unicode", option, str(folder / missing),
+            ))
+            try:
+                session.wait_for("Read another file")
+                session.type("1")
+                session.wait_for(prompt)
+                session.type(str(pipe) + terminal.ENTER)
+                session.wait_for("could not be read")
+                session.wait_for(prompt)
+                session.type(terminal.CTRL_C)
+                assert session.wait_for_exit() == 130
+            finally:
+                session.close()
+    print("file names: a pipe is refused at once, and Ctrl+C ends")

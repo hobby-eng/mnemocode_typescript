@@ -29,7 +29,7 @@ from terminal_answers import (
 # The lines of the summary, as src/cli/private-screen.ts and the notices
 # it keeps write them.
 CLOUD = "Dropbox keeps a copy of"
-CLOUD_MORE = "More: https://github.com/hobby-eng/mnemocode#cloud-folders"
+CLOUD_MORE = "More: https://github.com/hobby-eng/mnemocode_typescript#cloud-folders"
 SAVED = "Saved MnemoCode record:"
 CLEARED = "The screen with the result was cleared."
 CANCELLED_LINE = "Cancelled."

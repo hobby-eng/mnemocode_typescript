@@ -259,7 +259,8 @@ function mixedStructures(form: MixedForm, units: number): ShareStructure[] {
               ...fillingFields(packed, end),
             ]);
           } finally {
-            // The unmixed share, whose CBOR layoutResidual wipes in its own copy.
+            // The packed and the unmixed share, whose CBOR layoutResidual wipes in its own copy.
+            packed.bytes.fill(0);
             body.fill(0);
           }
         },

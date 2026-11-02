@@ -2,9 +2,10 @@
 //! secret into Shamir shares and restores it, with the shares written as compact URs or standard
 //! Bytewords. The host gives the fresh randomness of a split and reads the shares one per line.
 //! Once a call returns, its memory holds no copy of a secret, a seed or a share that the engine or
-//! its dependencies made while working: the buffers it owns are wiped, the text of a share is
-//! written and read here (share_text.rs), and the stack that the SSKR library worked on is
-//! overwritten (scrub_stack); test/sskr-engine-memory.test.ts searches the whole memory for them.
+//! its dependencies made while working: the buffers it owns are wiped, every block of the heap is
+//! overwritten as it is freed (ALLOCATOR), the text of a share is written and read here
+//! (share_text.rs), and the stack that the SSKR library worked on is overwritten (scrub_stack);
+//! test/sskr-engine-memory.test.ts searches the whole memory for them.
 //! What a call returns to the host, the text of the shares or the secret, the glue that
 //! scripts/build-sskr-wasm.mjs writes wipes in this memory once the host holds its copy.
 
@@ -12,12 +13,20 @@ use bc_rand::RandomNumberGenerator;
 use rand_chacha::ChaCha20Rng;
 use rand_core::{CryptoRng, RngCore, SeedableRng};
 use sskr::{sskr_combine, sskr_generate_using, GroupSpec, Secret, Spec};
+use std::alloc::System;
 use wasm_bindgen::prelude::*;
 use zeroize::{Zeroize, Zeroizing};
+use zeroizing_alloc::ZeroAlloc;
 
 mod refusal;
 mod share_text;
 pub use refusal::Refusal;
+
+/// The heap, which overwrites each block with zeros as it frees it: the SSKR library and its
+/// dependencies drop copies that they do not wipe, such as each share that bc-shamir interpolates
+/// in a split (AUD-039-SEC002), and a block that grows is moved and its old place freed.
+#[global_allocator]
+static ALLOCATOR: ZeroAlloc<System> = ZeroAlloc(System);
 
 /// The bytes of the stack below an entry's frame that scrub_stack overwrites once the SSKR library
 /// has returned: more than five times the deepest that a split or a restore was measured to go,

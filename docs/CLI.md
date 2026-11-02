@@ -22,7 +22,7 @@ chmod +x mnemocode-0.1.0-linux-x64
 GitHub also signs where each file of a release was built. On the computer you downloaded it with, the [GitHub CLI](https://cli.github.com/) checks that the file was built by a GitHub Actions workflow of this repository, and was not replaced afterwards:
 
 ```bash
-gh attestation verify mnemocode-0.1.0-linux-x64 --repo hobby-eng/mnemocode
+gh attestation verify mnemocode-0.1.0-linux-x64 --repo hobby-eng/mnemocode_typescript
 ```
 
 The file holds Node.js, the program, artwork, fonts and the SSKR engine. Image export also needs Poppler's `pdftocairo` in a folder of `PATH`. To build the executable from a checkout, run `corepack pnpm build:executable`; it writes the file and license notices to `release/` and checks it from an empty folder.

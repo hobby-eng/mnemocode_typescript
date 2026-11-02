@@ -258,7 +258,10 @@ class BackupSource {
         this.#qr ? "QR code file name:" : "Record file name:",
         (answer) => {
           const path = droppedPath(answer);
-          return this.#qr ? decodeQrPngFile(path) : readBoundedTextFile(path, "The file");
+          // A name typed here is a regular file: a pipe without a writer would hold the question.
+          return this.#qr
+            ? decodeQrPngFile(path, true)
+            : readBoundedTextFile(path, "The file", true);
         },
         { what: "the name of the file" },
       );

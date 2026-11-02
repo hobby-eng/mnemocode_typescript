@@ -82,7 +82,7 @@ describe("the result above the backup-check question", () => {
       expect(written).not.toContain("They do not reveal the phrase.");
       if (mode === "seedshift-legacy") {
         const link = written.indexOf(
-          "More: https://github.com/hobby-eng/mnemocode#transformation-modes",
+          "More: https://github.com/hobby-eng/mnemocode_typescript#transformation-modes",
         );
         expect(link).toBeGreaterThanOrEqual(0);
         expect(link).toBeLessThan(written.indexOf("Encoded result"));

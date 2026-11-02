@@ -72,7 +72,7 @@ describe("instructions for heirs", () => {
     // One address, the repository's, printed once; its README leads to the guide for heirs.
     const words = JSON.stringify(text);
     expect(words.match(/https:\/\//gu)).toHaveLength(1);
-    expect(words).toContain("https://github.com/hobby-eng/mnemocode,");
+    expect(words).toContain("https://github.com/hobby-eng/mnemocode_typescript,");
     expect(text.steps.join(" ")).toContain('answer "Yes"');
     const direct = heirSheetText({
       backup: { kind: "encoded", format: "indexes", words: 12 },
@@ -192,7 +192,7 @@ describe("instructions for heirs", () => {
     });
     expect(() => twice.text(facts)).toThrow("route's address once and no other");
     // A longer address that starts with the route's is another address, not the route's.
-    const repository = "https://github.com/hobby-eng/mnemocode";
+    const repository = "https://github.com/hobby-eng/mnemocode_typescript";
     for (const longer of ["/releases/tag/v0.1.0", "-mirror", ".git", "?ref=x"]) {
       const beside = new HeirInstructions({
         ...route,
@@ -269,6 +269,28 @@ describe("instructions for heirs", () => {
       ).rejects.toMatchObject({
         code: "export.heir-sheet.instructions-heirs-contain-character-not-supported-by-font",
         message: "The instructions for heirs contain a character not supported by the font.",
+      });
+  });
+
+  it("refuses a host's word wider than the page in A5 and A6 (AUD-039-UI001)", async () => {
+    const route: HeirRoute = {
+      subtitle: "W".repeat(100),
+      address: "example.com/wallet-tool",
+      start: ["Open example.com/wallet-tool on a computer you trust, then go offline."],
+      decode: () => ["Choose Decode and type the backup."],
+      restore: () => ["Choose Shares and type the shares."],
+      dateDigitHelp: undefined,
+    };
+    const facts: HeirSheetFacts = {
+      backup: { kind: "encoded", format: "unicode", words: 12 },
+      mode: "direct",
+      dates: 0,
+    };
+    for (const format of [A5, A6])
+      await expect(
+        renderHeirSheet(nodeCardRenderer, new HeirInstructions(route).text(facts), format),
+      ).rejects.toMatchObject({
+        code: "export.heir-sheet.instructions-heirs-word-wider-than-page",
       });
   });
 

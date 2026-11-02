@@ -185,7 +185,9 @@ export type ShareTrouble =
   | {
       /** Tells the one share that does not fit with the others: it is left out or typed again. */
       readonly kind: "odd";
-      /** The condition: the other shares restore a phrase without this one. */
+      /**
+       * The condition: without this one, the other shares restore a phrase that a digest checked.
+       */
       readonly code: "share-does-not-fit";
       /** The place of that share among those typed, counted from 1. */
       readonly place: number;
@@ -744,7 +746,7 @@ export class ShareInput implements Disposable {
    * Restores complete shares: each is read, copies are left out (and returned, with a note), the
    * set is checked (setTrouble, fewTrouble), and its phrase restored, every share checked against
    * it (ShareSet.restore). When they do not agree, the share without which the others restore a
-   * phrase is named: each is left out once.
+   * phrase that its digest checked is named: each is left out once.
    */
   async restoreComplete(
     platform: ShareCombiner,
@@ -931,12 +933,14 @@ export class ShareInput implements Disposable {
         if (remaining.length === 0 || !new SetTopology(remaining.map((other) => other.info)).enough)
           continue;
         try {
-          using _otherSet = await ShareSet.restore(
+          using otherSet = await ShareSet.restore(
             texts.filter((_, other) => other !== index),
             platform,
           );
           this.#texts.assertLive();
-          fits.push(share.place);
+          // Only a phrase that a digest checked tells against the share left out: shares that keep
+          // none, under a threshold of 1, merely agree with each other (AUD-039-FUN001).
+          if (otherSet.digestChecked) fits.push(share.place);
         } catch (other) {
           this.#texts.assertLive();
           if (!isCompleteShareRefusal(other)) throw other;

@@ -71,7 +71,7 @@ for (const name of recorders()) {
 const provenance = serialize({
   about:
     "Known answers of MnemoCode TS, recorded by its scripts/rust-parity.mjs from the build of one commit; the Rust tests replay them (RUST-14).",
-  repository: "hobby-eng/mnemocode",
+  repository: "hobby-eng/mnemocode_typescript",
   commit,
   node: process.version,
   recorders: recorded,

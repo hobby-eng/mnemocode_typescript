@@ -47,7 +47,7 @@ const HEADING = "MnemoCode · encode";
 const CLEARED = "The screen with the result was cleared.";
 /** A warning given with its README section, as the swap and cloud warnings are. */
 const SWAP = "Swap space is not encrypted: a secret may be written to the disk.";
-const SWAP_MORE = "More: https://github.com/hobby-eng/mnemocode#unencrypted-swap";
+const SWAP_MORE = "More: https://github.com/hobby-eng/mnemocode_typescript#unencrypted-swap";
 /** What recover-word says under candidates that no wallet confirmed. */
 const NOT_PROVEN = "A valid checksum does not prove the wallet: compare an address.";
 
@@ -149,7 +149,7 @@ describe("the summary left on the main screen after the private screen", () => {
       "",
       HEADING,
       `Dropbox keeps a copy of ${record}`,
-      "More: https://github.com/hobby-eng/mnemocode#cloud-folders",
+      "More: https://github.com/hobby-eng/mnemocode_typescript#cloud-folders",
       "",
     ]);
   });
