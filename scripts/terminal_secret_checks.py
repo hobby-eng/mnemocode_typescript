@@ -184,8 +184,8 @@ def check_encode_result_visible_in(mode):
         if shares and mode == "direct":
             arguments += ["--show-original", "words"]
         else:
-            # Word numbers are always masked: without Seedshift the codes
-            # are Unicode codes.
+            # Word numbers are always masked: without Seedshift the
+            # codes are Unicode codes.
             arguments += ["--format", "2" if mode == "seedshift" else "3"]
         session = Session(arguments=arguments)
         try:
