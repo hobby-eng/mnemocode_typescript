@@ -1,6 +1,6 @@
 {
   "name": "mnemocode",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packageManager": "pnpm@12.15.0",
   "private": true,
   "description": "Offline tool that writes a BIP39 mnemonic as numbers, Unicode codes or colors, masks it with dates you remember, splits it into Shamir shares, and prints QR codes and recovery cards",

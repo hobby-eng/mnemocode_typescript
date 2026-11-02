@@ -51,7 +51,7 @@ describe("help", () => {
   it("lists every command but sskr-split, and every topic, in the overview", async () => {
     for (const argument of [[], ["--help"], ["-h"], ["help"]]) {
       const { stdout } = await run(argument);
-      expect(stdout).toContain("MnemoCode 0.1.0");
+      expect(stdout).toContain("MnemoCode 0.1.1");
       for (const name of Object.keys(COMMAND_OPTIONS).filter((item) => item !== "sskr-split"))
         expect(stdout).toContain(`  ${name}`);
       for (const topic of Object.keys(TOPIC_HELP)) expect(stdout).toContain(`help ${topic}`);

@@ -4,7 +4,7 @@ For choosing a backup or recovery method, start with the [README](../README.md).
 
 ## Download verification
 
-Release assets use one executable file for Linux, Windows and macOS that runs without Node.js or anything else installed: `mnemocode-<version>-linux-x64`, `mnemocode-<version>-win-x64.exe` and `mnemocode-<version>-macos-arm64`. Next to each file is a file of the same name ending in `-licenses.txt`, for example `mnemocode-0.1.0-linux-x64-licenses.txt`, with the licenses of Node.js and of every library the file contains.
+Release assets use one executable file for Linux, Windows and macOS that runs without Node.js or anything else installed: `mnemocode-<version>-linux-x64`, `mnemocode-<version>-win-x64.exe` and `mnemocode-<version>-macos-arm64`. Next to each file is a file of the same name ending in `-licenses.txt`, for example `mnemocode-0.1.1-linux-x64-licenses.txt`, with the licenses of Node.js and of every library the file contains.
 
 Check a download once before you run it. The release's `SHA256SUMS` holds the SHA-256 of every file and is signed with the maintainer's OpenPGP key: `SHA256SUMS.asc` is the signature and `RELEASE-SIGNING-KEY.asc` the public key, whose fingerprint is `28FC51B1DB80DF2101128CB30EDD4814591DD095`. GitHub shows the same key for the maintainer at https://github.com/hobby-eng.gpg. Look at the key's fingerprint before you import it, check the signature and the SHA-256 of your file, then run it as `mnemocode`:
 
@@ -13,8 +13,8 @@ gpg --show-keys RELEASE-SIGNING-KEY.asc
 gpg --import RELEASE-SIGNING-KEY.asc
 gpg --verify SHA256SUMS.asc SHA256SUMS
 sha256sum --check --ignore-missing SHA256SUMS
-chmod +x mnemocode-0.1.0-linux-x64
-./mnemocode-0.1.0-linux-x64 self-test
+chmod +x mnemocode-0.1.1-linux-x64
+./mnemocode-0.1.1-linux-x64 self-test
 ```
 
 `gpg --verify` must say "Good signature" for a key with that fingerprint. Its warning that the key is not certified with a trusted signature only means that you have not certified the key yourself. [Releasing](RELEASING.md) describes how a release is built and signed.
@@ -22,7 +22,7 @@ chmod +x mnemocode-0.1.0-linux-x64
 GitHub also signs where each file of a release was built. On the computer you downloaded it with, the [GitHub CLI](https://cli.github.com/) checks that the file was built by a GitHub Actions workflow of this repository, and was not replaced afterwards:
 
 ```bash
-gh attestation verify mnemocode-0.1.0-linux-x64 --repo hobby-eng/mnemocode_typescript
+gh attestation verify mnemocode-0.1.1-linux-x64 --repo hobby-eng/mnemocode_typescript
 ```
 
 The file holds Node.js, the program, artwork, fonts and the SSKR engine. Image export also needs Poppler's `pdftocairo` in a folder of `PATH`. To build the executable from a checkout, run `corepack pnpm build:executable`; it writes the file and license notices to `release/` and checks it from an empty folder.

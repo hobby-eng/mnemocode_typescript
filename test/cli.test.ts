@@ -13,7 +13,7 @@ describe("CLI records", () => {
   it("reports the package version through both CLI forms", async () => {
     for (const argument of ["--version", "version"]) {
       const result = await run([argument]);
-      expect(result.stdout).toBe("mnemocode 0.1.0\n");
+      expect(result.stdout).toBe("mnemocode 0.1.1\n");
       expect(result.stderr).toBe("");
     }
     await expect(run(["--version", "extra"])).rejects.toMatchObject({
@@ -23,7 +23,7 @@ describe("CLI records", () => {
 
   it("runs the extended self-test and reports its coverage", async () => {
     const result = await run(["self-test"]);
-    expect(result.stdout).toContain("MnemoCode 0.1.0 self-test");
+    expect(result.stdout).toContain("MnemoCode 0.1.1 self-test");
     expect(result.stdout).toContain("Public vectors");
     expect(result.stdout).toContain("Representation matrix");
     expect(result.stdout).toContain("QR adapter");

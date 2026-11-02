@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 (2026-11-02)
+
+The last release of the TypeScript version, which takes fixes of critical defects only from now on. MnemoCode continues in Rust, in [hobby-eng/mnemocode](https://github.com/hobby-eng/mnemocode); this repository is `hobby-eng/mnemocode_typescript`.
 
 ### Repository
 

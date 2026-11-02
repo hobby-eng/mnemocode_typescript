@@ -9,7 +9,7 @@
 > [!IMPORTANT]
 > **This TypeScript version is complete and takes fixes of critical defects only.** MnemoCode continues in Rust: use the Rust version, [hobby-eng/mnemocode](https://github.com/hobby-eng/mnemocode).
 
-This README describes version 0.1.0.
+This README describes version 0.1.1, the last release of the TypeScript version.
 
 **Have you inherited a backup made with MnemoCode?** Start with [A guide for heirs](docs/HEIRS.md).
 

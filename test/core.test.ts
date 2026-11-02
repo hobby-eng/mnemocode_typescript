@@ -47,7 +47,7 @@ const dates = LEGACY_EXAMPLE_DATES.map(parseDate);
 
 describe("the package entry", () => {
   it("exports the package version", () => {
-    expect(MNEMOCODE_VERSION).toBe("0.1.0");
+    expect(MNEMOCODE_VERSION).toBe("0.1.1");
   });
 });
 
