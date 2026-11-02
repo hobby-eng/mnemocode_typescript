@@ -59,8 +59,10 @@ describe("the temporary folders of exports", () => {
       mtimeMs: made.mtimeMs + 1000,
     };
     expect(sameFolder(filled, made)).toBe(true);
-    expect(sameFolder({ dev: made.dev, ino: made.ino + 1 }, made)).toBe(false);
-    expect(sameFolder({ dev: made.dev + 1, ino: made.ino }, made)).toBe(false);
+    // Another number at any size: Windows' file IDs pass 2^53, where adding 1 may give the same.
+    const another = (value: number) => (value === 1 ? 2 : 1);
+    expect(sameFolder({ dev: made.dev, ino: another(made.ino) }, made)).toBe(false);
+    expect(sameFolder({ dev: another(made.dev), ino: made.ino }, made)).toBe(false);
     expect(sameFolder(undefined, made)).toBe(false);
   });
 
