@@ -33,11 +33,11 @@ CLOUD_MORE = "More: https://github.com/hobby-eng/mnemocode#cloud-folders"
 SAVED = "Saved MnemoCode record:"
 CLEARED = "The screen with the result was cleared."
 CANCELLED_LINE = "Cancelled."
-# Encode without Seedshift into a folder that a cloud service copies,
-# which it warns of before the first question; the backup is not
-# checked.
+# Encode without Seedshift, in Unicode codes, into a folder that a cloud
+# service copies, which it warns of before the first question; the backup
+# is not checked.
 ENCODE_TO_CLOUD = (
-    *("encode", "--ask-secrets", "--mode", "direct", "--format", "2"),
+    *("encode", "--ask-secrets", "--mode", "direct", "--format", "3"),
     *("--output", "Dropbox/record.txt", "--backup-check", "no"),
 )
 

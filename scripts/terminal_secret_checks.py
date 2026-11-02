@@ -184,7 +184,9 @@ def check_encode_result_visible_in(mode):
         if shares and mode == "direct":
             arguments += ["--show-original", "words"]
         else:
-            arguments += ["--format", "2"]
+            # Word numbers are always masked: without Seedshift the codes
+            # are Unicode codes.
+            arguments += ["--format", "2" if mode == "seedshift" else "3"]
         session = Session(arguments=arguments)
         try:
             session.wait_for("Seed phrase (English BIP39 words):")
@@ -195,7 +197,7 @@ def check_encode_result_visible_in(mode):
             session.wait_for("Check the backup now?")
             session.wait_for("Esc skips the check")
             seedshift = mode == "seedshift"
-            codes = MASKED_WORD_NUMBERS if seedshift else WORD_NUMBERS
+            codes = MASKED_WORD_NUMBERS if seedshift else JOINED_UNICODE
             markers = [TEST_PHRASE if shares and not seedshift else codes]
             if not shares or seedshift:
                 markers += ["SAVE THIS BACKUP", "End of backup."]
