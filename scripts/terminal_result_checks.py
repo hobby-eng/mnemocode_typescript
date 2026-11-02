@@ -75,6 +75,16 @@ def pages_from_here(session):
     return frames
 
 
+def through_pages(session, wanted):
+    """Waits for `wanted`, ending with Enter the pages of a result that
+    come first: a warning that takes rows, such as one of unencrypted
+    swap, leaves the result no room beside its question.
+    """
+    if session.wait_for_any((wanted, NAVIGATION)) == NAVIGATION:
+        session.type(terminal.ENTER)
+        session.wait_for(wanted)
+
+
 def navigate(session, first, wanted):
     """Reads every page, each of `wanted` on one of them, then goes back
     to the first page with Home and to the last with End, as xterm sends
@@ -317,7 +327,7 @@ def check_word_list_after_search():
                 "--mnemonic-file", str(words),
             ))
         try:
-            session.wait_for("Save them for the Discovery Scanner")
+            through_pages(session, "Save them for the Discovery Scanner")
             session.type("2")
             session.wait_for("File name")
             session.type(str(path) + terminal.ENTER)
@@ -325,7 +335,7 @@ def check_word_list_after_search():
             session.type("1")
             session.wait_for("Scanner key")
             session.type(vectors["age"]["recipient"] + terminal.ENTER)
-            session.wait_for(CLEAR_PROMPT)
+            through_pages(session, CLEAR_PROMPT)
             terminal.assert_private_result_visible(
                 session, ("Saved 1,497 candidate phrases",)
             )
