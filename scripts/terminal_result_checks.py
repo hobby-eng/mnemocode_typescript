@@ -361,11 +361,18 @@ def check_word_result(options, words, warnings):
     try:
         session.wait_for("? for each forgotten word:")
         session.type(words + terminal.ENTER)
-        session.wait_for("What now?")
         shown = ("MnemoCode · Missing word recovery", *warnings)
-        terminal.assert_private_result_visible(
-            session, (*shown, "What now?")
-        )
+        # A warning that takes rows, such as one of unencrypted swap,
+        # can leave the result no room beside its question: it then
+        # comes by pages first, the question after them.
+        if session.wait_for_any(("What now?", NAVIGATION)) == NAVIGATION:
+            terminal.assert_private_result_visible(session, shown)
+            session.type(terminal.ENTER)
+            session.wait_for("What now?")
+        else:
+            terminal.assert_private_result_visible(
+                session, (*shown, "What now?")
+            )
         session.type(terminal.CTRL_C)
         assert session.wait_for_exit() == CANCELLED
         terminal.assert_kept_private(session, (words,))
