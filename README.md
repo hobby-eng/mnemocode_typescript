@@ -1,9 +1,9 @@
 # MnemoCode
 
-[![CI](https://github.com/hobby-eng/mnemocode/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hobby-eng/mnemocode/actions/workflows/ci.yml)
-[![Executable](https://github.com/hobby-eng/mnemocode/actions/workflows/executable.yml/badge.svg)](https://github.com/hobby-eng/mnemocode/actions/workflows/executable.yml)
+[![CI](https://github.com/hobby-eng/mnemocode_typescript/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hobby-eng/mnemocode_typescript/actions/workflows/ci.yml)
+[![Executable](https://github.com/hobby-eng/mnemocode_typescript/actions/workflows/executable.yml/badge.svg)](https://github.com/hobby-eng/mnemocode_typescript/actions/workflows/executable.yml)
 [![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](#provenance-and-license)
-[![Build provenance: GitHub attestations](https://img.shields.io/badge/build%20provenance-GitHub%20attestations-2ea44f)](https://github.com/hobby-eng/mnemocode/attestations)
+[![Build provenance: GitHub attestations](https://img.shields.io/badge/build%20provenance-GitHub%20attestations-2ea44f)](https://github.com/hobby-eng/mnemocode_typescript/attestations)
 
 > [!IMPORTANT]
 > **This repository is no longer maintained.** MnemoCode has been ported to Rust: use the Rust version, [hobby-eng/mnemocode](https://github.com/hobby-eng/mnemocode).
