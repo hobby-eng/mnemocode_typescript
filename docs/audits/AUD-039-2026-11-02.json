@@ -1,0 +1,2144 @@
+{
+  "schemaVersion": 1,
+  "auditId": "AUD-039",
+  "auditNumber": 39,
+  "date": "2026-11-02",
+  "title": "TypeScript 0.2.0 prerelease audit after repository migration",
+  "reviewer": {
+    "name": "Codex coordinator with four scoped reviewers and one independent skeptic",
+    "model": null,
+    "reasoningEffort": null
+  },
+  "snapshot": {
+    "commit": "044a9edf0708cf6bf978643f2d365c75d25f5b90",
+    "commitComplete": true,
+    "workingTree": "Clean product baseline; audit-only harnesses/reports added afterwards. Maintainer changed README and added audit.yml during review; both changes reconciled to this snapshot. No implementation changes made by this audit.",
+    "sourceFingerprint": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+    "initialCommit": "25187ef52b6212375d88f66385decad01813e29e",
+    "initialSourceFingerprint": "cb5b5ea7bb3bb0108bd6d0856dc159cd6bb5b9f13fac4af769decc9f5a7709fe",
+    "trackedFiles": 1319,
+    "sourceVersion": "0.1.0",
+    "requestedNextVersion": "0.2.0",
+    "remote": "hobby-eng/mnemocode_typescript",
+    "transition": {
+      "from": "25187ef52b6212375d88f66385decad01813e29e",
+      "reason": "Concurrent maintainer commit changes README and adds scheduled advisory workflow; runtime inputs unchanged."
+    }
+  },
+  "scope": "Standalone TypeScript MnemoCode at the current local/remote main snapshot: all 307 src files assigned, 84 public package entries, five BIP39 phrase lengths, four masking modes, five ordinary representations, six share forms, recovery and wallet evidence, candidate files/encryption, host-neutral APIs, Node CLI/TTY/file boundaries, SSKR Rust/WASM/vendor inputs, cards/QR/PDF/images/heir guides, current documentation, tooling, CI and release routing. All 1,319 tracked files are inventoried; semantic depth is explicitly lower for historical audit archives, selected coordinator tools and binary assets. Rust successor and browser host implementation are outside this checkout.",
+  "checks": [
+    {
+      "checkId": "CHECK-SEC-001",
+      "primaryOwner": "core/SSKR",
+      "outcome": "reviewed; findings",
+      "evidence": "Threat model and ownership traced across all current source. SEC001/SEC002 are normal-path temporary-cleanup omissions, not measured heap disclosure."
+    },
+    {
+      "checkId": "CHECK-SEC-002",
+      "primaryOwner": "CLI/coordinator",
+      "outcome": "reviewed; bounded execution",
+      "evidence": "Native permission model, offline CSPRNG/platform seams, no dump/no sockets policy traced. Browser Secret Vault/CSP deployment is outside this checkout; fresh Linux protection checks not executed in this baseline."
+    },
+    {
+      "checkId": "CHECK-SEC-003",
+      "primaryOwner": "core/CLI",
+      "outcome": "reviewed",
+      "evidence": "No network operation in product; permissions/argv/material-file/private-screen paths reviewed. Advisory and gh traffic are audit tooling, not product egress."
+    },
+    {
+      "checkId": "CHECK-SEC-004",
+      "primaryOwner": "core/SSKR",
+      "outcome": "reviewed; execution incomplete",
+      "evidence": "OS randomness, age/scrypt, BIP39/PBKDF2/HMAC and SSKR digest contracts traced; suite/self-test/independent reference results recorded separately. No bespoke primitive certification."
+    },
+    {
+      "checkId": "CHECK-SEC-005",
+      "primaryOwner": "core/CLI/SSKR",
+      "outcome": "reviewed; findings",
+      "evidence": "Cancellation, disposal and refusal paths read; SEC001/SEC002 omit successful-path local wipes. CORE-54 excludes invented intrinsic failures."
+    },
+    {
+      "checkId": "CHECK-SEC-006",
+      "primaryOwner": "coordinator",
+      "outcome": "not-applicable",
+      "evidence": "No browser application, DOM or persisted browser storage is shipped in this standalone checkout. Portable modules reviewed; wallet-tools acceptance remains unexecuted outside this repository."
+    },
+    {
+      "checkId": "CHECK-SEC-007",
+      "primaryOwner": "CLI",
+      "outcome": "reviewed; findings",
+      "evidence": "Actual FIFO without writer and /dev/full probes; API002 blocks local cancellation, API003 returns false success on refused stdout. Size/count/search budgets traced; no remote DoS claim."
+    },
+    {
+      "checkId": "CHECK-FUN-001",
+      "primaryOwner": "core",
+      "outcome": "reviewed; execution incomplete",
+      "evidence": "All five BIP39 lengths, checksum/entropy/seed semantics and four modes traced with independent public tests. Full suite and self-test not executed in this baseline."
+    },
+    {
+      "checkId": "CHECK-FUN-002",
+      "primaryOwner": "core",
+      "outcome": "reviewed; execution incomplete",
+      "evidence": "Wallet evidence/fingerprint, address/path/network/coin profiles traced. Offline comparison only; full-suite results not executed in this baseline. No account discovery, funds or live node proof."
+    },
+    {
+      "checkId": "CHECK-FUN-003",
+      "primaryOwner": "core",
+      "outcome": "not-applicable",
+      "evidence": "No BIP85, BIP38, signing-message or Silent Payments operation in this project."
+    },
+    {
+      "checkId": "CHECK-FUN-004",
+      "primaryOwner": "core",
+      "outcome": "not-applicable",
+      "evidence": "No transaction scripts, descriptor/Miniscript builder or multisig wallet operation. Implemented address encodings are covered by FUN002."
+    },
+    {
+      "checkId": "CHECK-FUN-005",
+      "primaryOwner": "core",
+      "outcome": "not-applicable",
+      "evidence": "No transaction/PSBT creation, signing, broadcast, version context or commitment operation."
+    },
+    {
+      "checkId": "CHECK-FUN-006",
+      "primaryOwner": "core/SSKR/cards",
+      "outcome": "reviewed; finding; execution incomplete",
+      "evidence": "All ordinary/share representations and recovery/repair traced. FUN001 reproduced on six imported threshold-one permutations with checked control. Independent Python reference passes official quorums and five deterministic entropy widths. Final rasterized QR checks not executed in this baseline."
+    },
+    {
+      "checkId": "CHECK-FUN-007",
+      "primaryOwner": "coordinator",
+      "outcome": "not-applicable",
+      "evidence": "No connected providers, history/balance/accounting, chain discovery or external proofs. Scanner candidate-file export is offline and covered by API003/004."
+    },
+    {
+      "checkId": "CHECK-API-001",
+      "primaryOwner": "core/SSKR",
+      "outcome": "reviewed; finding",
+      "evidence": "Exact installed dependency and external host-service contracts traced; MissingCodes.run nonboolean callback accepted (API001). Existing safe wallet-check adapters remain distinct."
+    },
+    {
+      "checkId": "CHECK-API-002",
+      "primaryOwner": "core/CLI/SSKR",
+      "outcome": "reviewed; findings",
+      "evidence": "Returned cancellation states, host signals, late resolution/disposal and terminal navigation traced; actual FIFO cancellation failure API002. No fabricated runtime failures."
+    },
+    {
+      "checkId": "CHECK-API-003",
+      "primaryOwner": "core/CLI",
+      "outcome": "reviewed; finding",
+      "evidence": "Candidate-list version/layout/CRC/age and strict file writes traced; stdout error propagation fails under actual ENOSPC (API003). Monetary precision not applicable."
+    },
+    {
+      "checkId": "CHECK-API-004",
+      "primaryOwner": "core/SSKR/cards",
+      "outcome": "reviewed; execution incomplete",
+      "evidence": "Five ordinary forms, six share forms, records/QR, candidate transport and native format interoperability traced. Public vector/PNG/PDF round-trip receipts not executed in this baseline."
+    },
+    {
+      "checkId": "CHECK-BLD-001",
+      "primaryOwner": "coordinator",
+      "outcome": "reviewed; passed gates",
+      "evidence": "Pins/manifests/permission flags/dependencies and 84 exports reconciled. pnpm check/source/test/cards types pass; current source remains version 0.1.0."
+    },
+    {
+      "checkId": "CHECK-BLD-002",
+      "primaryOwner": "coordinator",
+      "outcome": "partial",
+      "evidence": "Linux one-worker suite stopped at the 30-minute supervisor limit without completed totals. No second suite, new full self-test/PTY/card-output or executable run began. Current three-OS CI fast/build/PTY passed; full suites skipped. Fresh host-browser and final 0.2.0 matrix not executed."
+    },
+    {
+      "checkId": "CHECK-BLD-003",
+      "primaryOwner": "coordinator/SSKR",
+      "outcome": "reviewed; advisory scans passed",
+      "evidence": "217 npm versions and 137 Cargo dependencies scanned, no known vulnerabilities; unmaintained paste warning. Linked licenses/pins checked; no independent upstream archive/vendor diff or publisher census."
+    },
+    {
+      "checkId": "CHECK-BLD-004",
+      "primaryOwner": "coordinator/SSKR",
+      "outcome": "not-run",
+      "evidence": "Generated WASM hash/integrity pins and actual bounded native probes retained. Fresh canonical Docker --check not executed because the shared slot was unavailable before final handover; no generated file changed."
+    },
+    {
+      "checkId": "CHECK-BLD-005",
+      "primaryOwner": "coordinator",
+      "outcome": "reviewed; release blocker",
+      "evidence": "BLD001 wrong signer repository, BLD002 missing advisory-workflow concurrency. Current CI read-only evidence retained; no release/sign/dispatch performed."
+    },
+    {
+      "checkId": "CHECK-UI-001",
+      "primaryOwner": "CLI/cards",
+      "outcome": "reviewed; finding; execution incomplete",
+      "evidence": "Real PDF/font geometry reproduces UI001; 13 artwork/font binaries metadata-only. Full CLI PTY/card-page checks not executed in this baseline; no complete physical print/pixel acceptance."
+    },
+    {
+      "checkId": "CHECK-UI-002",
+      "primaryOwner": "CLI",
+      "outcome": "reviewed; execution incomplete",
+      "evidence": "All menu/question/step paths read with source tests; real FIFO retry probe. Fresh comprehensive PTY not executed in this baseline; remote current three-OS PTY passed configured jobs."
+    },
+    {
+      "checkId": "CHECK-UI-003",
+      "primaryOwner": "CLI/cards",
+      "outcome": "reviewed; execution incomplete",
+      "evidence": "Private/paged results, wallet warnings, Unicode/keyboard/QR/help/card source verification traced. Active old repository help links included in BLD001; actual final rasterized QR checks not executed in this baseline."
+    },
+    {
+      "checkId": "CHECK-ARC-001",
+      "primaryOwner": "core/CLI/cards/SSKR",
+      "outcome": "reviewed; no further finding",
+      "evidence": "Domain owners, platform injection/host-neutral seams and caller ownership traced across all current src. Source-level native/TS temporary cleanup exceptions are SEC001/SEC002; no global optimality proof."
+    },
+    {
+      "checkId": "CHECK-ARC-002",
+      "primaryOwner": "coordinator",
+      "outcome": "passed gates; reviewed",
+      "evidence": "No 50-token duplicates in declared src/scripts scope; all 306 TS module exports reached or explicitly for hosts. Deliberate/review-only copies considered; gates do not establish minimal architecture."
+    },
+    {
+      "checkId": "CHECK-ARC-003",
+      "primaryOwner": "all reviewers",
+      "outcome": "reviewed; partial tooling depth",
+      "evidence": "Production/test oracles reviewed in four source scopes; coordinator gate/metadata/cancellation tests read, portable-module large table and generated-glue fault harness selected. File ledger gives exact depth. Full-suite attempt stopped at supervisor timeout; no completed test totals; no retry scheduled."
+    },
+    {
+      "checkId": "CHECK-DOC-001",
+      "primaryOwner": "coordinator",
+      "outcome": "reviewed; migration finding",
+      "evidence": "Current user docs/modes/recovery/QR/candidates/protection claims compared with code; stale help/download/security target family BLD001. Remaining selected manual/archive portions explicitly qualified."
+    },
+    {
+      "checkId": "CHECK-DOC-002",
+      "primaryOwner": "coordinator",
+      "outcome": "reviewed; migration finding",
+      "evidence": "CLI commands/release signer/metadata/legal materials inventoried; one intentional Rust README link preserved. Current version/notes not yet prepared for 0.2.0; historical provenance links classified separately."
+    },
+    {
+      "checkId": "CHECK-DOC-003",
+      "primaryOwner": "coordinator/skeptic",
+      "outcome": "reviewed; validated",
+      "evidence": "Paired JSON schema/duplicate keys/9 finding IDs/32 CHECK IDs/22 source locations/relative links validated. Privacy/Markdown/package gates passed with normal git/cache access. Local evidence hashes retained; historical record structure reviewed, not old tests freshly replayed."
+    }
+  ],
+  "findings": [
+    {
+      "candidateId": "BLD-C01",
+      "id": "AUD-039-BLD001",
+      "idStatus": "allocated in AUD-039",
+      "category": "BLD",
+      "kind": "finding",
+      "title": "TypeScript release signer and repository references retain the Rust repository target",
+      "severity": "medium",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": true,
+      "releaseBlockingReason": "The TypeScript release cannot use its supported signing/publication path until repository routing is corrected.",
+      "locations": [
+        {
+          "path": "scripts/sign-release.mjs",
+          "line": 157,
+          "snapshotSha256": "7ffb13b4da6db57e115567dd5fd9a29c48dcbb6a7d2f2cd2307c2d82525faaa4"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "method": "Independent static trace and inspection of coordinator-retained evidence; public data only.",
+        "entryAndInput": "node scripts/sign-release.mjs v0.2.0 --publish --dry-run; static COMMANDS inspection.",
+        "executedByCoordinator": true
+      },
+      "expected": "Release lookup, download, attestation, upload and optional publication target hobby-eng/mnemocode_typescript.",
+      "observed": "The retained dry run routes every repository-specific gh command to hobby-eng/mnemocode. The constant is unchanged between the initial and current snapshots. No release was signed, uploaded or published.",
+      "impact": "The supported TypeScript publication procedure addresses the Rust repository. It can fail to find the intended draft; if a same-tag compatible draft exists there, the commands remain directed to that other project. No wrong artifact signature or attestation bypass was demonstrated.",
+      "severityRationale": "Medium supported build/release routing failure; the concrete wrong command plan justifies blocking TypeScript publication. High severity is unsupported without an executed integrity failure.",
+      "evidence": [
+        {
+          "path": "docs/audits/AUD-039-evidence/signer-dry-run.log",
+          "localOnly": true,
+          "sha256": "26e0985bb30f912b7230e3932f4715c3747fc3ac5d22f0f36c123bd85150e5a3"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/signer-dry-run.command.json",
+          "localOnly": true,
+          "sha256": "d76eb2066069a9aaa07322ab1a082bdfc85213f690757403be9d0623e36e9000"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/repository-references.json",
+          "localOnly": true,
+          "sha256": "ce3eee5a003ef289c866669b23b62a0b46d75b4afaaef5c5e09da4c547652f49"
+        }
+      ],
+      "recommendedFix": "Correct the TypeScript repository target and stale current TS help/security/download/provenance links. Preserve the intentional opening README link recommending the Rust version. Keep historical audit evidence unchanged.",
+      "requiredVerification": "Verify the corrected dry-run plan for download/attestation/upload/publish and relevant no-publish/refusal cases. Inspect current TS references and preserve the deliberate Rust link. Do not create a real release as a test.",
+      "relatedFindings": [],
+      "core54Assessment": "Reachable external input/OS failure or ordinary successful-path ownership omission; no trusted intrinsic/runtime failure injected or required."
+    },
+    {
+      "candidateId": "SSKR-C01",
+      "id": "AUD-039-FUN001",
+      "idStatus": "allocated in AUD-039",
+      "category": "FUN",
+      "kind": "finding",
+      "title": "Digestless omission diagnosis mistakes majority agreement for evidence against one share",
+      "severity": "medium",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": false,
+      "releaseBlockingReason": "Bounded diagnostic defect for imported threshold-one sets. No automatic digest-checked phrase is emitted by this diagnosis; phrase-only recovery still refuses digestless results and downstream warnings remain. MnemoCode does not create threshold-one sets.",
+      "locations": [
+        {
+          "path": "src/sskr/share-input.ts",
+          "line": 923,
+          "endLine": 952,
+          "snapshotSha256": "9856d24d322b8d1f64059e420f4604aa325f7ed390314ed1d0899dffd7a21113"
+        },
+        {
+          "path": "src/sskr/complete-shares.ts",
+          "line": 114,
+          "endLine": 150,
+          "snapshotSha256": "e296dbfefdc20fb368ab799888fe31024a3d586a51ab0133184fa8960503091c"
+        },
+        {
+          "path": "src/sskr/complete-shares.ts",
+          "line": 267,
+          "endLine": 287,
+          "snapshotSha256": "e296dbfefdc20fb368ab799888fe31024a3d586a51ab0133184fa8960503091c"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "executedByCoordinator": true,
+        "entry": "ShareInput.restoreComplete(nodeSharePlatform), actual compiled WASM",
+        "input": "Independently CRC-framed public imported 1-of-3 values A,A,B with distinct members, all six permutations; checked 2-of-3 damaged-share control.",
+        "checker": {
+          "path": "docs/audits/AUD-039-harnesses/digest-diagnosis.mjs",
+          "sha256": "a1cc2de1d3f13fd6d8761cedb94f1f545eac2c6354c6849e71dabc358f77a531"
+        }
+      },
+      "expected": "Without a digest-checked restored reference, preserve unchecked disagreement without identifying a particular wrong share.",
+      "observed": "All six actual permutations return trouble.kind=odd/code=share-does-not-fit at the minority B place (3,2,3,2,1,1), despite the equal A,A reference having digestChecked=false. Real checked 2-of-3 control correctly identifies damaged share 3. Probe exits 1; no stop or source drift.",
+      "impact": "Recovery advice can tell a person to leave out the correct minority copy after correlated corruption of the majority. No automatic digest-checked phrase is returned by the failing diagnosis, and later digestless recovery remains labelled/refused by the phrase-only API.",
+      "severityRationale": "Medium supported recovery-diagnosis error: majority agreement of unauthenticated imported shares can cause a person to discard a correct minority copy. This is stronger than a cosmetic label issue. Limited import scope, required user action and preserved digestless warnings justify no release block. No secret theft, automatic correct-share deletion or authenticated wrong recovery was shown.",
+      "evidence": [
+        {
+          "path": "docs/audits/AUD-039-evidence/digest-diagnosis.log",
+          "localOnly": true,
+          "sha256": "61818cab94502b29cf41ad009cc7a78d9a395ad6d0e89b3553291b995904977a"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/digest-diagnosis.command.json",
+          "localOnly": true,
+          "sha256": "51c94d3435c5ae31d5666f1372ebe43a8bc4c1a9e7de054a9f9e2c7d67911f5c"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/digest-diagnosis-checker.json",
+          "localOnly": true,
+          "sha256": "18221becb0cb53c82ca5d76c6e244f50b77c960a6b31348b844d977354471744"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/review-sskr.json",
+          "localOnly": true,
+          "sha256": "2580d59452ba10853f71c8b56cd3d9bdba0db0971172c3d80f590bc3a43e2239"
+        }
+      ],
+      "recommendedFix": "Only count a successful omitted-share subset as identifying an outlier when its restored reference is digestChecked. Preserve non-attributing disagreement otherwise.",
+      "requiredVerification": "Preserve all six digestless permutations without named odd-share attribution, equal digestless sets with explicit unchecked state, grouped threshold-one cases and checked 2-of-3 outlier behavior. Trace ShareRestore/CLI propagation and keep operational host failures distinct.",
+      "relatedFindings": [
+        "AUD-037-API004",
+        "AUD-008-FUN001"
+      ],
+      "core54Assessment": "Real imported shares, independent CRC and ordinary WASM; no trusted native/runtime method is mocked or required to fail."
+    },
+    {
+      "candidateId": "CORE-C01",
+      "id": "AUD-039-API001",
+      "idStatus": "allocated in AUD-039",
+      "category": "API",
+      "kind": "finding",
+      "title": "Direct MissingCodes.run accepts malformed external check answers as passing codes",
+      "severity": "low",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": false,
+      "releaseBlockingReason": "Bounded impact; no additional release block justified under current audit rules.",
+      "locations": [
+        {
+          "path": "src/core/missing-codes.ts",
+          "line": 255,
+          "endLine": 260,
+          "snapshotSha256": "36d5792d892103e83468876a055a0c6e95d6bcd436be4eb003c58a917f6675f9"
+        },
+        {
+          "path": "src/core/missing-codes.ts",
+          "line": 485,
+          "endLine": 493,
+          "snapshotSha256": "36d5792d892103e83468876a055a0c6e95d6bcd436be4eb003c58a917f6675f9"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "method": "Independent static trace and inspection of coordinator-retained evidence; public data only.",
+        "entryAndInput": "Public direct MissingCodes.run API, english/direct, abandon x11 plus about|abandon; externally supplied callback returns {matched:false} or the string false.",
+        "executedByCoordinator": true
+      },
+      "expected": "The external host callback must return a boolean; malformed answers are refused before they can establish a passing candidate.",
+      "observed": "Retained source-entry probe: false => count 1/passed 0/kept 0; true => 1/1/1; both {matched:false} and string false => 1/1/1. Probe exits 1 for two accepted malformed answers.",
+      "impact": "A malformed JavaScript host integration can receive a false pass. Shipped MissingCodesSearch callbacks produce booleans and wallet paths validate through askWallet; no supported CLI false recovery was shown.",
+      "severityRationale": "Low direct-host contract defect. CORE-54 trusts the program's own typed results, not data returned by an external host service. Validation belongs only at that external boundary; it cannot verify an intentionally dishonest boolean checker.",
+      "evidence": [
+        {
+          "path": "docs/audits/AUD-039-evidence/missing-check.log",
+          "localOnly": true,
+          "sha256": "a4456a2095a57432ba4523c4601b4d4835f1a8e7436f4e613784b3b3a94157fc"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/missing-check.command.json",
+          "localOnly": true,
+          "sha256": "b40413bd05ab10a25adc982e38cf55451a17b0f91cae40a4ac0668dbb8151e8b"
+        }
+      ],
+      "recommendedFix": "Refuse non-boolean awaited answers at the direct public boundary, retaining valid booleans, cancellation and ownership behavior.",
+      "requiredVerification": "Keep false/true controls, sync/async malformed answer refusals, result disposal and late-stop semantics through the actual public entry. Do not inject native faults.",
+      "relatedFindings": [
+        "AUD-014-API001"
+      ],
+      "core54Assessment": "Reachable external input/OS failure or ordinary successful-path ownership omission; no trusted intrinsic/runtime failure injected or required."
+    },
+    {
+      "candidateId": "CLI-C01",
+      "id": "AUD-039-API002",
+      "idStatus": "allocated in AUD-039",
+      "category": "API",
+      "kind": "finding",
+      "title": "Interactive filename retries bypass regular-file admission and can block cancellation",
+      "severity": "low",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": false,
+      "releaseBlockingReason": "Bounded impact; no additional release block justified under current audit rules.",
+      "locations": [
+        {
+          "path": "src/cli/backup-questions.ts",
+          "line": 261,
+          "snapshotSha256": "351229a65424443ba9b6f2027593558c39c8388d50024a6c777bb183ef0a0271"
+        },
+        {
+          "path": "src/cli/bounded-read.ts",
+          "line": 63,
+          "snapshotSha256": "356ad8d5d5e51151eb40af1b7bd70bfea10cad01b9025c2b4f9ea4d4d362f61c"
+        },
+        {
+          "path": "src/cli/share-repair.ts",
+          "line": 272,
+          "snapshotSha256": "ad4b3e7a9c1643dd4a625103e5cad580450f771e44ed838d0a9120925e7c8f10"
+        },
+        {
+          "path": "src/cli/qr-input.ts",
+          "line": 13,
+          "snapshotSha256": "2e28984885cfa62b1391250acdd00987c63b1e9428d1f50c0b5a013cbb8da3ae"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "method": "Independent static trace and inspection of coordinator-retained evidence; public data only.",
+        "entryAndInput": "POSIX FIFO with no writer entered at the Record file name retry after an unreadable initial decode file.",
+        "executedByCoordinator": true
+      },
+      "expected": "Interactive filename admission refuses a non-regular file promptly, preserving cancellation; explicit headless material streams remain a separate supported contract.",
+      "observed": "The real PTY control common-input route exits 130 after SIGINT. The retry-file route remains running for the two-second wait and is ended by the probe-owned group cleanup. Static QR retry/next-share routes use the same blocking reader default; those variants were not separately reproduced.",
+      "impact": "A person selecting a FIFO or link to one can stall the local interactive recovery session, including its JavaScript SIGINT cleanup. No remote denial of service, secret disclosure or ordinary regular-file failure was shown.",
+      "severityRationale": "Low bounded local availability/cancellation failure. This is an OS file-kind trigger, not an injected failure of openSync.",
+      "evidence": [
+        {
+          "path": "docs/audits/AUD-039-evidence/fifo-input.log",
+          "localOnly": true,
+          "sha256": "0d90147815b547c18dc515257531c27230e7c99c7432fcbe4fe24c4cb177ed85"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/fifo-input.command.json",
+          "localOnly": true,
+          "sha256": "68bc8bb716e260628cc1efc1cf7d01fe66eab5f73aa5269e2f6709a7302e4587"
+        }
+      ],
+      "recommendedFix": "Apply the existing regular/nonblocking descriptor policy at interactive text and QR filename boundaries without removing intentionally supported explicit headless streams.",
+      "requiredVerification": "Actual PTY: text retry FIFO, QR retry and next-share FIFO, regular-file success, directories/devices, links and Ctrl+C. Keep limit/limit+1 streaming regressions separate.",
+      "relatedFindings": [
+        "AUD-004-SEC001"
+      ],
+      "core54Assessment": "Reachable external input/OS failure or ordinary successful-path ownership omission; no trusted intrinsic/runtime failure injected or required."
+    },
+    {
+      "candidateId": "CLI-H01",
+      "id": "AUD-039-API003",
+      "idStatus": "allocated in AUD-039",
+      "category": "API",
+      "kind": "finding",
+      "title": "Failed redirected stdout export reports successful process completion",
+      "severity": "low",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": false,
+      "releaseBlockingReason": "Bounded impact; no additional release block justified under current audit rules.",
+      "locations": [
+        {
+          "path": "src/cli/terminal.ts",
+          "line": 75,
+          "endLine": 85,
+          "snapshotSha256": "e1be805d5775115c59a53bf131e4a136bceb71580e3c88b8f2fec08d20fabd85"
+        },
+        {
+          "path": "src/cli/encode-report.ts",
+          "line": 118,
+          "snapshotSha256": "d0ed6f322690b2392080ae75666f7883ee824333061e93f3f5e6dc1afe3f22a4"
+        },
+        {
+          "path": "src/mnemocode.ts",
+          "line": 29,
+          "snapshotSha256": "b0a62a1866fd19e16cb2d02bd6ee3717e3054ec1aa8d2b25720a3475daaa1260"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "method": "Independent static trace and inspection of coordinator-retained evidence; public data only.",
+        "entryAndInput": "Protected encode --mode direct --format unicode --mnemonic-file - with public zero-entropy phrase and stdout on Linux /dev/full.",
+        "executedByCoordinator": true
+      },
+      "expected": "A refused output write produces an observable nonzero failure rather than successful export completion.",
+      "observed": "The retained /dev/full CLI run returns status 0, signal null, and only expected fingerprints on stderr. Independent OS control gets ENOSPC; normal stdout control returns 0 and the expected 105-character public output. The defect harness itself exits 1.",
+      "impact": "A script can accept a missing/incomplete redirected backup as successfully emitted. No original phrase was deleted, file overwritten, wallet changed, or secret compromised in this example.",
+      "severityRationale": "Low export defect with bounded demonstrated impact. Supported I/O failure is real, but Medium data-loss language would overstate evidence without automatic destruction of the only source or a stronger mandatory persistence guarantee.",
+      "evidence": [
+        {
+          "path": "docs/audits/AUD-039-evidence/output-failure.log",
+          "localOnly": true,
+          "sha256": "8b5f9f5eb6e4e93a0de878fc2a088c5c6908992c81a0f023fbedffc04db1a87d"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/output-failure.command.json",
+          "localOnly": true,
+          "sha256": "3bb5fc24e5791542fd2db868116e29ef7feebdab076fb26481d778f872ac0436"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/output-failure-control.log",
+          "localOnly": true,
+          "sha256": "82f76314bf762783faaace94cecd0018838ca1d1410c08a3a9ebbb35d9167fbc"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/output-failure-control.command.json",
+          "localOnly": true,
+          "sha256": "4d3b03f9ecfa4b9a49d01acb08124dfee0f4ea06d2a42155764038592dc907b8"
+        }
+      ],
+      "recommendedFix": "Propagate real standard-output write failures through command completion, with meaningful stderr and terminal cleanup. Keep expected broken-pipe policy explicit if relevant.",
+      "requiredVerification": "Real OS failed output plus ordinary pipe/file output controls, process status and cleanup. Exercise affected result writers through the shared policy; do not mock intrinsic write methods.",
+      "relatedFindings": [],
+      "core54Assessment": "Reachable external input/OS failure or ordinary successful-path ownership omission; no trusted intrinsic/runtime failure injected or required."
+    },
+    {
+      "candidateId": "BLD-C02",
+      "id": "AUD-039-BLD002",
+      "idStatus": "allocated in AUD-039",
+      "category": "BLD",
+      "kind": "finding",
+      "title": "Advisory workflow omits superseded-run concurrency cancellation",
+      "severity": "low",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": false,
+      "releaseBlockingReason": "Bounded impact; no additional release block justified under current audit rules.",
+      "locations": [
+        {
+          "path": ".github/workflows/audit.yml",
+          "line": 1,
+          "snapshotSha256": "af76d47b14c697b43616049d3f4d6e55d7c189500b5b3ee23bd3d4091df2bf0f"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "method": "Independent static trace and inspection of coordinator-retained evidence; public data only.",
+        "entryAndInput": "Push/schedule/manual triggers in the new .github/workflows/audit.yml."
+      },
+      "expected": "CI-03 requires every non-publication workflow to define a concurrency group with cancel-in-progress: true.",
+      "observed": "The complete workflow has no concurrency declaration. It is an advisory job, not the release-publication exception.",
+      "impact": "Repeated triggers can leave superseded advisory jobs running and consuming CI resources. No security bypass, failed audit or actual bill was demonstrated.",
+      "severityRationale": "Low CI policy/resource defect; no release block. A runtime dispatch is unnecessary to establish the missing declaration.",
+      "evidence": [],
+      "recommendedFix": "Add a suitable workflow/ref concurrency group and cancellation under CI-03 in the separate remediation phase.",
+      "requiredVerification": "Statically verify the scope of the group and cancel-in-progress: true; run the existing applicable workflow gate when fixes are authorized. No paid dispatch is needed.",
+      "relatedFindings": [],
+      "core54Assessment": "Reachable external input/OS failure or ordinary successful-path ownership omission; no trusted intrinsic/runtime failure injected or required."
+    },
+    {
+      "candidateId": "SSKR-C02",
+      "id": "AUD-039-SEC001",
+      "idStatus": "allocated in AUD-039",
+      "category": "SEC",
+      "kind": "finding",
+      "title": "Mixed share conversion leaves ordinary mutable working copies unwiped",
+      "severity": "low",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": false,
+      "releaseBlockingReason": "Bounded impact; no additional release block justified under current audit rules.",
+      "locations": [
+        {
+          "path": "src/sskr/mixed-layout.ts",
+          "line": 147,
+          "endLine": 152,
+          "snapshotSha256": "d5c2f4f72fec051c5a116db1fdfdc8771e40564f5eee86a9953dc29cea728201"
+        },
+        {
+          "path": "src/sskr/mixed-layout.ts",
+          "line": 196,
+          "endLine": 200,
+          "snapshotSha256": "d5c2f4f72fec051c5a116db1fdfdc8771e40564f5eee86a9953dc29cea728201"
+        },
+        {
+          "path": "src/sskr/mixed-layout.ts",
+          "line": 209,
+          "endLine": 227,
+          "snapshotSha256": "d5c2f4f72fec051c5a116db1fdfdc8771e40564f5eee86a9953dc29cea728201"
+        },
+        {
+          "path": "src/sskr/transport.ts",
+          "line": 365,
+          "endLine": 369,
+          "snapshotSha256": "b7330082a32ced46ad9b73decd3232ff0f8f6213a326137911632f5e4da17b4e"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "method": "Independent static trace and inspection of coordinator-retained evidence; public data only.",
+        "entryAndInput": "Normal mixed-form share reads/writes, e.g. colorsToShare on the retained public SSKR vector."
+      },
+      "expected": "Program-owned mutable working copies of a share or a reversible representation receive one best-effort wipe after use under CORE-24/TS-07.",
+      "observed": "mixShare creates an unmixed full body; ownUnitCount creates packed bytes; mixedTransport creates an unmixed body; mixedToShare creates sliced units and packed bytes. They are not transferred as live results and have no local wipe. Wiping only the final transport does not wipe these separate allocations.",
+      "impact": "Avoidable share-bearing mutable copies are abandoned for GC. This establishes missing source-level cleanup, not a measured surviving heap pattern, cross-process disclosure or guaranteed JavaScript erasure failure.",
+      "severityRationale": "Low normal-path cleanup/conformance defect, statically established without failed fill/set operations. Existing owner disposal and immutable-string limitations do not excuse these owned local copies.",
+      "evidence": [
+        {
+          "path": "docs/audits/AUD-039-evidence/review-sskr.json",
+          "localOnly": true,
+          "sha256": "2580d59452ba10853f71c8b56cd3d9bdba0db0971172c3d80f590bc3a43e2239"
+        }
+      ],
+      "recommendedFix": "Give temporary arrays explicit ownership and one finally cleanup attempt, or pack only the header when that is all the caller needs. Preserve borrowed arrays and live returned results.",
+      "requiredVerification": "Review normal successful/refused public mixed reads/writes, literal six-form results and caller-input preservation. Passive temporary ownership evidence is sufficient; no synthetic trusted-native faults or broad heap claims.",
+      "relatedFindings": [
+        "AUD-012-SEC004"
+      ],
+      "core54Assessment": "Reachable external input/OS failure or ordinary successful-path ownership omission; no trusted intrinsic/runtime failure injected or required."
+    },
+    {
+      "candidateId": "SSKR-H03",
+      "id": "AUD-039-SEC002",
+      "idStatus": "allocated in AUD-039",
+      "category": "SEC",
+      "kind": "finding",
+      "title": "Native split drops its copied interpolation result without a zeroizing owner",
+      "severity": "low",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": false,
+      "releaseBlockingReason": "Bounded impact; no additional release block justified under current audit rules.",
+      "locations": [
+        {
+          "path": "sskr-wasm/rust/vendor/bc-shamir-0.13.0/src/shamir.rs",
+          "line": 118,
+          "endLine": 130,
+          "snapshotSha256": "a3c0327301038028c1523466ec432ca9493c0fdde1cacde9625893e062681de6"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "method": "Independent static trace and inspection of coordinator-retained evidence; public data only.",
+        "entryAndInput": "Normal native Shamir split with threshold at least two and a generated interpolated share."
+      },
+      "expected": "The temporary share-bearing Vec is wiped once after copying or held by a zeroizing owner under CORE-24/RUST-13.",
+      "observed": "interpolate returns Result<Vec<u8>>; the loop binds v, copies v into result_item, then drops ordinary Vec v without memzero or a zeroizing owner. Later memzero calls cover digest/x/y, not v.",
+      "impact": "Source-level best-effort cleanup omission for a generated share copy. Whether optimized canonical WASM allocates or retains it after return remains unmeasured; no post-call memory leak is asserted.",
+      "severityRationale": "Low source-conformance finding, rather than the hypothesis's unproved residual-memory allegation. The same narrow evidentiary standard accepts C02: ordinary successful-path temporary ownership is enough to show that no cleanup attempt was requested.",
+      "evidence": [
+        {
+          "path": "docs/audits/AUD-039-evidence/review-sskr.json",
+          "localOnly": true,
+          "sha256": "2580d59452ba10853f71c8b56cd3d9bdba0db0971172c3d80f590bc3a43e2239"
+        }
+      ],
+      "recommendedFix": "Zeroize/own the interpolation temporary or avoid the redundant copy in separately authorized vendor remediation, retaining canonical build procedure.",
+      "requiredVerification": "Inspect success ownership and share literals; targeted native regressions and canonical regeneration only when remediation is authorized. Binary/assembly evidence is required only for stronger retained-memory claims.",
+      "relatedFindings": [
+        "AUD-035-SEC001"
+      ],
+      "core54Assessment": "Reachable external input/OS failure or ordinary successful-path ownership omission; no trusted intrinsic/runtime failure injected or required."
+    },
+    {
+      "candidateId": "AUD-039-CARDS001",
+      "id": "AUD-039-UI001",
+      "idStatus": "allocated in AUD-039",
+      "category": "UI",
+      "kind": "finding",
+      "title": "Heir-sheet renderer lets an unbreakable host subtitle extend outside the page",
+      "severity": "low",
+      "status": "open",
+      "decision": "confirmed by coordinator and independent skeptic",
+      "releaseBlocking": false,
+      "releaseBlockingReason": "Bounded impact; no additional release block justified under current audit rules.",
+      "locations": [
+        {
+          "path": "src/export/heir-sheet.ts",
+          "line": 159,
+          "endLine": 173,
+          "snapshotSha256": "052f23a7c14185dc6cdde87b27d324ce673f7c5480069a5255e788b516610642"
+        },
+        {
+          "path": "src/export/heir-sheet.ts",
+          "line": 203,
+          "endLine": 213,
+          "snapshotSha256": "052f23a7c14185dc6cdde87b27d324ce673f7c5480069a5255e788b516610642"
+        },
+        {
+          "path": "src/export/heir-sheet-text.ts",
+          "line": 107,
+          "snapshotSha256": "a854fe790b70539f6238146da0bc5d93f9f26641bca9aea4cf3462c584232485"
+        }
+      ],
+      "reproduction": {
+        "executedByThisReviewer": false,
+        "method": "Independent static trace and inspection of coordinator-retained evidence; public data only.",
+        "entryAndInput": "Supported HeirRoute with subtitle W repeated 100 times; ordinary encoded/direct 12-word facts; real node renderer, A5 and A6.",
+        "executedByCoordinator": true
+      },
+      "expected": "A successful printable guide keeps host text on paper or explicitly refuses unsupported width.",
+      "observed": "Actual two-page PDFs retain one 100-identical-glyph Tj line. Actual font advance and placement give A5 right edge 769.923605 versus page width 419.527559 pt; A6 607.434947 versus 297.637795 pt. Both return success; clippedDocuments=2 and the harness exits 1.",
+      "impact": "A supported host can receive a recovery instruction sheet with text beyond the page. Standard CLI route was not affected by this fixture; no backup code corruption or confidentiality failure is established.",
+      "severityRationale": "Low host-provided layout defect; actual PDF operators/geometry establish overflow without claiming a pixel or physical-print acceptance run.",
+      "evidence": [
+        {
+          "path": "docs/audits/AUD-039-evidence/heir-width.log",
+          "localOnly": true,
+          "sha256": "5e26c3a9db27b237db3e7348733b8d1dd7284ebd38333f34ae0a25496d7d374b"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/heir-width.command.json",
+          "localOnly": true,
+          "sha256": "0cf7173cfbf7d6c888afcfebebbb8ca8966f703e9c820a325f152d1412c51c7a"
+        },
+        {
+          "path": "docs/audits/AUD-039-evidence/heir-width-checker.json",
+          "localOnly": true,
+          "sha256": "41aade259482ea0802b21ace61f8b9f874b49a88bb4ee3eec9410f07ce3370d0"
+        }
+      ],
+      "recommendedFix": "Break/scale/refuse over-wide single tokens before returning a successful sheet, preserving ordinary routes and vertical limits.",
+      "requiredVerification": "A5/A6 actual generated PDF bounds for long subtitle/step/address, ordinary routes, vertical fit and supported font coverage. Preserve caller-owned output and input.",
+      "relatedFindings": [],
+      "core54Assessment": "Reachable external input/OS failure or ordinary successful-path ownership omission; no trusted intrinsic/runtime failure injected or required."
+    }
+  ],
+  "observations": [],
+  "remediation": [
+    {
+      "id": "AUD-039-BLD001",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    },
+    {
+      "id": "AUD-039-FUN001",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    },
+    {
+      "id": "AUD-039-API001",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    },
+    {
+      "id": "AUD-039-API002",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    },
+    {
+      "id": "AUD-039-API003",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    },
+    {
+      "id": "AUD-039-BLD002",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    },
+    {
+      "id": "AUD-039-SEC001",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    },
+    {
+      "id": "AUD-039-SEC002",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    },
+    {
+      "id": "AUD-039-UI001",
+      "status": "open",
+      "fixCommit": null,
+      "verificationCommit": null,
+      "evidence": "Baseline only. Implementation changes were explicitly reserved for Claude by the owner."
+    }
+  ],
+  "limitations": [
+    "Final baseline handover: the owner is passing this report to Claude. Findings and source identity are frozen; future fixes and verification belong in a separate follow-up/addendum. No deferred command is left running and no further tests are scheduled by this audit.",
+    "The one-worker full Vitest attempt reached the 30-minute audit supervisor limit, received SIGTERM and produced no completed test totals. The proposed two-worker retry did not start. The shared heavy slot was occupied by another project; waiting-only TS jobs were withdrawn for a short neighboring verification window and final handover. These are incomplete/unexecuted checks, not passes or proven product test failures.",
+    "Not executed: fresh frozen dependency installation, complete self-test, new full PTY sweep, all-design rasterized PDF/QR check, canonical Docker reproduction, fresh Linux executable build/empty-folder verification/PTY and complete two-worker suite. Targeted CLI/native/PDF probes, passed gates/build/reference/advisory scans and retained three-OS fast CI are separate evidence.",
+    "Audit only: implementation, tests, ordinary documentation, dependencies, generated/native files and workflows were not changed; no commit, push, tag, signature, release, workflow dispatch or browser-host fix was made.",
+    "Initial 25187ef baseline moved to 044a9edf during the review through a maintainer README change and the new audit workflow. Runtime/test/dependency/native projection stayed equal. Early transient fingerprints omit the new workflow and must not be presented as the entire current tree.",
+    "The supervisor is sampled, not a kernel cap: 1,536 MiB combined observed child RSS, 384 MiB Node heap, 3 GiB host reserve; only one heavy job holds the shared lock. It records rather than rejects source drift; result reuse separately requires matching source projection, empty changedFiles, accepted exit/stop state and checker/artifact hashes. Children orphaned between samples and Docker daemon containers are not proven fully covered by descendant accounting.",
+    "Fresh Linux command evidence and current CI evidence are separate. Current 044a9edf CI passes fast/build/PTY jobs on Linux, Windows and macOS; complete portable source tests and release verification are skipped there. No fresh Windows/macOS full suite or final 0.2.0 executable matrix was dispatched.",
+    "No browser application resides in this checkout. The stopped wallet-tools session did not run acceptance. Read-only comparison found 182/217 portable imported files equal and 35 changed; this is not a browser pass or proof of a browser defect. Current host synchronization and browser acceptance remain pending with that maintainer.",
+    "No 0.2.0 source version, release notes, final signed artifacts, attestations or publication exists at this audited snapshot. Any local executable built here retains the actual 0.1.0 source version and is an audit candidate only.",
+    "All confirmed findings retain their full severity. Low issues do not block release under the audit rules; the imported threshold-one diagnostic issue is medium but nonblocking for the documented limited reason. The wrong release repository is an actual blocker.",
+    "A source-level missing wipe is not proof of a surviving secret in optimized WASM, and JavaScript zeroization cannot guarantee erasure of immutable strings, runtime copies or all physical memory. No stronger memory disclosure claim is made.",
+    "Selected coordinator/tooling coverage, binary/artwork depth and historical archive limits are explicit. Complete assignment and passing tests cannot establish absence of all errors, global code optimality or unconditional compliance with every CORE rule.",
+    "Final report-validation gates run after the sole tracked edit, the AUD-039 row in docs/audits/README.md. Their source projection is b7a695f72ba3ccd5dd59449fe31cc93feda4aaa7171de526bb7c91031222f17d. All original runtime/test/dependency/native/asset files and all 613 dist files remain unchanged; baseline fingerprint remains the audited 044a9edf snapshot. New audit materials have their own final hashes."
+  ],
+  "assessment": "FAIL for release acceptance: AUD-039-BLD001 directs the supported TypeScript signing/publication procedure to the Rust repository. Nine confirmed findings (2 medium, 7 low), one release blocker; none high or critical confirmed. This baseline report is complete and frozen for remediation handover, not a completed release acceptance. The full suite was stopped by the audit time budget and remaining heavy release checks were not executed. Source remains version 0.1.0; final 0.2.0 metadata and acceptance are pending.",
+  "procedureHashes": {
+    "docs/FULL_AUDIT_GUIDE.md": "e1b2fb641e4a25ebf292548fc1e2ef0c25dbd01faa5c2b580c6ba75df2afcab7",
+    "docs/audits/AUDIT_STANDARD.md": "0c80621acaf5d210f85af76de28a994e545f89f3f660a129026ac0931bb38593",
+    "docs/audits/AUDIT_TEMPLATE.md": "8122777f8093b04119633459b9b2cc50bc6ca9258bfc6184b52136d3b8172210",
+    "docs/audit-report.schema.json": "989bf3de974d581579c1d1c1e143d5ab9fa232dc70cc8c6f84ad00531ae698fb"
+  },
+  "toolsAndSkills": [
+    "Measured environment: Linux x64; Node.js 26.12.1, pnpm 12.15.0, TypeScript 7.0.2, Vitest 5.0.5, oxlint 1.89.0, Python 3.14.4, Rust 1.99.1 and Docker 29.9.2. The original environment log and command receipts are local-only.",
+    "Applied wallet-full-audit and wallet-release-verification from the shared skill catalog. Core scoped reviewer also used audit-context-building, wallet-derivation-validation and wallet-security-review. Exact model identifiers and reasoning settings were not retained.",
+    "New audit-only tools: capture.mjs/run.mjs retain source identities, UTC command receipts and sampled memory; inventory.mjs builds file/public-entry/declaration inventories; missing-check.mjs, output-failure.mjs, fifo-input.mjs, heir-width.mjs and digest-diagnosis.mjs reproduce real malformed-callback, OS I/O, PDF and imported-share cases; unicode-bridge.mjs challenges a native-memory hypothesis. make-report.mjs assembles retained evidence and anonymizes public paths.",
+    "Existing repository tools actually used: pnpm format:check/check/build, type-aware oxlint, strict TypeScript, duplicate/dead-export/code-rule/privacy/package gates, Cargo clippy/fmt/tests/doctests, Vitest, pnpm audit, cargo audit, npm pack dry run, gh read-only API and signing --dry-run. Additional release commands and their actual outcomes are in the receipts; a listed available tool is not claimed as executed.",
+    "Five distinct scoped read-only reviewers (four subsystem reviewers plus a separate skeptic/completeness reviewer), at most two concurrent; coordinator owns commands and final decisions. Reviewers did not implement fixes.",
+    "Supply-chain-risk-auditor skill was read for applicability but its collection workflow was not run: required uv was unavailable and its npm parser did not cover the pnpm lockfile. No publisher-concentration, abandoned-upstream census or collector result is claimed. Actual npm/RustSec advisory queries are separate measured results.",
+    "No Semgrep, CodeQL, mutation/fuzzing campaign, independent cryptographic certification, paid workflow dispatch or new tool/dependency installation was performed. Native source review is distinct from machine-code/constant-time proof.",
+    "For final handover, no heavyweight verification was dispatched after the shared-slot wait. release-checks.mjs is a retained plan, not an executed result. Only explicit .command.json receipts are counted as execution."
+  ],
+  "commands": [
+    {
+      "label": "build",
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "startedAtUtc": "2026-11-02T13:05:49.422Z",
+      "endedAtUtc": "2026-11-02T13:05:51.495Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "b4a0bcd3a19166a72281ffad6a15215a99d6fae576db7490a4c4364c66f08494",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 368193536,
+      "minimumAvailableBytes": 8090800128,
+      "interpretation": "Fresh TypeScript dist build passed at current source; no source drift."
+    },
+    {
+      "label": "cargo-advisories",
+      "command": [
+        "cargo",
+        "audit",
+        "--file",
+        "sskr-wasm/rust/Cargo.lock",
+        "--json"
+      ],
+      "startedAtUtc": "2026-11-02T12:56:26.421Z",
+      "endedAtUtc": "2026-11-02T12:56:31.114Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "4f78bfe610b2c071dadd128199cd8bffdbaf9b2678941eb49f4d64b14c72bbaa",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 26628096,
+      "minimumAvailableBytes": 8964493312,
+      "interpretation": "137 dependencies; zero vulnerabilities; paste 1.0.15 unmaintained proc-macro warning."
+    },
+    {
+      "label": "dependency-advisories",
+      "command": [
+        "pnpm",
+        "audit",
+        "--audit-level",
+        "high",
+        "--json"
+      ],
+      "startedAtUtc": "2026-11-02T12:49:40.310Z",
+      "endedAtUtc": "2026-11-02T12:49:41.251Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "sourceAfter": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "changedFiles": [],
+      "logSha256": "d922b70278cca6f9e43e957991311e89070e7af4cea0220d021572f8674f7697",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 90669056,
+      "minimumAvailableBytes": 8937598976,
+      "interpretation": "217 npm versions audited, zero known vulnerabilities at all levels in this advisory snapshot."
+    },
+    {
+      "label": "digest-diagnosis",
+      "command": [
+        "node",
+        "docs/audits/AUD-039-harnesses/digest-diagnosis.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:23:54.206Z",
+      "endedAtUtc": "2026-11-02T13:23:54.701Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "61818cab94502b29cf41ad009cc7a78d9a395ad6d0e89b3553291b995904977a",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 76849152,
+      "minimumAvailableBytes": 7806312448,
+      "interpretation": "Expected red: six digestless permutations misattribute a minority share; digest-checked control passes."
+    },
+    {
+      "label": "fifo-input",
+      "command": [
+        "node",
+        "docs/audits/AUD-039-harnesses/fifo-input.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:07:32.411Z",
+      "endedAtUtc": "2026-11-02T13:07:39.648Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "0d90147815b547c18dc515257531c27230e7c99c7432fcbe4fe24c4cb177ed85",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 443310080,
+      "minimumAvailableBytes": 8167690240,
+      "interpretation": "Expected red: real no-writer FIFO blocks retry-file route; common-input SIGINT control exits 130."
+    },
+    {
+      "label": "final-markdown",
+      "command": [
+        "node",
+        "scripts/verify-markdown.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T14:09:26.444Z",
+      "endedAtUtc": "2026-11-02T14:09:27.419Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "b7a695f72ba3ccd5dd59449fe31cc93feda4aaa7171de526bb7c91031222f17d",
+      "sourceAfter": "b7a695f72ba3ccd5dd59449fe31cc93feda4aaa7171de526bb7c91031222f17d",
+      "changedFiles": [],
+      "logSha256": "c7739b99fb60ec4f2fee1d88840693c7a6ee45b14a94b35a14ae0cbb7903ddb9",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 53977088,
+      "minimumAvailableBytes": 7145369600,
+      "interpretation": "Final audit report/harness/index Markdown gate passed."
+    },
+    {
+      "label": "final-privacy",
+      "command": [
+        "node",
+        "scripts/verify-audit-privacy.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T14:09:28.103Z",
+      "endedAtUtc": "2026-11-02T14:09:31.231Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "b7a695f72ba3ccd5dd59449fe31cc93feda4aaa7171de526bb7c91031222f17d",
+      "sourceAfter": "b7a695f72ba3ccd5dd59449fe31cc93feda4aaa7171de526bb7c91031222f17d",
+      "changedFiles": [],
+      "logSha256": "050d8c26254254c143e8644e931b71187e04629e0aa2d13cf60d4de5f64a2e27",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 134791168,
+      "minimumAvailableBytes": 7082508288,
+      "interpretation": "Final audit report/harness/index privacy gate passed; only the tracked audit index differs from the product baseline."
+    },
+    {
+      "label": "format-current",
+      "command": [
+        "pnpm",
+        "format:check"
+      ],
+      "startedAtUtc": "2026-11-02T13:19:07.992Z",
+      "endedAtUtc": "2026-11-02T13:19:24.707Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "1d66faad74f5e8709353f7288592866bd3a9095da1174a916e7aa632949971e2",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 437264384,
+      "minimumAvailableBytes": 6980624384,
+      "interpretation": "Fresh formatting check passed at current 044a9edf snapshot."
+    },
+    {
+      "label": "format-light",
+      "command": [
+        "pnpm",
+        "format:check"
+      ],
+      "startedAtUtc": "2026-11-02T12:48:35.245Z",
+      "endedAtUtc": "2026-11-02T12:48:51.622Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "sourceAfter": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "changedFiles": [],
+      "logSha256": "1d66faad74f5e8709353f7288592866bd3a9095da1174a916e7aa632949971e2",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 425701376,
+      "minimumAvailableBytes": 8048259072,
+      "interpretation": "Passed on unchanged product projection; early file-list transition is explicitly retained."
+    },
+    {
+      "label": "gates",
+      "command": [
+        "pnpm",
+        "check"
+      ],
+      "startedAtUtc": "2026-11-02T13:05:09.101Z",
+      "endedAtUtc": "2026-11-02T13:05:31.210Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "645bfe50ae510a9218f217fac8ac3f7bbfbef502d0e72e4db09c73f82f2390f1",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 1078767616,
+      "minimumAvailableBytes": 7783227392,
+      "interpretation": "pnpm check passed including strict types, type-aware lint, duplicate/dead-export/code-rule/privacy/package gates, Rust tests/doctests."
+    },
+    {
+      "label": "guard-control",
+      "command": [
+        "node",
+        "-e",
+        "console.log(\"AUD-039 supervisor control\")"
+      ],
+      "startedAtUtc": "2026-11-02T12:47:08.696Z",
+      "endedAtUtc": "2026-11-02T12:47:08.985Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "cb5b5ea7bb3bb0108bd6d0856dc159cd6bb5b9f13fac4af769decc9f5a7709fe",
+      "sourceAfter": "cb5b5ea7bb3bb0108bd6d0856dc159cd6bb5b9f13fac4af769decc9f5a7709fe",
+      "changedFiles": [],
+      "logSha256": "f33b60ad5d5ae117885b5f73fbef7d992bd2858c3e32adf634a1ee31a47b9d4e",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 1200128,
+      "minimumAvailableBytes": 9146421248,
+      "interpretation": "Supervisor positive control passed."
+    },
+    {
+      "label": "guard-exit",
+      "command": [
+        "node",
+        "-e",
+        "process.exit(7)"
+      ],
+      "startedAtUtc": "2026-11-02T13:14:33.041Z",
+      "endedAtUtc": "2026-11-02T13:14:33.336Z",
+      "exitCode": 7,
+      "wrapperExitCode": 7,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 913408,
+      "minimumAvailableBytes": 7673442304,
+      "interpretation": "Expected negative control: real child exit 7 preserved, not a product defect."
+    },
+    {
+      "label": "guard-stop",
+      "command": [
+        "node",
+        "-e",
+        "process.on(\"SIGTERM\",()=>process.exit(0)); setTimeout(()=>{},10000)"
+      ],
+      "startedAtUtc": "2026-11-02T13:14:31.884Z",
+      "endedAtUtc": "2026-11-02T13:14:33.181Z",
+      "exitCode": 0,
+      "wrapperExitCode": 125,
+      "stopReason": "timeout",
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 43249664,
+      "minimumAvailableBytes": 7663890432,
+      "interpretation": "Expected timeout control: child handler exited 0 but supervisor correctly returned 125."
+    },
+    {
+      "label": "heir-width",
+      "command": [
+        "node",
+        "docs/audits/AUD-039-harnesses/heir-width.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:16:40.808Z",
+      "endedAtUtc": "2026-11-02T13:16:41.499Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "5e26c3a9db27b237db3e7348733b8d1dd7284ebd38333f34ae0a25496d7d374b",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 131325952,
+      "minimumAvailableBytes": 7478239232,
+      "interpretation": "Expected red: actual font/PDF geometry proves A5 and A6 subtitle overflow."
+    },
+    {
+      "label": "inventory-current-2",
+      "command": [
+        "node",
+        "docs/audits/AUD-039-harnesses/inventory.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T12:54:53.359Z",
+      "endedAtUtc": "2026-11-02T12:54:54.054Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "9b4b054587e33d86e22b5b42db75c606b447231aa9d38531fb03a6777ed6459e",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 135159808,
+      "minimumAvailableBytes": 8922320896,
+      "interpretation": "Current 1,319-file identity, 84 package entries and 2,770 syntactic declarations passed."
+    },
+    {
+      "label": "inventory-current",
+      "command": [
+        "node",
+        "docs/audits/AUD-039-harnesses/inventory.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T12:54:31.779Z",
+      "endedAtUtc": "2026-11-02T12:54:32.471Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "sourceAfter": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "changedFiles": [],
+      "logSha256": "a0967ee2ccf5f1f2dc059a4af84db35f2e9284eb92893a84c10741cf32a51a2d",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 133722112,
+      "minimumAvailableBytes": 8923197440,
+      "interpretation": "Expected identity red before current snapshot reconciliation; preserved, not a product defect."
+    },
+    {
+      "label": "inventory",
+      "command": [
+        "node",
+        "docs/audits/AUD-039-harnesses/inventory.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T12:53:58.794Z",
+      "endedAtUtc": "2026-11-02T12:53:59.489Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "sourceAfter": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "changedFiles": [],
+      "logSha256": "a0967ee2ccf5f1f2dc059a4af84db35f2e9284eb92893a84c10741cf32a51a2d",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 135516160,
+      "minimumAvailableBytes": 8808415232,
+      "interpretation": "Expected source-identity red: concurrent maintainer README change against initial snapshot."
+    },
+    {
+      "label": "missing-check",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "docs/audits/AUD-039-harnesses/missing-check.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:00:50.179Z",
+      "endedAtUtc": "2026-11-02T13:00:50.878Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "a4456a2095a57432ba4523c4601b4d4835f1a8e7436f4e613784b3b3a94157fc",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 91017216,
+      "minimumAvailableBytes": 8826507264,
+      "interpretation": "Expected red: two malformed external check answers accepted; boolean controls correct."
+    },
+    {
+      "label": "output-failure-control",
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import { openSync, writeSync, closeSync } from \"node:fs\"; import { spawnSync } from \"node:child_process\"; import assert from \"node:assert/strict\"; const f=openSync(\"/dev/full\",\"w\"); try { assert.throws(()=>writeSync(f,\"public control\"),{code:\"ENOSPC\"}); } finally {closeSync(f)} const r=spawnSync(process.execPath,[\"dist/mnemocode.js\",\"encode\",\"--mode\",\"direct\",\"--format\",\"unicode\",\"--mnemonic-file\",\"-\"],{input:\"abandon \".repeat(11)+\"about\\n\",encoding:\"utf8\",timeout:15000}); assert.equal(r.status,0);assert.ok(r.stdout.includes(\"7684\".repeat(11)+\"5728\"));console.log(JSON.stringify({devFull:\"ENOSPC\",normalStatus:r.status,normalBytes:r.stdout.length,normalPayloadMatches:true}));"
+      ],
+      "startedAtUtc": "2026-11-02T13:11:11.315Z",
+      "endedAtUtc": "2026-11-02T13:11:13.726Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "82f76314bf762783faaace94cecd0018838ca1d1410c08a3a9ebbb35d9167fbc",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 427384832,
+      "minimumAvailableBytes": 7770251264,
+      "interpretation": "Actual /dev/full synchronous write refuses ENOSPC; normal CLI pipe returns expected public codes."
+    },
+    {
+      "label": "output-failure",
+      "command": [
+        "node",
+        "docs/audits/AUD-039-harnesses/output-failure.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:07:24.197Z",
+      "endedAtUtc": "2026-11-02T13:07:26.635Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "8b5f9f5eb6e4e93a0de878fc2a088c5c6908992c81a0f023fbedffc04db1a87d",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 429928448,
+      "minimumAvailableBytes": 8201105408,
+      "interpretation": "Expected red: real /dev/full stdout export child returned success."
+    },
+    {
+      "label": "package-fresh",
+      "command": [
+        "npm",
+        "pack",
+        "--dry-run",
+        "--json",
+        "--ignore-scripts"
+      ],
+      "startedAtUtc": "2026-11-02T13:50:17.475Z",
+      "endedAtUtc": "2026-11-02T13:50:31.123Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "9a2d68d127286a7172a9645e7b9912cd95bd53da9c92710260ce7e978df08066",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 167096320,
+      "minimumAvailableBytes": 7247007744,
+      "interpretation": "Fresh post-build/package file-list review: 1,230 entries, 613 dist files, 539 audit files; no ignored evidence or user export/output files. File inventory only, not final tarball digest after report updates."
+    },
+    {
+      "label": "package-list-host",
+      "command": [
+        "npm",
+        "pack",
+        "--dry-run",
+        "--json",
+        "--ignore-scripts"
+      ],
+      "startedAtUtc": "2026-11-02T12:51:27.998Z",
+      "endedAtUtc": "2026-11-02T12:51:31.564Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "sourceAfter": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "changedFiles": [],
+      "logSha256": "b79bace1f7b2b275c97aeb068b9c632555d56a547caa872df879546eef0bc5e1",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 205369344,
+      "minimumAvailableBytes": 7816732672,
+      "interpretation": "Same dry run passed with normal permitted cache access; initial pre-build package inventory only."
+    },
+    {
+      "label": "package-list",
+      "command": [
+        "npm",
+        "pack",
+        "--dry-run",
+        "--json",
+        "--ignore-scripts"
+      ],
+      "startedAtUtc": "2026-11-02T12:49:04.677Z",
+      "endedAtUtc": "2026-11-02T12:49:06.373Z",
+      "exitCode": 226,
+      "wrapperExitCode": 226,
+      "stopReason": null,
+      "sourceBefore": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "sourceAfter": "098e92d14c33ecb2f04360cc8010e5d375aefcccb58ed2d6c6e42f4a00f9daca",
+      "changedFiles": [],
+      "logSha256": "c9c4b230222b992ba9c1e07004156d234a100bfe704d26e4fbe67e4b3266cc49",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 131211264,
+      "minimumAvailableBytes": 8518074368,
+      "interpretation": "Infrastructure failure: sandbox read-only existing npm cache; not a package defect."
+    },
+    {
+      "label": "report-markdown-host",
+      "command": [
+        "node",
+        "scripts/verify-markdown.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:42:27.755Z",
+      "endedAtUtc": "2026-11-02T13:42:28.096Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "c7739b99fb60ec4f2fee1d88840693c7a6ee45b14a94b35a14ae0cbb7903ddb9",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 23617536,
+      "minimumAvailableBytes": 8202555392,
+      "interpretation": "Same Markdown gate passed with normal permitted git process access."
+    },
+    {
+      "label": "report-markdown",
+      "command": [
+        "node",
+        "scripts/verify-markdown.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:42:09.055Z",
+      "endedAtUtc": "2026-11-02T13:42:09.363Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "ee8513b88173195cbdabd9c2229c33d55c08cac1c84feed1df763dfb43e49249",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 1183744,
+      "minimumAvailableBytes": 8289689600,
+      "interpretation": "Infrastructure failure: sandbox denied child git (spawnSync EPERM); no Markdown-content violation established."
+    },
+    {
+      "label": "report-package",
+      "command": [
+        "node",
+        "scripts/verify-audit-package.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:51:01.127Z",
+      "endedAtUtc": "2026-11-02T13:51:13.368Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "fb12f3c3ac43b0558712c5af4bf9de4d77f64f549c109196fa792e8f17e0a2eb",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 264523776,
+      "minimumAvailableBytes": 7202287616,
+      "interpretation": "All currently published audit files are included in the dry-run npm package."
+    },
+    {
+      "label": "report-privacy-host",
+      "command": [
+        "node",
+        "scripts/verify-audit-privacy.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:42:26.071Z",
+      "endedAtUtc": "2026-11-02T13:42:26.817Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "050d8c26254254c143e8644e931b71187e04629e0aa2d13cf60d4de5f64a2e27",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 127295488,
+      "minimumAvailableBytes": 8203386880,
+      "interpretation": "Same privacy gate passed with normal permitted git process access."
+    },
+    {
+      "label": "report-privacy",
+      "command": [
+        "node",
+        "scripts/verify-audit-privacy.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:42:08.476Z",
+      "endedAtUtc": "2026-11-02T13:42:08.766Z",
+      "exitCode": 1,
+      "wrapperExitCode": 1,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "138544f3f53cce446878c17709046c8ca8b74df6b972c684760681cc64dc3f6f",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 3166208,
+      "minimumAvailableBytes": 8309002240,
+      "interpretation": "Infrastructure failure: sandbox denied child git (spawnSync EPERM); no report-content violation established."
+    },
+    {
+      "label": "signer-dry-run",
+      "command": [
+        "node",
+        "scripts/sign-release.mjs",
+        "v0.2.0",
+        "--publish",
+        "--dry-run"
+      ],
+      "startedAtUtc": "2026-11-02T12:47:16.525Z",
+      "endedAtUtc": "2026-11-02T12:47:16.820Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "cb5b5ea7bb3bb0108bd6d0856dc159cd6bb5b9f13fac4af769decc9f5a7709fe",
+      "sourceAfter": "cb5b5ea7bb3bb0108bd6d0856dc159cd6bb5b9f13fac4af769decc9f5a7709fe",
+      "changedFiles": [],
+      "logSha256": "26e0985bb30f912b7230e3932f4715c3747fc3ac5d22f0f36c123bd85150e5a3",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 1056768,
+      "minimumAvailableBytes": 9071812608,
+      "interpretation": "Wrong-repository commands reproduced safely; dry-run 0 means plan printed, not correct routing or actual signing."
+    },
+    {
+      "label": "sskr-reference",
+      "command": [
+        "python3",
+        "scripts/verify-sskr-known-answers.py"
+      ],
+      "startedAtUtc": "2026-11-02T13:38:14.775Z",
+      "endedAtUtc": "2026-11-02T13:38:15.064Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "5735ee7eb756a60aed4b573aa88b44d0e009a26f3a4101d87048b4f1845d664c",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 1753088,
+      "minimumAvailableBytes": 7930208256,
+      "interpretation": "Independent Python reference passed official BCR-2020-011 every valid quorum and five deterministic BIP39 entropy widths from every share pair."
+    },
+    {
+      "label": "suite",
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "--maxWorkers=1"
+      ],
+      "startedAtUtc": "2026-11-02T13:06:14.789Z",
+      "endedAtUtc": "2026-11-02T13:36:15.335Z",
+      "exitCode": null,
+      "wrapperExitCode": 125,
+      "stopReason": "timeout",
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "9ed777833a03ff1c0dcb7c81cd09be8f1fd8e50882cd00a981d610d9538c1bb2",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 1049464832,
+      "minimumAvailableBytes": 6800072704,
+      "interpretation": "Incomplete: one-worker full suite stopped by audit supervisor at 30 minutes, no completed test totals. SIGTERM/125 is not a product test failure or a pass. Subsequent attempt is separate."
+    },
+    {
+      "label": "unicode-bridge",
+      "command": [
+        "node",
+        "docs/audits/AUD-039-harnesses/unicode-bridge.mjs"
+      ],
+      "startedAtUtc": "2026-11-02T13:28:16.822Z",
+      "endedAtUtc": "2026-11-02T13:28:17.116Z",
+      "exitCode": 0,
+      "wrapperExitCode": 0,
+      "stopReason": null,
+      "sourceBefore": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "sourceAfter": "ceb27b547fba24a2815a934fee93d362a0b8780b44307b0d3f196bc30af2bbc6",
+      "changedFiles": [],
+      "logSha256": "9151bcb3e0d64e4a49e73c79dfc09fbe4a1dd89b9459a87e2fbfa027046499ab",
+      "runnerSha256": "af6d283758d81f2c062bfdb3ad66c55771ec69ae1dc282f08028d23b1bb84cd5",
+      "peakProcessRssBytes": 925696,
+      "minimumAvailableBytes": 7575334912,
+      "interpretation": "Six fresh actual-WASM ASCII/Unicode cases passed bounded public-needle absence checks; no universal memory claim."
+    }
+  ],
+  "fileCoverage": {
+    "inventory": "AUD-039-harnesses/coverage.json",
+    "sha256": "0ebbb73e5b352cb1fcb50092a0fd7b2357347fe92f324281e32a219b885b57e1",
+    "trackedFiles": 1319,
+    "packageEntries": 84,
+    "syntacticDeclarations": 2770,
+    "caveats": [
+      "Four scoped ledgers cover 653 distinct paths: 635 full semantic/static text reads, two exhaustive numeric-data parses, two partial/structural native texts and 14 binary metadata/hash-only paths. Every current src path has an owner; numeric world-map data and protection flag JSON are not ordinary algorithm source.",
+      "The remaining 666 paths belong to the coordinator, including one newly added workflow. coverage.json states actual full or selected current-tool/document reads and structural-only historical review; no claim of semantic review of all archived reports/harnesses.",
+      "All 84 package exports map to reviewed source owners (54 core/root, 15 cards, 15 SSKR). Token inventory finds 2,770 declarations/methods; it is not a full TypeScript AST, exhaustive invocation inventory or branch-coverage measure.",
+      "Historical audit JSON records were structurally parsed and paired with Markdown; hashes, privacy and package inclusion were checked. Their old tests were not rerun en masse and their historical findings are not reopened or declared freshly verified.",
+      "Binary artwork/fonts were inspected through metadata/source placement and relevant generated checks, not a pixel-by-pixel/physical-print audit. Native vendor original archives and optimized erasure/constant-time behavior were not independently certified."
+    ]
+  },
+  "artifactEvidence": [
+    "Fresh dist build is bound to unchanged source through build.command.json and local-only dist-manifest.json: 613 files; manifest SHA-256 688ca0b03cb88dec5c3e8ff39cd594e241b959ef1058021655a636801f977ff2. No fresh standalone Linux executable was built in this baseline.",
+    "Committed generated WASM SHA-256 e8ecd362366c34d5d0e04cc0d2eb96926c599037ae75a69d32a85ef10e76ad67 (168,163 bytes). Static source/integrity pins and actual bounded WASM probes were reviewed/executed; fresh canonical Docker reproduction was not executed.",
+    "31 unreleased commit objects have signature headers and UTC author/committer dates. This inspection is not independent cryptographic verification of every signature. Existing v0.1.0 tag is fc6d1e819300ad8ad00112959db5c6222a7eb1a3.",
+    "Current CI https://github.com/hobby-eng/mnemocode_typescript/actions/runs/41447825957 is successful for configured jobs; skipped full suites are not counted as passed. No current 0.2.0 release assets were attested or signed.",
+    "Independent Python SSKR reference passed official valid quorums and all five deterministic 2-of-3 widths in the current snapshot; the script does not call the WASM engine.",
+    "Fresh npm dry-run file list: 1,230 entries, 613 dist and 539 audit files, 42,354,176 unpacked bytes at that attempt. No ignored evidence or user output/export entry. The listing establishes inclusion; its transient tarball digest is not asserted as a final release package hash after audit text/index edits."
+  ],
+  "contextualObservations": [
+    "Known advisory snapshot: 217 npm resolved versions, zero vulnerabilities at every reported level; Cargo 137 dependencies, zero reported vulnerabilities, paste 1.0.15 flagged unmaintained. paste is a proc-macro build dependency through the CBOR/UR chain; this warning alone is not a validated exploit or an extra code finding.",
+    "Architecture review found domain owners and narrow host platform seams reused across CLI and browser-neutral code. Automated gates report no 50-token duplicates or unreachable production exports in their declared scope. These facts do not prove a globally minimal or optimal implementation.",
+    "Current release routing, help/security/download links and oracle provenance require a coherent repository migration. The explicit README Rust-successor link is intentional. Historical action/tag/source identities require case-by-case preservation or recorded documentation migration, not a global replacement.",
+    "A normal share/phrase QR carries that payload, not hidden dates or wallet metadata. Source QR verification is not itself proof every printed or recompressed page remains readable; actual image/PDF round-trip results are reported separately."
+  ],
+  "referenceMigration": {
+    "guidance": [
+      "Preserve the opening README Rust-successor link. It is the one explicit intentional Rust reference in current user-facing documentation.",
+      "Correct current TS release-signing, attestation, publication, help, downloads, security reporting, issue forms and oracle-provenance routing together. Update their active expectations/fixtures too.",
+      "Separate frozen historical audits/source IDs and old action/release links. Resolve their current ownership and add a migration record if needed; never silently rewrite old snapshot or artifact hashes.",
+      "The reference rows classify intent, not link liveness. A working old URL can now address the other implementation."
+    ],
+    "counts": {
+      "current-typescript": 22,
+      "historical-audit": 44,
+      "historical-reference-review": 12,
+      "intentional-rust": 1
+    },
+    "rows": [
+      {
+        "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
+        "line": 10,
+        "kind": "current-typescript",
+        "sourceSha256": "8b4628fce48b5339c30f2abc9f1956442c4ef8ae2cb3b265835a27a6d1c7a3ed",
+        "text": "If the problem could expose, alter, or incorrectly recover secret material, report it privately through [GitHub private vulnerability reporting](https://github.com/hobby-eng/mnemocode/security/advisories/new) instead of opening a public issue."
+      },
+      {
+        "path": ".github/ISSUE_TEMPLATE/config.yml",
+        "line": 4,
+        "kind": "current-typescript",
+        "sourceSha256": "1d4a4dc76b5dd79b00c298102e49879355efadb55d0afa8419d27dcc7d7e9252",
+        "text": "url: https://github.com/hobby-eng/mnemocode/security/advisories/new"
+      },
+      {
+        "path": "README.md",
+        "line": 10,
+        "kind": "intentional-rust",
+        "sourceSha256": "197620fcb805bd4c4f09f2a6386f3852526a3b17267bc4c9ea1d285d563eb012",
+        "text": "> **This TypeScript version is complete and takes fixes of critical defects only.** MnemoCode continues in Rust: use the Rust version, [hobby-eng/mnemocode](https://github.com/hobby-eng/mnemocode)."
+      },
+      {
+        "path": "SECURITY.md",
+        "line": 5,
+        "kind": "current-typescript",
+        "sourceSha256": "41027adcf036f15eceffc90f82d6687a6a8eb70fa9a3e8785263343cd24dc8c0",
+        "text": "Report a suspected vulnerability privately through the [GitHub private vulnerability reporting form](https://github.com/hobby-eng/mnemocode/security/advisories/new) of this repository. The report goes to the repository owner and maintainers. Do not describe an unfixed security problem in a public issue, discussion, pull request, screenshot or log."
+      },
+      {
+        "path": "SECURITY.md",
+        "line": 14,
+        "kind": "current-typescript",
+        "sourceSha256": "41027adcf036f15eceffc90f82d6687a6a8eb70fa9a3e8785263343cd24dc8c0",
+        "text": "Ordinary defects and feature requests belong in the [public issue forms](https://github.com/hobby-eng/mnemocode/issues/new/choose). If publishing a report could help an attacker or reveal recovery material, report it privately."
+      },
+      {
+        "path": "SECURITY.md",
+        "line": 63,
+        "kind": "current-typescript",
+        "sourceSha256": "41027adcf036f15eceffc90f82d6687a6a8eb70fa9a3e8785263343cd24dc8c0",
+        "text": "The project has automated tests and dated audit records. It has not had an independent security audit by cryptography specialists. The Rust library behind the Shamir shares describes itself as being under community review; the external audit of the C version does not cover it. The [source layout](docs/ARCHITECTURE.md) and the [audit records](https://github.com/hobby-eng/mnemocode/tree/main/docs/audits) describe the limits of the program; they are not a security certificate."
+      },
+      {
+        "path": "docs/CLI.md",
+        "line": 25,
+        "kind": "current-typescript",
+        "sourceSha256": "9f92c64d9119ad2bcc824f53c84db790a7ed0435f4fea12bab4b8c1f37c583f2",
+        "text": "gh attestation verify mnemocode-0.1.0-linux-x64 --repo hobby-eng/mnemocode"
+      },
+      {
+        "path": "docs/HEIRS.md",
+        "line": 31,
+        "kind": "current-typescript",
+        "sourceSha256": "1504010e35f57c9e77e045390844007be3be1a8c67dc2533e1e5a24ecfbb6972",
+        "text": "Download MnemoCode from its release page, `https://github.com/hobby-eng/mnemocode/releases`, and from nowhere else. Choose the file for your computer: the one ending in `win-x64.exe` for Windows, `macos-arm64` for a Mac with an Apple processor, `linux-x64` for Linux."
+      },
+      {
+        "path": "docs/RELEASING.md",
+        "line": 53,
+        "kind": "current-typescript",
+        "sourceSha256": "e3885f1e1e5eec2f40184f550a12edbed5c173bdfb3f15e1eeaac50ffefe2bb1",
+        "text": "The signing computer needs the [GitHub CLI](https://cli.github.com/) with the `gh attestation` command, logged in (`gh auth login`) with the right to edit releases of `hobby-eng/mnemocode`; GnuPG with the release key; and `sha256sum`. The release key's fingerprint:"
+      },
+      {
+        "path": "docs/RELEASING.md",
+        "line": 83,
+        "kind": "current-typescript",
+        "sourceSha256": "e3885f1e1e5eec2f40184f550a12edbed5c173bdfb3f15e1eeaac50ffefe2bb1",
+        "text": "gh release edit v0.1.0 --repo hobby-eng/mnemocode --draft=false"
+      },
+      {
+        "path": "docs/RELEASING.md",
+        "line": 97,
+        "kind": "current-typescript",
+        "sourceSha256": "e3885f1e1e5eec2f40184f550a12edbed5c173bdfb3f15e1eeaac50ffefe2bb1",
+        "text": "gh attestation verify mnemocode-0.1.0-linux-x64 --repo hobby-eng/mnemocode"
+      },
+      {
+        "path": "docs/REMEDIATION.md",
+        "line": 26,
+        "kind": "historical-reference-review",
+        "sourceSha256": "f1ae2e332c7ae478f3fe6df6f22489cb1689312bfaf5eccc5b0cd16d75d66f35",
+        "text": "Standalone pre-release verification is complete for the three tested native targets. The full [CI run](https://github.com/hobby-eng/mnemocode/actions/runs/39722442871) checked signed source `f980236`; all three source-test and real-terminal jobs passed. No confirmed high/medium code finding remains open in the reviewed release paths. This is bounded verification, not a claim that every possible defect or CORE violation has been ruled out."
+      },
+      {
+        "path": "docs/REMEDIATION.md",
+        "line": 36,
+        "kind": "historical-reference-review",
+        "sourceSha256": "f1ae2e332c7ae478f3fe6df6f22489cb1689312bfaf5eccc5b0cd16d75d66f35",
+        "text": "The full Linux job also passed mandatory code/duplication/dead-export/type/lint gates, Rust tests and doctests, build, full self-test, PDF/image/QR export, independent SSKR known answers and the standard dependency audit, which reported no known vulnerabilities. The runtime source, native engine, dependencies, assets, embedded manual/vectors and executable-build inputs remain byte-identical to the three accepted [native executable jobs](https://github.com/hobby-eng/mnemocode/actions/runs/39719696645) at `2e8c249`. Those executables were built and tested on their own OS, including empty-folder execution and real terminal checks; their source identity is preserved rather than relabeled as a later rebuild. The Linux artifact also matches the two local builds byte for byte."
+      },
+      {
+        "path": "docs/REMEDIATION.md",
+        "line": 146,
+        "kind": "historical-reference-review",
+        "sourceSha256": "f1ae2e332c7ae478f3fe6df6f22489cb1689312bfaf5eccc5b0cd16d75d66f35",
+        "text": "[complete CI run](https://github.com/hobby-eng/mnemocode/actions/runs/39291308933)"
+      },
+      {
+        "path": "docs/REMEDIATION.md",
+        "line": 252,
+        "kind": "historical-reference-review",
+        "sourceSha256": "f1ae2e332c7ae478f3fe6df6f22489cb1689312bfaf5eccc5b0cd16d75d66f35",
+        "text": "The [Executable run](https://github.com/hobby-eng/mnemocode/actions/runs/39288756606)"
+      },
+      {
+        "path": "docs/REMEDIATION.md",
+        "line": 291,
+        "kind": "historical-reference-review",
+        "sourceSha256": "f1ae2e332c7ae478f3fe6df6f22489cb1689312bfaf5eccc5b0cd16d75d66f35",
+        "text": "The [complete CI run](https://github.com/hobby-eng/mnemocode/actions/runs/39291308933)"
+      },
+      {
+        "path": "docs/REMEDIATION.md",
+        "line": 314,
+        "kind": "historical-reference-review",
+        "sourceSha256": "f1ae2e332c7ae478f3fe6df6f22489cb1689312bfaf5eccc5b0cd16d75d66f35",
+        "text": "The separate [Executable run](https://github.com/hobby-eng/mnemocode/actions/runs/39288756606)"
+      },
+      {
+        "path": "docs/audits/AUD-002-2026-09-27.json",
+        "line": 16,
+        "kind": "historical-audit",
+        "sourceSha256": "1a5bc67b9780c942c0200bcc959109acabdf80b99101b2d8931eec953b6a7bb2",
+        "text": "\"remote\": \"git@github.com:hobby-eng/mnemocode.git\","
+      },
+      {
+        "path": "docs/audits/AUD-002-2026-09-27.json",
+        "line": 1052,
+        "kind": "historical-audit",
+        "sourceSha256": "1a5bc67b9780c942c0200bcc959109acabdf80b99101b2d8931eec953b6a7bb2",
+        "text": "\"url\": \"https://github.com/hobby-eng/mnemocode/actions/runs/36331656864\","
+      },
+      {
+        "path": "docs/audits/AUD-002-2026-09-27.md",
+        "line": 15,
+        "kind": "historical-audit",
+        "sourceSha256": "481a973af8be8b44ce876434a22dcba7865a76f07dcac8dee93fb5e9053d0627",
+        "text": "- **Reviewed commit:** `b4f334f982044ef586002c9b9816646631b3751e` on `main`, equal to `origin/main` of `git@github.com:hobby-eng/mnemocode.git`. `snapshot.json` records the tree as clean at the stated start, but no timestamped raw `git status --short` log or command companion was retained. The later environment capture records one uncommitted entry after audit evidence collection had begun. The source fingerprint below identifies the reviewed tracked bytes independently of that metadata gap."
+      },
+      {
+        "path": "docs/audits/AUD-006-2026-10-01.json",
+        "line": 467,
+        "kind": "historical-audit",
+        "sourceSha256": "b17195fdce0618f47c5e8ed8b2c3d6ede872a629d0abb40202b665a8eb9d0741",
+        "text": "\"command\": \"gh run list --repo hobby-eng/mnemocode --workflow ci.yml --limit 8; executable.yml equivalent\","
+      },
+      {
+        "path": "docs/audits/AUD-006-2026-10-01.json",
+        "line": 473,
+        "kind": "historical-audit",
+        "sourceSha256": "b17195fdce0618f47c5e8ed8b2c3d6ede872a629d0abb40202b665a8eb9d0741",
+        "text": "\"command\": \"gh run list --repo hobby-eng/mnemocode --workflow executable.yml --commit f93a5787a9a9b345c3fc30517e007a7ffaf208da --limit 10; repeat for 3db995936132a3265333a25f5f6f99258f3b3b9f\","
+      },
+      {
+        "path": "docs/audits/AUD-007-2026-10-02.json",
+        "line": 131,
+        "kind": "historical-audit",
+        "sourceSha256": "a2f2bbb450b3ced7a756522cdf689812b44e505da9359cc325190e8c614fed2c",
+        "text": "\"command\": \"'gh' 'run' 'list' '--repo' 'hobby-eng/mnemocode' '--limit' '8' '--json' 'databaseId,headSha,status,conclusion,workflowName,url'\","
+      },
+      {
+        "path": "docs/audits/AUD-007-2026-10-02.md",
+        "line": 93,
+        "kind": "historical-audit",
+        "sourceSha256": "da80d3a3681a695921d6d30eed8865bc9b9359db84b6d0d331492495af5bcb36",
+        "text": "| `'gh' 'run' 'list' '--repo' 'hobby-eng/mnemocode' '--limit' '8' '--json' 'databaseId,headSha,status,conclusion,workflowName,url'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | passed / 0     | Read-only listing; latest CI and Executable success is c07cf1a1c5d49e9bd9284e329b1ac1e92334a8fb, no current candidate run.                  | `github-runs.log` — `ab079050011eef7d7c29b0127acf81d7335d47f68f43894ad278a91cc616c164`                |"
+      },
+      {
+        "path": "docs/audits/AUD-008-2026-10-06.json",
+        "line": 55,
+        "kind": "historical-audit",
+        "sourceSha256": "b41d7bc666d593d00ee3dee6bad52f0a9532fa0ddbda2f8c4fde46b4dae10376",
+        "text": "\"remote\": \"git@github.com:hobby-eng/mnemocode.git\","
+      },
+      {
+        "path": "docs/audits/AUD-010-harnesses/build-docs.mjs",
+        "line": 160,
+        "kind": "historical-audit",
+        "sourceSha256": "baca4066cda14293b79edf72f6c6b98a779397c68d2f1947f30a7d8f050e33a6",
+        "text": "const TAG_BASE = \"https://github.com/hobby-eng/mnemocode/blob/v0.1.0/\";"
+      },
+      {
+        "path": "docs/audits/AUD-014-2026-10-12.json",
+        "line": 239,
+        "kind": "historical-audit",
+        "sourceSha256": "e0c12e6b3b1e2229e8c78c6dd0d5f4c313c562e0d66e2de34ac0bc71e5a70120",
+        "text": "\"repos/hobby-eng/mnemocode/private-vulnerability-reporting\""
+      },
+      {
+        "path": "docs/audits/AUD-014-2026-10-12.md",
+        "line": 113,
+        "kind": "historical-audit",
+        "sourceSha256": "96e9545c71d9d762d4da709e393804fa899cb421a65f226092f924a5bdbd6fd9",
+        "text": "| resumed-private-reporting | 0 | 4.688 | `gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting` |"
+      },
+      {
+        "path": "docs/audits/AUD-018-2026-10-12.json",
+        "line": 185,
+        "kind": "historical-audit",
+        "sourceSha256": "1289d5b297ca35cc3693faefbb8aa4cf483568c507578f6a7c823af14b97827e",
+        "text": "\"command\": \"gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting\","
+      },
+      {
+        "path": "docs/audits/AUD-018-2026-10-12.md",
+        "line": 94,
+        "kind": "historical-audit",
+        "sourceSha256": "9219c108ad7ca813f9046e009681e175f845ade5f4227670918d9d167e079647",
+        "text": "| private-reporting | 0 | GitHub private vulnerability reporting: enabled (read-only API) | `gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting` |"
+      },
+      {
+        "path": "docs/audits/AUD-018-harnesses/run-checks.sh",
+        "line": 30,
+        "kind": "historical-audit",
+        "sourceSha256": "75aac1de83f5644d9e234d92e96e791d30dc274a70e02729ea0ce0f8fb62ea1b",
+        "text": "run $A check private-reporting gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting"
+      },
+      {
+        "path": "docs/audits/AUD-019-2026-10-13.json",
+        "line": 369,
+        "kind": "historical-audit",
+        "sourceSha256": "c21e14f30ca1f485f6f9d370103c85548ad3b0ff8159763b26da1b77b06518a4",
+        "text": "\"command\": \"gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting\","
+      },
+      {
+        "path": "docs/audits/AUD-019-2026-10-13.md",
+        "line": 96,
+        "kind": "historical-audit",
+        "sourceSha256": "b73a22833429c948ac3c5e3985564a21ebc0b5fda3f6bcef556228594963f07d",
+        "text": "| private-reporting | 0 | GitHub private vulnerability reporting: enabled (read-only API) | `gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting` |"
+      },
+      {
+        "path": "docs/audits/AUD-019-harnesses/run-checks.sh",
+        "line": 26,
+        "kind": "historical-audit",
+        "sourceSha256": "c830c20fce9d88ed43e67c4e07b19b7ab5becbbe9ae5ffdf5ef82fc7e62daa24",
+        "text": "run $A check private-reporting gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting"
+      },
+      {
+        "path": "docs/audits/AUD-021-2026-10-13.json",
+        "line": 342,
+        "kind": "historical-audit",
+        "sourceSha256": "bb90c5dbcd30d41794809163730f3771f141f635ce0cdfac9c535f2082502c19",
+        "text": "\"https://github.com/hobby-eng/mnemocode/actions/runs/38387222400\","
+      },
+      {
+        "path": "docs/audits/AUD-021-2026-10-13.json",
+        "line": 343,
+        "kind": "historical-audit",
+        "sourceSha256": "bb90c5dbcd30d41794809163730f3771f141f635ce0cdfac9c535f2082502c19",
+        "text": "\"https://github.com/hobby-eng/mnemocode/actions/runs/38387222298\""
+      },
+      {
+        "path": "docs/audits/AUD-021-2026-10-13.md",
+        "line": 135,
+        "kind": "historical-audit",
+        "sourceSha256": "5504cc1a9fb7e447d9210ec58823fe5c100dc74f2ff515b721493425c3812743",
+        "text": "\"https://github.com/hobby-eng/mnemocode/actions/runs/38387222400\","
+      },
+      {
+        "path": "docs/audits/AUD-021-2026-10-13.md",
+        "line": 136,
+        "kind": "historical-audit",
+        "sourceSha256": "5504cc1a9fb7e447d9210ec58823fe5c100dc74f2ff515b721493425c3812743",
+        "text": "\"https://github.com/hobby-eng/mnemocode/actions/runs/38387222298\""
+      },
+      {
+        "path": "docs/audits/AUD-021-2026-10-13.md",
+        "line": 186,
+        "kind": "historical-audit",
+        "sourceSha256": "5504cc1a9fb7e447d9210ec58823fe5c100dc74f2ff515b721493425c3812743",
+        "text": "Remote HEAD evidence: [executable workflow](https://github.com/hobby-eng/mnemocode/actions/runs/38387222400) and [CI](https://github.com/hobby-eng/mnemocode/actions/runs/38387222298) both failed Windows PTY. Linux/macOS jobs passed on HEAD; these are not current dirty-source CI results. No remote workflow was dispatched by this audit."
+      },
+      {
+        "path": "docs/audits/AUD-021-harnesses/finish.py",
+        "line": 196,
+        "kind": "historical-audit",
+        "sourceSha256": "ae33d96e011d811f6fabe9004ac2e3392b77fc577ae05aa8e28166adfafada41",
+        "text": "\"Remote HEAD evidence: [executable workflow](https://github.com/hobby-eng/mnemocode/actions/runs/38387222400) and [CI](https://github.com/hobby-eng/mnemocode/actions/runs/38387222298) both failed Windows PTY. Linux/macOS jobs passed on HEAD; these are not current dirty-source CI results. No remote workflow was dispatched by this audit.\", \"\","
+      },
+      {
+        "path": "docs/audits/AUD-030-2026-10-15.json",
+        "line": 25453,
+        "kind": "historical-audit",
+        "sourceSha256": "f48a49c4fe73884bc9c85908ecbe2d970298957e10c21c1026c7a37914cb831b",
+        "text": "\"name\": \"export const README_URL = \\\"https://github.com/hobby-eng/mnemocode\\\";\","
+      },
+      {
+        "path": "docs/audits/AUD-030-2026-10-15.json",
+        "line": 51811,
+        "kind": "historical-audit",
+        "sourceSha256": "f48a49c4fe73884bc9c85908ecbe2d970298957e10c21c1026c7a37914cb831b",
+        "text": "\"repos/hobby-eng/mnemocode/private-vulnerability-reporting\""
+      },
+      {
+        "path": "docs/audits/AUD-030-2026-10-15.json",
+        "line": 51838,
+        "kind": "historical-audit",
+        "sourceSha256": "f48a49c4fe73884bc9c85908ecbe2d970298957e10c21c1026c7a37914cb831b",
+        "text": "\"repos/hobby-eng/mnemocode\","
+      },
+      {
+        "path": "docs/audits/AUD-030-2026-10-15.md",
+        "line": 235,
+        "kind": "historical-audit",
+        "sourceSha256": "2d3240c54ad2ae67a50c11313d71f95829691013f4765902b082f9bb7ae5050b",
+        "text": "| reporting-channel-enabled | gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting | 0 | 26b3426b2593763c96d0890b4a77a0bbf66d13fc512b0c6b138a23c290f30a2a |"
+      },
+      {
+        "path": "docs/audits/AUD-030-2026-10-15.md",
+        "line": 236,
+        "kind": "historical-audit",
+        "sourceSha256": "2d3240c54ad2ae67a50c11313d71f95829691013f4765902b082f9bb7ae5050b",
+        "text": "| repository-reporting-channel | gh api repos/hobby-eng/mnemocode --jq {full_name,visibility,security_and_analysis} | 0 | 5c9bd20b428f186df967236ccfceb07f4ecd1616b12478825bddb94ac08c51ae |"
+      },
+      {
+        "path": "docs/audits/AUD-031-2026-10-15.json",
+        "line": 110001,
+        "kind": "historical-audit",
+        "sourceSha256": "e5452b35bc164c125b0a84ba6a754eed7dc88fad8feb68aeecb61e9728b92b06",
+        "text": "\"name\": \"export const README_URL = \\\"https://github.com/hobby-eng/mnemocode\\\";\","
+      },
+      {
+        "path": "docs/audits/AUD-031-2026-10-15.json",
+        "line": 180864,
+        "kind": "historical-audit",
+        "sourceSha256": "e5452b35bc164c125b0a84ba6a754eed7dc88fad8feb68aeecb61e9728b92b06",
+        "text": "\"name\": \"export const README_URL = \\\"https://github.com/hobby-eng/mnemocode\\\";\","
+      },
+      {
+        "path": "docs/audits/AUD-031-2026-10-15.json",
+        "line": 199028,
+        "kind": "historical-audit",
+        "sourceSha256": "e5452b35bc164c125b0a84ba6a754eed7dc88fad8feb68aeecb61e9728b92b06",
+        "text": "\"text\": \"export const README_URL = \\\"https://github.com/hobby-eng/mnemocode\\\";\""
+      },
+      {
+        "path": "docs/audits/AUD-031-2026-10-15.json",
+        "line": 243840,
+        "kind": "historical-audit",
+        "sourceSha256": "e5452b35bc164c125b0a84ba6a754eed7dc88fad8feb68aeecb61e9728b92b06",
+        "text": "\"name\": \"export const README_URL = \\\"https://github.com/hobby-eng/mnemocode\\\";\","
+      },
+      {
+        "path": "docs/audits/AUD-031-2026-10-15.json",
+        "line": 267676,
+        "kind": "historical-audit",
+        "sourceSha256": "e5452b35bc164c125b0a84ba6a754eed7dc88fad8feb68aeecb61e9728b92b06",
+        "text": "\"repos/hobby-eng/mnemocode/private-vulnerability-reporting\","
+      },
+      {
+        "path": "docs/audits/AUD-032-2026-10-16.json",
+        "line": 35,
+        "kind": "historical-audit",
+        "sourceSha256": "57fcce0a9771a978b05f75a24772bb2ca13da095106c24a335e8c80d68c5daa9",
+        "text": "\"repository\": \"https://github.com/hobby-eng/mnemocode\","
+      },
+      {
+        "path": "docs/audits/AUD-032-2026-10-16.json",
+        "line": 84738,
+        "kind": "historical-audit",
+        "sourceSha256": "57fcce0a9771a978b05f75a24772bb2ca13da095106c24a335e8c80d68c5daa9",
+        "text": "\"name\": \"export const README_URL = \\\"https://github.com/hobby-eng/mnemocode\\\";\","
+      },
+      {
+        "path": "docs/audits/AUD-032-2026-10-16.json",
+        "line": 116056,
+        "kind": "historical-audit",
+        "sourceSha256": "57fcce0a9771a978b05f75a24772bb2ca13da095106c24a335e8c80d68c5daa9",
+        "text": "\"hobby-eng/mnemocode\","
+      },
+      {
+        "path": "docs/audits/AUD-032-2026-10-16.json",
+        "line": 116759,
+        "kind": "historical-audit",
+        "sourceSha256": "57fcce0a9771a978b05f75a24772bb2ca13da095106c24a335e8c80d68c5daa9",
+        "text": "\"set -e; printf \\\"UTC \\\"; date -u +%FT%TZ; printf \\\"Release metadata\\\\n\\\"; gh api \\\"repos/hobby-eng/mnemocode/releases?per_page=5\\\" --jq \\\"map({tag_name,draft,prerelease,published_at,target_commitish,html_url})\\\"; printf \\\"Recent Actions metadata\\\\n\\\"; gh run list --repo hobby-eng/mnemocode --limit 5 --json databaseId,headSha,event,conclusion,workflowName,url,createdAt; printf \\\"Private vulnerability reporting\\\\n\\\"; gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting; printf \\\"Tags\\\\n\\\"; git --no-pager tag --list; printf \\\"Commit dates\\\\n\\\"; git --no-pager log --format=\\\"%H %aI %cI\\\" --all -20\""
+      },
+      {
+        "path": "docs/audits/AUD-032-2026-10-16.md",
+        "line": 109,
+        "kind": "historical-audit",
+        "sourceSha256": "227f8c62271a4f902244d9a361b8e325c94531a1f5936c2964c814b677d5e9a2",
+        "text": "| `current-ci-scope` | 0 | `gh run view 38791616213 --repo hobby-eng/mnemocode --json \"databaseId,headSha,event,conclusion,jobs,url\"` | `a570329f7843114e6449b185ec6aefe61625090e2fa5337d6c72b442b6134a98` |"
+      },
+      {
+        "path": "docs/audits/AUD-032-2026-10-16.md",
+        "line": 125,
+        "kind": "historical-audit",
+        "sourceSha256": "227f8c62271a4f902244d9a361b8e325c94531a1f5936c2964c814b677d5e9a2",
+        "text": "| `remote-metadata` | 0 | `bash -c \"set -e; printf \\\"UTC \\\"; date -u +%FT%TZ; printf \\\"Release metadata\\\\n\\\"; gh api \\\"repos/hobby-eng/mnemocode/releases?per_page=5\\\" --jq \\\"map({tag_name,draft,prerelease,published_at,target_commitish,html_url})\\\"; printf \\\"Recent Actions metadata\\\\n\\\"; gh run list --repo hobby-eng/mnemocode --limit 5 --json databaseId,headSha,event,conclusion,workflowName,url,createdAt; printf \\\"Private vulnerability reporting\\\\n\\\"; gh api repos/hobby-eng/mnemocode/private-vulnerability-reporting; printf \\\"Tags\\\\n\\\"; git --no-pager tag --list; printf \\\"Commit dates\\\\n\\\"; git --no-pager log --format=\\\"%H %aI %cI\\\" --all -20\"` | `a07eaed70f241bb3c778357b8c432de7e861e9f01dca27eaed2cec9849b6ea52` |"
+      },
+      {
+        "path": "docs/audits/AUD-032-2026-10-16.md",
+        "line": 150,
+        "kind": "historical-audit",
+        "sourceSha256": "227f8c62271a4f902244d9a361b8e325c94531a1f5936c2964c814b677d5e9a2",
+        "text": "Read-only remote metadata shows no release or tag. [Current CI](https://github.com/hobby-eng/mnemocode/actions/runs/38791616213) is successful fast push CI at the exact HEAD, not full release CI. All 131 HEAD ancestors have signature headers and UTC author/committer offsets; independent cryptographic verification was not performed. Release signing, attestations and all three final platform assets still require their authorized normal process."
+      },
+      {
+        "path": "docs/audits/AUD-032-harnesses/report.mjs",
+        "line": 133,
+        "kind": "historical-audit",
+        "sourceSha256": "2d55b10fa1681e45116e47cf0167f9c04af6cde9513086fcffa1ba8b708051cf",
+        "text": "repository: \"https://github.com/hobby-eng/mnemocode\","
+      },
+      {
+        "path": "docs/audits/AUD-032-harnesses/report.mjs",
+        "line": 298,
+        "kind": "historical-audit",
+        "sourceSha256": "2d55b10fa1681e45116e47cf0167f9c04af6cde9513086fcffa1ba8b708051cf",
+        "text": "\"Read-only remote metadata shows no release or tag. [Current CI](https://github.com/hobby-eng/mnemocode/actions/runs/38791616213) is successful fast push CI at the exact HEAD, not full release CI. All 131 HEAD ancestors have signature headers and UTC author/committer offsets; independent cryptographic verification was not performed. Release signing, attestations and all three final platform assets still require their authorized normal process.\","
+      },
+      {
+        "path": "docs/audits/AUD-034-2026-10-18.json",
+        "line": 1040,
+        "kind": "historical-audit",
+        "sourceSha256": "135aac29086642f822fe73380cb4f384157b46ffc681ad31af0c996c84481029",
+        "text": "\"set -euo pipefail; git fetch --no-tags origin; git rev-list --left-right --count HEAD...origin/main; gh api \\\"repos/hobby-eng/mnemocode/releases?per_page=5\\\" --jq \\\"map({tag_name,draft,prerelease,published_at,target_commitish,html_url})\\\"; gh run list --repo hobby-eng/mnemocode --limit 5 --json databaseId,headSha,event,conclusion,workflowName,url,createdAt; git tag --list\""
+      },
+      {
+        "path": "docs/audits/AUD-035-2026-10-18.json",
+        "line": 3272,
+        "kind": "historical-audit",
+        "sourceSha256": "d79e2700a14cd0e47d7769a5850831cc8e584fdb626fdce55770392c46aaefbb",
+        "text": "\"hobby-eng/mnemocode\","
+      },
+      {
+        "path": "docs/releases/v0.1.0.md",
+        "line": 3,
+        "kind": "historical-reference-review",
+        "sourceSha256": "1dd584b8db37f6c79993f0a21f8fe86af0dabf8123517af3e9bd87147d9a85d2",
+        "text": "who develop MnemoCode, is in [CHANGELOG.md](https://github.com/hobby-eng/mnemocode/blob/v0.1.0/CHANGELOG.md)."
+      },
+      {
+        "path": "docs/releases/v0.1.0.md",
+        "line": 14,
+        "kind": "historical-reference-review",
+        "sourceSha256": "1dd584b8db37f6c79993f0a21f8fe86af0dabf8123517af3e9bd87147d9a85d2",
+        "text": "- The `SHA256SUMS` of every release is signed with the maintainer's OpenPGP key, fingerprint `28FC51B1DB80DF2101128CB30EDD4814591DD095`, which GitHub also shows at https://github.com/hobby-eng.gpg. A tag creates a draft release, which the maintainer checks and signs on their own computer with `scripts/sign-release.mjs` before publishing it with `SHA256SUMS.asc` and `RELEASE-SIGNING-KEY.asc`; [Releasing](https://github.com/hobby-eng/mnemocode/blob/v0.1.0/docs/RELEASING.md) describes the steps."
+      },
+      {
+        "path": "docs/releases/v0.1.0.md",
+        "line": 17,
+        "kind": "historical-reference-review",
+        "sourceSha256": "1dd584b8db37f6c79993f0a21f8fe86af0dabf8123517af3e9bd87147d9a85d2",
+        "text": "- The README gives an overview. The [command-line reference](https://github.com/hobby-eng/mnemocode/blob/v0.1.0/docs/CLI.md) holds the command examples and every option."
+      },
+      {
+        "path": "docs/releases/v0.1.0.md",
+        "line": 86,
+        "kind": "historical-reference-review",
+        "sourceSha256": "1dd584b8db37f6c79993f0a21f8fe86af0dabf8123517af3e9bd87147d9a85d2",
+        "text": "- `recover-word`, `recover-date` and `sskr-combine` save their candidates with `--candidates-file` as a [candidate list](https://github.com/hobby-eng/mnemocode/blob/v0.1.0/docs/CANDIDATES.md) for the Discovery Scanner of the multi-chain wallet tools: encrypted with age to the one-time key the Scanner shows, or with a passphrase; without encryption only with `--plaintext-candidates`. Entry 6 of the menu offers it. The search, the list and its encryption are host-neutral modules that the Wallet Deriver and the Scanner compile unchanged."
+      },
+      {
+        "path": "docs/releases/v0.1.0.md",
+        "line": 133,
+        "kind": "historical-reference-review",
+        "sourceSha256": "1dd584b8db37f6c79993f0a21f8fe86af0dabf8123517af3e9bd87147d9a85d2",
+        "text": "- `encode --heir-sheet` saves one sheet for heirs, to print on both sides in A5 or A6 (`--heir-sheet-size`): what the backup is, room for a hint written by hand, the steps in the menu, and the basics for someone new to wallets. It holds no secret: no codes, no dates, no fingerprint and no places. [A guide for heirs](https://github.com/hobby-eng/mnemocode/blob/v0.1.0/docs/HEIRS.md) explains the same in more detail."
+      },
+      {
+        "path": "docs/releases/v0.1.0.md",
+        "line": 249,
+        "kind": "historical-reference-review",
+        "sourceSha256": "1dd584b8db37f6c79993f0a21f8fe86af0dabf8123517af3e9bd87147d9a85d2",
+        "text": "- Each part of the library, such as the date search, the share set or the wallet check, has an entry point of its own without Node.js code, such as `mnemocode/core/date-search`. Another program, a browser page for example, takes only the part it needs and passes what only it has, such as its PBKDF2 or its SSKR library. A long search, or the assessment of a share repair, stops at the host's signal and gives what it found before the stop, marked as stopped, rather than failing. [Source layout](https://github.com/hobby-eng/mnemocode/blob/v0.1.0/docs/ARCHITECTURE.md#modules-for-other-hosts) lists the parts."
+      },
+      {
+        "path": "scripts/rust-parity.mjs",
+        "line": 74,
+        "kind": "current-typescript",
+        "sourceSha256": "e888a7af5111fe0f3708ead558cb857959fccca1d4af741b9d470bbd4a84e7e8",
+        "text": "repository: \"hobby-eng/mnemocode\","
+      },
+      {
+        "path": "scripts/sign-release.mjs",
+        "line": 157,
+        "kind": "current-typescript",
+        "sourceSha256": "7ffb13b4da6db57e115567dd5fd9a29c48dcbb6a7d2f2cd2307c2d82525faaa4",
+        "text": "const REPOSITORY = \"hobby-eng/mnemocode\";"
+      },
+      {
+        "path": "scripts/terminal_context_checks.py",
+        "line": 215,
+        "kind": "current-typescript",
+        "sourceSha256": "ee613ede1425df139c97beb5e0ba2d7c3364d0fc9186aea406956c09d43942c4",
+        "text": "more = \"More: https://github.com/hobby-eng/mnemocode#cloud-folders\""
+      },
+      {
+        "path": "scripts/terminal_summary_checks.py",
+        "line": 32,
+        "kind": "current-typescript",
+        "sourceSha256": "0238d76136711f9e70a63927fa1933bddd20b61baea137db63c0bc403cfcccaa",
+        "text": "CLOUD_MORE = \"More: https://github.com/hobby-eng/mnemocode#cloud-folders\""
+      },
+      {
+        "path": "src/cli/terminal.ts",
+        "line": 412,
+        "kind": "current-typescript",
+        "sourceSha256": "e1be805d5775115c59a53bf131e4a136bceb71580e3c88b8f2fec08d20fabd85",
+        "text": "export const README_URL = \"https://github.com/hobby-eng/mnemocode\";"
+      },
+      {
+        "path": "test/date-search.test.ts",
+        "line": 322,
+        "kind": "current-typescript",
+        "sourceSha256": "382c9fc310e421d3ed94048ae8f2427cd1898e122315c0ef0db5216b05c3844c",
+        "text": "\"err More: https://github.com/hobby-eng/mnemocode#exact-local-recovery-checks\","
+      },
+      {
+        "path": "test/date-search.test.ts",
+        "line": 370,
+        "kind": "current-typescript",
+        "sourceSha256": "382c9fc310e421d3ed94048ae8f2427cd1898e122315c0ef0db5216b05c3844c",
+        "text": "\"err More: https://github.com/hobby-eng/mnemocode#exact-local-recovery-checks\","
+      },
+      {
+        "path": "test/encode-result-visibility.test.ts",
+        "line": 85,
+        "kind": "current-typescript",
+        "sourceSha256": "b0df7f319bd498e50e17b46550728871e8c40a289eda65a2a7f16f014c58d97e",
+        "text": "\"More: https://github.com/hobby-eng/mnemocode#transformation-modes\","
+      },
+      {
+        "path": "test/heir-sheet.test.ts",
+        "line": 75,
+        "kind": "current-typescript",
+        "sourceSha256": "0402fdeee3761d6a06b8af4fbe0ba500bb269f590d44fe8e0adc682a19ef196a",
+        "text": "expect(words).toContain(\"https://github.com/hobby-eng/mnemocode,\");"
+      },
+      {
+        "path": "test/heir-sheet.test.ts",
+        "line": 195,
+        "kind": "current-typescript",
+        "sourceSha256": "0402fdeee3761d6a06b8af4fbe0ba500bb269f590d44fe8e0adc682a19ef196a",
+        "text": "const repository = \"https://github.com/hobby-eng/mnemocode\";"
+      },
+      {
+        "path": "test/private-summary.test.ts",
+        "line": 50,
+        "kind": "current-typescript",
+        "sourceSha256": "ce6338f6909d447d0c89b2dfa520fbbddc07c7bdb58badf8d88b2604f44f7bff",
+        "text": "const SWAP_MORE = \"More: https://github.com/hobby-eng/mnemocode#unencrypted-swap\";"
+      },
+      {
+        "path": "test/private-summary.test.ts",
+        "line": 152,
+        "kind": "current-typescript",
+        "sourceSha256": "ce6338f6909d447d0c89b2dfa520fbbddc07c7bdb58badf8d88b2604f44f7bff",
+        "text": "\"More: https://github.com/hobby-eng/mnemocode#cloud-folders\","
+      }
+    ]
+  },
+  "hypothesisDisposition": [
+    "SSKR-H01: six fresh actual-WASM public Unicode/ASCII cases left none of the selected public share-text window in linear memory after return/refusal. Hypothesis not reproduced, no finding. This bounded negative check is not universal erasure proof.",
+    "SSKR-H02: source cap of 256 hidden coordinates identified, but no supported concrete valid fixture with an independently complete expected candidate set was established. Unresolved hypothesis, not a finding or known omitted recovery result.",
+    "SSKR-H03 was narrowed to AUD-039-SEC002: ordinary source-level absence of a cleanup owner only. Post-return binary residue remains unproved.",
+    "Failures requiring trusted fill/set/DataView/Drop/runtime operations to fail were excluded under CORE-54. Trusted installed-code/manifest substitution and hostile pre-initialization are trust-model limits, not malformed-share attacks.",
+    "No automatic digest-checked false phrase, arbitrary secret disclosure, remote execution or high/critical bug was established by these probes."
+  ],
+  "independentReview": {
+    "kind": "read-only scoped review, separate skeptical validation and completeness review",
+    "simultaneousReviewersMaximum": 2,
+    "distinctReviewers": 5,
+    "reviewerModel": null,
+    "reviewerReasoningEffort": null,
+    "evidenceFiles": [
+      {
+        "path": "docs/audits/AUD-039-evidence/review-core.json",
+        "localOnly": true,
+        "sha256": "a834b2632119726cd1dac159a1ea5469b01cec099235e77c7897ede707a0d72f"
+      },
+      {
+        "path": "docs/audits/AUD-039-evidence/review-cli.json",
+        "localOnly": true,
+        "sha256": "fbcaa97777cc769ffd50a4d3d2f4fa37fe965ccfb0c2fdaeb41f5aa69c898237"
+      },
+      {
+        "path": "docs/audits/AUD-039-evidence/review-cards.json",
+        "localOnly": true,
+        "sha256": "e1bc636021f65d472cdb00f26aaa4f57dbf15f3f7e64276ab421607e18b6054c"
+      },
+      {
+        "path": "docs/audits/AUD-039-evidence/review-sskr.json",
+        "localOnly": true,
+        "sha256": "2580d59452ba10853f71c8b56cd3d9bdba0db0971172c3d80f590bc3a43e2239"
+      },
+      {
+        "path": "docs/audits/AUD-039-evidence/review-skeptic.json",
+        "localOnly": true,
+        "sha256": "2119fcbee309b32bd7ff3f0613e97e6ce582822725c020aebce0c2f202e2e9e6"
+      }
+    ]
+  }
+}
