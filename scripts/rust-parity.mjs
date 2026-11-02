@@ -58,13 +58,15 @@ const changed = [];
 mkdirSync(output, { recursive: true });
 for (const name of recorders()) {
   const recorder = await import(pathToFileURL(join(RECORDERS, name)).href);
+  recorded[name] = sha256(readFileSync(join(RECORDERS, name)));
+  // A part of another recorder, such as recovery-shares.mjs, records nothing of its own.
+  if (recorder.record === undefined) continue;
   const bytes = serialize(await recorder.record(ts));
   const path = join(output, recorder.FILE);
   if (check && (!existsSync(path) || readFileSync(path, "utf8") !== bytes))
     changed.push(recorder.FILE);
   if (!check) writeFileSync(path, bytes);
   outputs[recorder.FILE] = sha256(bytes);
-  recorded[name] = sha256(readFileSync(join(RECORDERS, name)));
 }
 const provenance = serialize({
   about:

@@ -100,7 +100,9 @@ function note(page, step) {
 
 /** Makes every page of this build tell what it is asked to draw. */
 function watchPages() {
-  const { drawText, drawImage } = PDFPage.prototype;
+  const { prototype } = PDFPage;
+  const drawText = Object.getOwnPropertyDescriptor(prototype, "drawText").value;
+  const drawImage = Object.getOwnPropertyDescriptor(prototype, "drawImage").value;
   PDFPage.prototype.drawText = function drawTextWatched(text, options) {
     const { x, y, size, color } = options;
     const rgb = [color?.red ?? 0, color?.green ?? 0, color?.blue ?? 0].map(rounded);

@@ -6,6 +6,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
+/** The order of `Array.prototype.sort` without a comparison: by UTF-16 code units. */
+const inOrder = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 /** The file this recorder writes in vectors/ts-0.1.0/. */
 export const FILE = "refusals-v1.json";
 /** Where a catalog begins, with its namespace. */
@@ -30,7 +33,7 @@ export async function record(ts) {
   const names = readdirSync(folder, { recursive: true }).filter((name) => name.endsWith(".ts"));
   const codes = new Set();
   let catalogs = 0;
-  for (const name of names.sort()) {
+  for (const name of names.sort(inOrder)) {
     const text = readFileSync(join(folder, name), "utf8");
     for (const match of text.matchAll(CATALOG)) {
       catalogs += 1;
@@ -38,5 +41,5 @@ export async function record(ts) {
       for (const code of codesOf(match[1], body)) codes.add(code);
     }
   }
-  return { catalogs, codes: [...codes].sort() };
+  return { catalogs, codes: [...codes].sort(inOrder) };
 }
