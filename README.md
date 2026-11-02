@@ -7,7 +7,7 @@
 [![Build provenance: GitHub attestations](https://img.shields.io/badge/build%20provenance-GitHub%20attestations-2ea44f)](https://github.com/hobby-eng/mnemocode_typescript/attestations)
 
 > [!IMPORTANT]
-> **This TypeScript version is complete and takes fixes of critical defects only.** MnemoCode continues in Rust: use the Rust version, [hobby-eng/mnemocode](https://github.com/hobby-eng/mnemocode).
+> **This TypeScript version is no longer developed: it takes fixes of critical defects only.** MnemoCode continues in Rust: use the Rust version, [hobby-eng/mnemocode](https://github.com/hobby-eng/mnemocode).
 
 This README describes version 0.1.1, the last release of the TypeScript version.
 
